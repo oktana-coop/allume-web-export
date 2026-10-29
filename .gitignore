@@ -1,0 +1,13 @@
+# SwiftPM
+.build/
+.swiftpm/
+
+# Private example exports, copied from the POC. Never commit them.
+/example-boards/
+
+# Generated sites
+/out/
+
+# macOS and editors
+.DS_Store
+.idea/
