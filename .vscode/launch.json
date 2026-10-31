@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:allume-web-export}",
+      "name": "Debug allume-web-export",
+      "target": "allume-web-export",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug allume-web-export"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:allume-web-export}",
+      "name": "Release allume-web-export",
+      "target": "allume-web-export",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release allume-web-export"
+    }
+  ]
+}
