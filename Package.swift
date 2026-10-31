@@ -10,13 +10,14 @@ let package = Package(
         .iOS(.v17),
     ],
     products: [
-        .library(name: "AllumeWeb", targets: ["AllumeWeb"]),
+        .library(name: "AllumeWeb", targets: ["AllumeWeb", "AllumeWebModels"]),
         .executable(name: "allume-web-export", targets: ["AllumeWebCLI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.8.0"),
     ],
     targets: [
+        .target(name: "AllumeWebModels"),
         .target(name: "AllumeWeb"),
         .executableTarget(
             name: "AllumeWebCLI",
@@ -25,5 +26,6 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
+        .testTarget(name: "AllumeWebModelsTests", dependencies: ["AllumeWebModels"]),
     ]
 )
