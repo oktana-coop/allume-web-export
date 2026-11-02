@@ -15,7 +15,9 @@ import Testing
         ],
         people: [:]
       )
+
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "note"))
+
       #expect(parents.map(\.rawValue) == ["near", "far"])
     }
 
@@ -25,7 +27,9 @@ import Testing
         documents: [makeBoard("root", commentThread: ["comment"]), makeComment("comment")],
         people: [:]
       )
+
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "comment"))
+
       #expect(parents.map(\.rawValue) == ["root"])
     }
 
@@ -35,7 +39,9 @@ import Testing
         documents: [makeBoard("root", cards: ["note", "note"]), makeNote("note")],
         people: [:]
       )
+
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "note"))
+
       #expect(parents.map(\.rawValue) == ["root"])
     }
   }
@@ -53,7 +59,9 @@ import Testing
         ],
         people: [:]
       )
+
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "haskell"))
+
       #expect(ancestors.map(\.rawValue) == ["root", "languages"])
     }
 
@@ -70,7 +78,9 @@ import Testing
         ],
         people: [:]
       )
+
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "monads"))
+
       #expect(ancestors.map(\.rawValue) == ["root", "languages", "haskell"])
     }
 
@@ -85,7 +95,9 @@ import Testing
         ],
         people: [:]
       )
+
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "c"))
+
       #expect(ancestors.map(\.rawValue) == ["root", "b"])
     }
 
@@ -102,7 +114,9 @@ import Testing
         ],
         people: [:]
       )
+
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "z"))
+
       #expect(ancestors.map(\.rawValue) == ["root", "p", "x"])
     }
 
@@ -116,7 +130,9 @@ import Testing
         ],
         people: [:]
       )
+
       let hierarchy = contents.hierarchy
+
       #expect(hierarchy.primaryAncestors(of: Document.ID(rawValue: "root")).isEmpty)
       #expect(
         hierarchy.primaryAncestors(of: Document.ID(rawValue: "a")).map(\.rawValue) == ["root"])
