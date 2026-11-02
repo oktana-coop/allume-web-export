@@ -1,85 +1,94 @@
 public struct Hierarchy: Equatable, Sendable {
-  /// Each document's parents: the boards that have it as a card or a comment.
+  /// Each document's parents: the boards that have it as a card or a comment, in breadth-first order
+  /// from the root.
   private let parentIDs: [Document.ID: [Document.ID]]
-  /// A board's primary ancestors, from the root down to its primary parent. That's the board that
-  /// first reaches it on a breadth-first walk from the root, so it's one of the closest to the root.
+  /// Each board's primary ancestors, from the root down to its primary parent: the first of its
+  /// parents in breadth-first order, so one of the closest to the root.
   private let primaryAncestorIDs: [Document.ID: [Document.ID]]
 
   init(rootID: Document.ID, documents: [Document]) throws(InvalidContentsError) {
-    let boards: [Document.Board] = documents.compactMap { document in
-      guard case .board(let board) = document else {
-        return nil
-      }
-      return board
-    }
     let boardsByID = Dictionary(
-      boards.map { board in (board.id, board) },
+      documents.compactMap { document -> (Document.ID, Document.Board)? in
+        guard case .board(let board) = document else {
+          return nil
+        }
+        return (board.id, board)
+      },
       uniquingKeysWith: { first, _ in first }
     )
 
-    let primaryAncestorIDs = Self.primaryAncestorIDs(rootID: rootID, boards: boardsByID)
-
-    let childParentPairs = boards.flatMap { board in
-      board.allCards.map { card in (childID: card.documentID, parentID: board.id) }
+    let orderedBoards = Self.orderedBoards(rootID: rootID, boardsByID: boardsByID)
+    let childParentPairs = orderedBoards.flatMap { entry in
+      entry.board.allCards.map { card in (childID: card.documentID, parentID: entry.board.id) }
     }
 
-    let reachableIDs = Set(
-      childParentPairs
-        .filter { pair in primaryAncestorIDs[pair.parentID] != nil }
-        .map { pair in pair.childID }
-    ).union([rootID])
-    if let unreachable = documents.first(where: { document in
-      !reachableIDs.contains(document.id)
+    let rootDescendantIDs = Set(childParentPairs.map { pair in pair.childID })
+    if let outsider = documents.first(where: { document in
+      document.id != rootID && !rootDescendantIDs.contains(document.id)
     }) {
-      throw .unreachableDocument(unreachable.id)
+      throw .documentOutsideRoot(outsider.id)
     }
 
     self.parentIDs = Dictionary(grouping: childParentPairs, by: { pair in pair.childID })
       .mapValues { pairs in
         pairs.uniqued(by: { pair in pair.parentID }).map { pair in pair.parentID }
       }
-    self.primaryAncestorIDs = primaryAncestorIDs
+    self.primaryAncestorIDs = Dictionary(
+      uniqueKeysWithValues: orderedBoards.map { entry in
+        (entry.board.id, entry.primaryAncestorIDs)
+      })
   }
 
-  /// The boards that have the document as a card or a comment, in the order the input lists them.
+  /// The boards that have the document as a card or a comment, in breadth-first order from the root,
+  /// so a board's primary parent comes first.
   public func parents(of documentID: Document.ID) -> [Document.ID] {
-    parentIDs[documentID] ?? []
+    parentIDs[documentID, default: []]
   }
 
-  /// A board's primary ancestors, from the root down to its primary parent. That's the board that
-  /// first reaches it on a breadth-first walk from the root, so it's one of the closest to the root.
+  /// A board's primary ancestors, from the root down to its primary parent: the first of its parents
+  /// in breadth-first order, so one of the closest to the root.
   public func primaryAncestors(of boardID: Document.ID) -> [Document.ID] {
-    primaryAncestorIDs[boardID] ?? []
+    primaryAncestorIDs[boardID, default: []]
   }
 
-  private static func primaryAncestorIDs(
+  private struct BoardWithPrimaryAncestors {
+    let board: Document.Board
+    let primaryAncestorIDs: [Document.ID]
+  }
+
+  /// The root and the boards under it, in breadth-first order: level by level, and within a level in
+  /// the order of the previous level's cards.
+  private static func orderedBoards(
     rootID: Document.ID,
-    boards: [Document.ID: Document.Board]
-  ) -> [Document.ID: [Document.ID]] {
-    func walk(
-      level: [Document.ID],
-      known: [Document.ID: [Document.ID]]
-    ) -> [Document.ID: [Document.ID]] {
+    boardsByID: [Document.ID: Document.Board]
+  ) -> [BoardWithPrimaryAncestors] {
+    /// The boards below the level, level by level, leaving out the boards already known.
+    func boardsBelow(_ level: [BoardWithPrimaryAncestors], excluding known: Set<Document.ID>)
+      -> [BoardWithPrimaryAncestors]
+    {
       // A board that several boards on this level have as a card keeps the first one's path.
-      let newPaths = level.flatMap { parentID in
-        let path = (known[parentID] ?? []) + [parentID]
-        return (boards[parentID]?.allCards ?? [])
-          .map { card in card.documentID }
-          .filter { childID in boards[childID] != nil && known[childID] == nil }
-          .map { childID in (childID, path) }
+      let nextLevel = level.flatMap { parent in
+        parent.board.allCards
+          .compactMap { card in boardsByID[card.documentID] }
+          .filter { child in !known.contains(child.id) }
+          .map { child in
+            BoardWithPrimaryAncestors(
+              board: child, primaryAncestorIDs: parent.primaryAncestorIDs + [parent.board.id])
+          }
       }
-      .uniqued(by: { childID, _ in childID })
-      guard !newPaths.isEmpty else {
-        return known
+      .uniqued(by: { child in child.board.id })
+      guard !nextLevel.isEmpty else {
+        return []
       }
 
-      return walk(
-        level: newPaths.map { childID, _ in childID },
-        known: known.merging(newPaths, uniquingKeysWith: { first, _ in first })
-      )
+      return nextLevel
+        + boardsBelow(nextLevel, excluding: known.union(nextLevel.map { child in child.board.id }))
     }
 
-    return walk(level: [rootID], known: [rootID: []])
+    return boardsByID[rootID].map { root in
+      let rootLevel = [BoardWithPrimaryAncestors(board: root, primaryAncestorIDs: [])]
+      return rootLevel + boardsBelow(rootLevel, excluding: [rootID])
+    } ?? []
   }
 }
 

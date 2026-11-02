@@ -3,19 +3,20 @@ import Testing
 
 @Suite struct HierarchyTests {
   @Suite struct Parents {
-    @Test func keepTheOrderOfDocuments() throws {
+    @Test func followBreadthFirstOrder() throws {
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [
-          makeBoard("root", cards: ["x", "y"]),
-          makeBoard("y", cards: ["note"]),
-          makeBoard("x", cards: ["note"]),
           makeNote("note"),
+          makeBoard("far", cards: ["note"]),
+          makeBoard("middle", cards: ["far"]),
+          makeBoard("near", cards: ["note"]),
+          makeBoard("root", cards: ["middle", "near"]),
         ],
         people: [:]
       )
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "note"))
-      #expect(parents.map(\.rawValue) == ["y", "x"])
+      #expect(parents.map(\.rawValue) == ["near", "far"])
     }
 
     @Test func includeTheBoardOfAComment() throws {
@@ -88,7 +89,7 @@ import Testing
       #expect(ancestors.map(\.rawValue) == ["root", "b"])
     }
 
-    @Test func settleTiesFurtherDownByTheWalksOrder() throws {
+    @Test func settleTiesFurtherDownByBreadthFirstOrder() throws {
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [

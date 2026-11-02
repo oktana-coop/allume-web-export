@@ -2,16 +2,15 @@
 /// a graph, not a tree, since a board can sit in several boards.
 public struct Contents: Equatable, Sendable {
   public let rootID: Document.ID
-  /// In the order the input lists them.
   public let documents: [Document]
   public let people: [Person.ID: Person]
   public let hierarchy: Hierarchy
 
   private let documentIndices: [Document.ID: Int]
 
-  /// Throws if the root is missing or isn't a board, if two documents share an ID, or if the
-  /// root's cards don't reach a document. Other references between documents, like a card's
-  /// `documentID`, aren't checked.
+  /// Throws if the root is missing or isn't a board, if two documents share an ID, or if a document
+  /// isn't under the root. Other references between documents, like a card's `documentID`, aren't
+  /// checked.
   public init(
     rootID: Document.ID,
     documents: [Document],

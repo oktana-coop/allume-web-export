@@ -41,8 +41,8 @@ import Testing
     }
   }
 
-  @Test func rejectsADocumentTheRootDoesNotReach() {
-    #expect(throws: InvalidContentsError.unreachableDocument(Document.ID(rawValue: "a"))) {
+  @Test func rejectsADocumentOutsideTheRoot() {
+    #expect(throws: InvalidContentsError.documentOutsideRoot(Document.ID(rawValue: "a"))) {
       try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeBoard("root"), makeBoard("a", cards: ["note"]), makeNote("note")],
@@ -50,7 +50,7 @@ import Testing
     }
   }
 
-  @Test func reachesCommentsOnlyInThreads() throws {
+  @Test func acceptsCommentsOnlyInThreads() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", commentThread: ["comment"]), makeComment("comment")],
