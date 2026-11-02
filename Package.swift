@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
   name: "allume-web-export",
   platforms: [
-    // Allume's own minimums (a Mac Catalyst app on macOS 14), so the app can embed the library.
+    // Allume's minimums: it's a Mac Catalyst app on macOS 14.
     .macOS(.v14),
     .iOS(.v17),
   ],

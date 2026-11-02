@@ -1,5 +1,5 @@
 extension Document {
-  /// Carries no file, since PDFs are never published.
+  /// Leaves out the PDF's file, which the export includes.
   public struct PDF: Equatable, Sendable {
     public let id: ID
     public let label: String?

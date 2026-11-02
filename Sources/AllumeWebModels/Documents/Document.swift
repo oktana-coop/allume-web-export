@@ -1,5 +1,4 @@
-// Every kind is nested, as the export lists them all as documents. It also keeps
-// `Image` and `Link` from clashing with SwiftUI's in files that import both.
+// Every kind is nested, as the export lists them all as documents.
 
 public enum Document: Equatable, Sendable {
   case board(Board)
