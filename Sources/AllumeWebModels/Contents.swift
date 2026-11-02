@@ -5,11 +5,13 @@ public struct Contents: Equatable, Sendable {
   /// In the order the input lists them.
   public let documents: [Document]
   public let people: [Person.ID: Person]
+  public let hierarchy: Hierarchy
 
   private let documentIndices: [Document.ID: Int]
 
-  /// Throws if the root is missing or isn't a board, or if two documents share an ID.
-  /// References between documents, like a card's `documentID`, aren't checked.
+  /// Throws if the root is missing or isn't a board, if two documents share an ID, or if the
+  /// root's cards don't reach a document. Other references between documents, like a card's
+  /// `documentID`, aren't checked.
   public init(
     rootID: Document.ID,
     documents: [Document],
@@ -25,15 +27,20 @@ public struct Contents: Equatable, Sendable {
     }) {
       throw .duplicateDocument(documents[duplicateIndex].id)
     }
+
     guard let rootIndex = documentIndices[rootID] else {
       throw .missingRoot(rootID)
     }
     guard case .board = documents[rootIndex] else {
       throw .rootNotABoard(rootID)
     }
+
+    let hierarchy = try Hierarchy(rootID: rootID, documents: documents)
+
     self.rootID = rootID
     self.documents = documents
     self.people = people
+    self.hierarchy = hierarchy
     self.documentIndices = documentIndices
   }
 

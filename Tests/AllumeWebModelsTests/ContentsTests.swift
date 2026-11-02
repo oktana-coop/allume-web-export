@@ -5,7 +5,7 @@ import Testing
   @Test func findsDocumentsByIDAndKeepsTheirOrder() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
-      documents: [makeBoard("root"), makeNote("b"), makeBoard("a")],
+      documents: [makeBoard("root", cards: ["b", "a"]), makeNote("b"), makeBoard("a")],
       people: [:]
     )
     #expect(contents.documents.map(\.id.rawValue) == ["root", "b", "a"])
@@ -15,8 +15,8 @@ import Testing
 
   @Test func findsOnlyBoardsAsBoards() throws {
     let contents = try Contents(
-      rootID: Document.ID(rawValue: "root"), documents: [makeBoard("root"), makeNote("b")],
-      people: [:])
+      rootID: Document.ID(rawValue: "root"),
+      documents: [makeBoard("root", cards: ["b"]), makeNote("b")], people: [:])
     #expect(contents.board(Document.ID(rawValue: "root"))?.id == Document.ID(rawValue: "root"))
     #expect(contents.board(Document.ID(rawValue: "b")) == nil)
   }
@@ -41,13 +41,21 @@ import Testing
     }
   }
 
-  private func makeBoard(_ id: String) -> Document {
-    .board(
-      Document.Board(
-        id: Document.ID(rawValue: id), label: nil, cards: [], chains: [], connections: [], ink: []))
+  @Test func rejectsADocumentTheRootDoesNotReach() {
+    #expect(throws: InvalidContentsError.unreachableDocument(Document.ID(rawValue: "a"))) {
+      try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root"), makeBoard("a", cards: ["note"]), makeNote("note")],
+        people: [:])
+    }
   }
 
-  private func makeNote(_ id: String) -> Document {
-    .note(Document.Note(id: Document.ID(rawValue: id), text: "A note"))
+  @Test func reachesCommentsOnlyInThreads() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [makeBoard("root", commentThread: ["comment"]), makeComment("comment")],
+      people: [:])
+    #expect(contents.document(Document.ID(rawValue: "comment")) == makeComment("comment"))
   }
+
 }

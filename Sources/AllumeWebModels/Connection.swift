@@ -8,7 +8,7 @@ public struct Connection: Equatable, Sendable {
   }
 
   public enum Endpoint: Hashable, Sendable {
-    /// The card placing this document, on the board or in one of its comment threads.
+    /// The document's card, on the board or in one of its comment threads.
     case card(Document.ID)
     case chain(Chain.ID)
   }
