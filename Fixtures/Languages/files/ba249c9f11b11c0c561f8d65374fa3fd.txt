@@ -1,0 +1,2 @@
+Functional programming
+Functions are values, and programs are built by combining them.

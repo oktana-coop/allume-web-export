@@ -1,0 +1,1195 @@
+{
+  "documents" : {
+    "712191f5ef3cdf93c8c332a92ee2c941" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Programming paradigm - Wikipedia",
+      "title" : "Programming paradigm - Wikipedia",
+      "type" : "url",
+      "url" : "https:\/\/en.wikipedia.org\/wiki\/Programming_paradigm"
+    },
+    "6875c1070068abd21ee23f58b0bbaa36" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "c4c5145cef54af21420325ca131ae6af",
+      "modifiedAt" : "2026-10-28T10:45:00Z",
+      "text" : "Datalog would fit here too.",
+      "type" : "comment",
+      "user_id" : "e8a49d138cc96d564bb566c460b094c4"
+    },
+    "cfbad6caf2a83177629e10911bcba74b" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.3611111111111111,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.3042929292929293
+      },
+      "label" : "",
+      "original_file" : "cfbad6caf2a83177629e10911bcba74b_original.png",
+      "type" : "image"
+    },
+    "b0132d2b19a8af36e9ebd3b97213d158" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "9620402c6b03b6be47ab0422b340e435",
+      "modifiedAt" : "2026-10-26T09:30:00Z",
+      "text" : "Yes, the type classes PDF in Reading covers them.",
+      "type" : "comment",
+      "user_id" : "e9f29b606436c511a0e857fe252fa809"
+    },
+    "b60b385b4577f51fe0bbe1d446adb3d1" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "c4c5145cef54af21420325ca131ae6af",
+      "modifiedAt" : "2026-10-25T17:02:00Z",
+      "text" : "Worth adding a card on type classes here?",
+      "type" : "comment",
+      "user_id" : "e8a49d138cc96d564bb566c460b094c4"
+    },
+    "d1e850ae3790672b35715cc5bc38222e" : {
+      "cards" : [
+        {
+          "document_id" : "f76ff6d97ad777dac223434a205e0a59",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "document_id" : "15da7de98ce8897d64a5a691748bd749",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 240,
+          "size_width" : 640,
+          "z" : 2
+        },
+        {
+          "document_id" : "8b79681d038ede856c0ed07f9b8596bf",
+          "position_x" : 636,
+          "position_y" : 360,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 3
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Families",
+      "type" : "board"
+    },
+    "a4ab07620278d65538ebe9c42d7efa8c" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Laziness",
+      "original_file" : "a4ab07620278d65538ebe9c42d7efa8c_original.txt",
+      "type" : "text"
+    },
+    "8b79681d038ede856c0ed07f9b8596bf" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Lisp (programming language) - Wikipedia",
+      "title" : "Lisp (programming language) - Wikipedia",
+      "type" : "url",
+      "url" : "https:\/\/en.wikipedia.org\/wiki\/Lisp_(programming_language)"
+    },
+    "bae3837e1e629694792842291db914bf" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Haskell Language",
+      "title" : "Haskell Language",
+      "type" : "url",
+      "url" : "https:\/\/www.haskell.org\/"
+    },
+    "3148a7d577321f0fdae83737cb35e289" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.22348484848484848,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 2,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.16666666666666666
+      },
+      "label" : "",
+      "original_file" : "3148a7d577321f0fdae83737cb35e289_original.png",
+      "type" : "image"
+    },
+    "dd7bf0decb9c7c423ead28d27949f48c" : {
+      "cards" : [
+        {
+          "document_id" : "cd0c2ef09e02306757bf005d280c1928",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 1
+        },
+        {
+          "document_id" : "f75f13266058cf34deaa7f0e362e71d8",
+          "position_x" : 705,
+          "position_y" : 80,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 2
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Notes",
+      "type" : "board"
+    },
+    "cd0c2ef09e02306757bf005d280c1928" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "OCaml is strict, unlike Haskell, and allows mutation where it helps.",
+      "original_file" : "cd0c2ef09e02306757bf005d280c1928_original.txt",
+      "type" : "text"
+    },
+    "c9673d8163fc28b84cb09998c66c5754" : {
+      "created_at" : "2026-09-14T10:03:00Z",
+      "label" : "",
+      "original_file" : "c9673d8163fc28b84cb09998c66c5754_original.png",
+      "type" : "image"
+    },
+    "650cc668ec558027bff503f043355d60" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "076363b8ef4f6c85ab80f1b89ba472d0",
+      "modifiedAt" : "2026-10-29T19:20:00Z",
+      "text" : "Read the type classes PDF before the monoids one.",
+      "type" : "comment",
+      "user_id" : "e9f29b606436c511a0e857fe252fa809"
+    },
+    "f76ff6d97ad777dac223434a205e0a59" : {
+      "cards" : [
+        {
+          "document_id" : "0b92912e0774056fbb869596628560b7",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "document_id" : "af801f00f48770cd6a5d14329427565c",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 2
+        },
+        {
+          "document_id" : "ba900a8e25556d8b4d63f90052a0e6fd",
+          "position_x" : 80,
+          "position_y" : 470,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 3
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "ML family",
+      "type" : "board"
+    },
+    "f0aa996b966a86b58756d0dcc74edf65" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "",
+      "original_file" : "f0aa996b966a86b58756d0dcc74edf65_original.jpg",
+      "type" : "image"
+    },
+    "eba911c2265398fb98a70c672ad6bda8" : {
+      "cards" : [
+        {
+          "card_id" : "9ce8dd33f51f0ad5d6ab30a1c7fa7ba6",
+          "color" : "Purple",
+          "document_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+          "position_x" : 80,
+          "position_y" : 80,
+          "scroll_position" : 0.35,
+          "size_height" : 508,
+          "size_width" : 677,
+          "z" : 1
+        },
+        {
+          "card_id" : "dbc78c8b4d9cf19fbbab4b4b011f45ec",
+          "document_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+          "position_x" : 797,
+          "position_y" : 80,
+          "scroll_position" : 0.12,
+          "size_height" : 508,
+          "size_width" : 677,
+          "z" : 2
+        },
+        {
+          "document_id" : "382613a5ed1f936bfeda0551a70d1392",
+          "position_x" : 1514,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 3
+        },
+        {
+          "document_id" : "2f24f1dbf00de6f63706a93f9d8aeaef",
+          "position_x" : 1514,
+          "position_y" : 465,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 4
+        },
+        {
+          "document_id" : "9e5901b6d1197123acf6ac68ce9bd687",
+          "position_x" : 1514,
+          "position_y" : 541,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 5
+        },
+        {
+          "card_id" : "73375c36dbba0cbab8bcc5cbe933faf9",
+          "document_id" : "76cde050559d550f6ea9681e32ea683a",
+          "position_x" : 80,
+          "position_y" : 640,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 6
+        },
+        {
+          "document_id" : "a49fd42b45af0011efbcc9802870de35",
+          "position_x" : 80,
+          "position_y" : 720,
+          "size_height" : 68,
+          "size_width" : 532,
+          "z" : 7
+        },
+        {
+          "document_id" : "cfbad6caf2a83177629e10911bcba74b",
+          "position_x" : 80,
+          "position_y" : 818,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 8
+        },
+        {
+          "document_id" : "442c4cc742b5a5f7176ab309d3728d24",
+          "position_x" : 80,
+          "position_y" : 898,
+          "size_height" : 31,
+          "size_width" : 532,
+          "z" : 9
+        },
+        {
+          "card_id" : "0374c140e56a6baa8f625e57630c67ec",
+          "document_id" : "6d4fbef86960983aabcf798e0f07ddb2",
+          "position_x" : 680,
+          "position_y" : 640,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 10
+        },
+        {
+          "document_id" : "e2089cbb2800ab33f1b4cfec4e7fe98d",
+          "position_x" : 680,
+          "position_y" : 720,
+          "size_height" : 31,
+          "size_width" : 532,
+          "z" : 11
+        },
+        {
+          "document_id" : "ff15fc2cc131c3b00b92807f60057f1c",
+          "position_x" : 680,
+          "position_y" : 781,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 12
+        },
+        {
+          "document_id" : "24f1ca419a2dea034f03b4789bb6e545",
+          "position_x" : 680,
+          "position_y" : 861,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 13
+        },
+        {
+          "document_id" : "f896d581f144bc585bf8b70b4b4ce41c",
+          "position_x" : 680,
+          "position_y" : 941,
+          "size_height" : 31,
+          "size_width" : 532,
+          "z" : 14
+        }
+      ],
+      "chains" : [
+        {
+          "cards" : [
+            {
+              "card_id" : "cfa75c08bdbdddc10eba013e6f9fce1e",
+              "document_id" : "650cc668ec558027bff503f043355d60",
+              "position_x" : 1514,
+              "position_y" : 640,
+              "size_height" : 85,
+              "size_width" : 320,
+              "z" : 15
+            }
+          ],
+          "chain_id" : "4ab30a48ee2b22e2e9230f3960403341",
+          "ink_models" : {
+
+          },
+          "position_x" : 1514,
+          "position_y" : 640
+        }
+      ],
+      "connections" : [
+        [
+          "9ce8dd33f51f0ad5d6ab30a1c7fa7ba6",
+          "73375c36dbba0cbab8bcc5cbe933faf9"
+        ],
+        [
+          "dbc78c8b4d9cf19fbbab4b4b011f45ec",
+          "0374c140e56a6baa8f625e57630c67ec"
+        ],
+        [
+          "cfa75c08bdbdddc10eba013e6f9fce1e",
+          "dbc78c8b4d9cf19fbbab4b4b011f45ec"
+        ]
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Reading",
+      "type" : "board"
+    },
+    "90af8cf39694f71c55ce2a6aa50636e3" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "OCaml",
+      "title" : "OCaml",
+      "type" : "url",
+      "url" : "https:\/\/ocaml.org\/"
+    },
+    "a49fd42b45af0011efbcc9802870de35" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.30303030303030304,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.22474747474747475
+      },
+      "label" : "",
+      "original_file" : "a49fd42b45af0011efbcc9802870de35_original.png",
+      "type" : "image"
+    },
+    "f896d581f144bc585bf8b70b4b4ce41c" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.2967171717171717,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 1,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.26136363636363635
+      },
+      "label" : "",
+      "original_file" : "f896d581f144bc585bf8b70b4b4ce41c_original.png",
+      "type" : "image"
+    },
+    "4aca4e9585db52cce3830466fa60bed5" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.2815656565656566,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 2,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.22474747474747475
+      },
+      "label" : "",
+      "original_file" : "4aca4e9585db52cce3830466fa60bed5_original.png",
+      "type" : "image"
+    },
+    "2f24f1dbf00de6f63706a93f9d8aeaef" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "A Gentle Introduction to Haskell, Version 98",
+      "title" : "A Gentle Introduction to Haskell, Version 98",
+      "type" : "url",
+      "url" : "https:\/\/www.haskell.org\/tutorial\/"
+    },
+    "ff15fc2cc131c3b00b92807f60057f1c" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.3181818181818182,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.26136363636363635
+      },
+      "label" : "",
+      "original_file" : "ff15fc2cc131c3b00b92807f60057f1c_original.png",
+      "type" : "image"
+    },
+    "1641aad5fb464422acb7eeb712ba221d" : {
+      "cards" : [
+        {
+          "document_id" : "603bd947ed1b5a02b87dec03264fb238",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 1
+        },
+        {
+          "document_id" : "74a8750aca09a35e66e9586bde045c6b",
+          "position_x" : 705,
+          "position_y" : 80,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 2
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Notes",
+      "type" : "board"
+    },
+    "e2089cbb2800ab33f1b4cfec4e7fe98d" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.2601010101010101,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.22474747474747475
+      },
+      "label" : "",
+      "original_file" : "e2089cbb2800ab33f1b4cfec4e7fe98d_original.png",
+      "type" : "image"
+    },
+    "442c4cc742b5a5f7176ab309d3728d24" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.2601010101010101,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 1,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.22474747474747475
+      },
+      "label" : "",
+      "original_file" : "442c4cc742b5a5f7176ab309d3728d24_original.png",
+      "type" : "image"
+    },
+    "4b313eb564890d916e583755ed03ddce" : {
+      "cards" : [
+        {
+          "document_id" : "952bc6e6d029105a897f51b5e61c34cf",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 240,
+          "size_width" : 480,
+          "z" : 1
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "",
+      "type" : "board"
+    },
+    "4bd3545d00af80ac6a2a84c38a3b0108" : {
+      "cards" : [
+        {
+          "card_id" : "da26148eb627690f3ef83003a9d97d1d",
+          "document_id" : "d6e6adf7d783d443f01ed1db489ca420",
+          "position_x" : 80,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "card_id" : "a71271aaca68e6fb63f5da06c2dd4956",
+          "document_id" : "d1e850ae3790672b35715cc5bc38222e",
+          "position_x" : 636,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 2
+        },
+        {
+          "card_id" : "93a5eedd2eec37ab2cd875635df1ff1e",
+          "color" : "Purple",
+          "document_id" : "eba911c2265398fb98a70c672ad6bda8",
+          "position_x" : 1192,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 3
+        },
+        {
+          "color" : "Yellow",
+          "document_id" : "9208c3c6d6b8f5ca311e548a78dc0a88",
+          "position_x" : 80,
+          "position_y" : 600,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 4
+        },
+        {
+          "document_id" : "c9673d8163fc28b84cb09998c66c5754",
+          "position_x" : 685,
+          "position_y" : 600,
+          "size_height" : 280,
+          "size_width" : 420,
+          "z" : 5
+        }
+      ],
+      "chains" : [
+        {
+          "chain_id" : "9c526e9c8b6d7a2bb890a8a785d94368",
+          "format" : {
+            "0" : {
+              "color" : "Purple"
+            },
+            "1" : {
+              "color" : "Purple"
+            }
+          },
+          "ink_models" : {
+
+          },
+          "line_break_width" : 600,
+          "position_x" : 80,
+          "position_y" : 60,
+          "text_file" : "9c526e9c8b6d7a2bb890a8a785d94368.txt"
+        },
+        {
+          "cards" : [
+            {
+              "card_id" : "7df929edbb437c09814f0ca1d68ad317",
+              "document_id" : "89c7d9366e6a4c0fc10b8b0500bf2395",
+              "position_x" : 1192,
+              "position_y" : 600,
+              "size_height" : 85,
+              "size_width" : 320,
+              "z" : 6
+            }
+          ],
+          "chain_id" : "f107fdf066f2f1c0f8052544c24e9cd9",
+          "ink_models" : {
+
+          },
+          "position_x" : 1192,
+          "position_y" : 600
+        }
+      ],
+      "connections" : [
+        [
+          "da26148eb627690f3ef83003a9d97d1d",
+          "a71271aaca68e6fb63f5da06c2dd4956"
+        ],
+        [
+          "93a5eedd2eec37ab2cd875635df1ff1e",
+          "7df929edbb437c09814f0ca1d68ad317"
+        ]
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "ink_models" : {
+        "0" : {
+          "ink_svg" : "4bd3545d00af80ac6a2a84c38a3b01080_0_ink.svg",
+          "scale" : 1
+        }
+      },
+      "label" : "Languages",
+      "type" : "board"
+    },
+    "952bc6e6d029105a897f51b5e61c34cf" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "",
+      "original_file" : "952bc6e6d029105a897f51b5e61c34cf_original.png",
+      "type" : "image"
+    },
+    "ba900a8e25556d8b4d63f90052a0e6fd" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "ML brought type inference to a wide audience. OCaml and Haskell both inherit it.",
+      "original_file" : "ba900a8e25556d8b4d63f90052a0e6fd_original.txt",
+      "type" : "text"
+    },
+    "04b8149e0f92653e1ed65282a4f10171" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "A paradigm is a style of programming. Most languages mix several: Haskell is functional, OCaml adds ",
+      "original_file" : "04b8149e0f92653e1ed65282a4f10171_original.txt",
+      "type" : "text"
+    },
+    "a7f13ab235c23b16b85e0ca635564f5f" : {
+      "cards" : [
+        {
+          "card_id" : "ae5274202b54286b72668485c1c4a57b",
+          "document_id" : "0b92912e0774056fbb869596628560b7",
+          "position_x" : 80,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "card_id" : "fbd74bf4155775d6ea2810163bcd0fc2",
+          "document_id" : "af801f00f48770cd6a5d14329427565c",
+          "position_x" : 636,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 2
+        },
+        {
+          "document_id" : "382613a5ed1f936bfeda0551a70d1392",
+          "position_x" : 1192,
+          "position_y" : 200,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 3
+        },
+        {
+          "document_id" : "04b8149e0f92653e1ed65282a4f10171",
+          "position_x" : 80,
+          "position_y" : 600,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 4
+        }
+      ],
+      "chains" : [
+        {
+          "chain_id" : "ba249c9f11b11c0c561f8d65374fa3fd",
+          "ink_models" : {
+
+          },
+          "line_break_width" : 600,
+          "position_x" : 80,
+          "position_y" : 40,
+          "text_file" : "ba249c9f11b11c0c561f8d65374fa3fd.txt"
+        },
+        {
+          "chain_id" : "36bbf3df7fa60fe18f82123452c6d6e4",
+          "format" : {
+            "0" : {
+              "color" : "Purple"
+            },
+            "2" : {
+              "color" : "Green"
+            }
+          },
+          "ink_models" : {
+
+          },
+          "line_break_width" : 400,
+          "position_x" : 700,
+          "position_y" : 40,
+          "text_file" : "36bbf3df7fa60fe18f82123452c6d6e4.txt"
+        }
+      ],
+      "connections" : [
+        [
+          "ae5274202b54286b72668485c1c4a57b",
+          "fbd74bf4155775d6ea2810163bcd0fc2"
+        ]
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Functional",
+      "type" : "board"
+    },
+    "d6e6adf7d783d443f01ed1db489ca420" : {
+      "cards" : [
+        {
+          "document_id" : "a7f13ab235c23b16b85e0ca635564f5f",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "document_id" : "c307f262eeed5b301fcb901822b18aee",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 2
+        },
+        {
+          "document_id" : "04b8149e0f92653e1ed65282a4f10171",
+          "position_x" : 80,
+          "position_y" : 480,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 3
+        },
+        {
+          "document_id" : "2350f409c2f3d1d6b4f5e83f602ae176",
+          "position_x" : 685,
+          "position_y" : 480,
+          "size_height" : 260,
+          "size_width" : 400,
+          "z" : 4
+        },
+        {
+          "document_id" : "712191f5ef3cdf93c8c332a92ee2c941",
+          "position_x" : 1125,
+          "position_y" : 480,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 5
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Paradigms",
+      "type" : "board"
+    },
+    "96ef8d192ae1641f3af600655565c51d" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.23863636363636365,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 1,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.2032828282828283
+      },
+      "label" : "",
+      "original_file" : "96ef8d192ae1641f3af600655565c51d_original.png",
+      "type" : "image"
+    },
+    "74a8750aca09a35e66e9586bde045c6b" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "base: Core data structures and operations",
+      "title" : "base: Core data structures and operations",
+      "type" : "url",
+      "url" : "https:\/\/hackage.haskell.org\/package\/base"
+    },
+    "62ac178284d2e67aae290cef05dc1855" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Monoid - Wikipedia",
+      "title" : "Monoid - Wikipedia",
+      "type" : "url",
+      "url" : "https:\/\/en.wikipedia.org\/wiki\/Monoid"
+    },
+    "603bd947ed1b5a02b87dec03264fb238" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "The Prelude is the module every Haskell program imports by default. It defines map, foldr and the ba",
+      "original_file" : "603bd947ed1b5a02b87dec03264fb238_original.txt",
+      "type" : "text"
+    },
+    "24f1ca419a2dea034f03b4789bb6e545" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.22348484848484848,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 1,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.16666666666666666
+      },
+      "label" : "Some classes come with laws that instances should obey. Monoid instances must be associative and res",
+      "original_file" : "24f1ca419a2dea034f03b4789bb6e545_original.png",
+      "type" : "image"
+    },
+    "af801f00f48770cd6a5d14329427565c" : {
+      "cards" : [
+        {
+          "color" : "Red",
+          "document_id" : "dd7bf0decb9c7c423ead28d27949f48c",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "document_id" : "f0aa996b966a86b58756d0dcc74edf65",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 270,
+          "size_width" : 480,
+          "z" : 2
+        },
+        {
+          "document_id" : "90af8cf39694f71c55ce2a6aa50636e3",
+          "position_x" : 636,
+          "position_y" : 390,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 3
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "OCaml",
+      "type" : "board"
+    },
+    "15da7de98ce8897d64a5a691748bd749" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Timeline",
+      "original_file" : "15da7de98ce8897d64a5a691748bd749_original.png",
+      "type" : "image"
+    },
+    "2b02d9dd6c4f675f876fe02907d69fe7" : {
+      "created_at" : "2026-09-14T10:03:00Z",
+      "label" : "A Short Tour of Type Classes",
+      "last_viewed_page" : 0,
+      "original_file" : "2b02d9dd6c4f675f876fe02907d69fe7_original.pdf",
+      "type" : "pdf"
+    },
+    "9208c3c6d6b8f5ca311e548a78dc0a88" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "These boards collect notes on programming languages: how they relate, which ideas they share, and wh",
+      "original_file" : "9208c3c6d6b8f5ca311e548a78dc0a88_original.txt",
+      "type" : "text"
+    },
+    "3cc94d1368cb29fcccab4ac1645c3be6" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "In logic programming, a program is a set of facts and rules, and running it means asking questions, ",
+      "original_file" : "3cc94d1368cb29fcccab4ac1645c3be6_original.txt",
+      "type" : "text"
+    },
+    "9e5901b6d1197123acf6ac68ce9bd687" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "",
+      "title" : "",
+      "type" : "url",
+      "url" : "example.com\/talks\/lambda"
+    },
+    "89c7d9366e6a4c0fc10b8b0500bf2395" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "9620402c6b03b6be47ab0422b340e435",
+      "modifiedAt" : "2026-10-24T08:15:00Z",
+      "text" : "Should Reading be split by topic once it grows?",
+      "type" : "comment",
+      "user_id" : "e9f29b606436c511a0e857fe252fa809"
+    },
+    "f200f34e029385b67a6e26b618476369" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "deviceId" : "076363b8ef4f6c85ab80f1b89ba472d0",
+      "modifiedAt" : "2026-10-27T12:00:00Z",
+      "text" : "This is the point that matters in practice: associativity is what makes the fold parallel.",
+      "type" : "comment",
+      "user_id" : "e9f29b606436c511a0e857fe252fa809"
+    },
+    "6d4fbef86960983aabcf798e0f07ddb2" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.22348484848484848,
+        "excerpted_id" : "2b02d9dd6c4f675f876fe02907d69fe7",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.16666666666666666
+      },
+      "label" : "A type class names a set of operations. A type becomes an instance of the class by providing them.",
+      "original_file" : "6d4fbef86960983aabcf798e0f07ddb2_original.png",
+      "type" : "image"
+    },
+    "f8c2aa92544366c34b7f2609722ef4d2" : {
+      "created_at" : "2026-09-14T10:03:00Z",
+      "label" : "Monoids in Practice",
+      "last_viewed_page" : 1,
+      "original_file" : "f8c2aa92544366c34b7f2609722ef4d2_original.pdf",
+      "type" : "pdf"
+    },
+    "76cde050559d550f6ea9681e32ea683a" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.22348484848484848,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 0,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.16666666666666666
+      },
+      "label" : "A monoid is a set with an associative operation and an identity element. Addition over the integers,",
+      "original_file" : "76cde050559d550f6ea9681e32ea683a_original.png",
+      "type" : "image"
+    },
+    "2350f409c2f3d1d6b4f5e83f602ae176" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "",
+      "original_file" : "2350f409c2f3d1d6b4f5e83f602ae176_original.png",
+      "type" : "image"
+    },
+    "c307f262eeed5b301fcb901822b18aee" : {
+      "cards" : [
+        {
+          "color" : "Gray",
+          "document_id" : "4b313eb564890d916e583755ed03ddce",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "color" : "Green",
+          "document_id" : "3cc94d1368cb29fcccab4ac1645c3be6",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 2
+        },
+        {
+          "document_id" : "fd282645659ed3799375b118f6bf6560",
+          "position_x" : 636,
+          "position_y" : 328,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 3
+        }
+      ],
+      "chains" : [
+        {
+          "cards" : [
+            {
+              "document_id" : "6875c1070068abd21ee23f58b0bbaa36",
+              "position_x" : 80,
+              "position_y" : 470,
+              "size_height" : 65,
+              "size_width" : 320,
+              "z" : 4
+            }
+          ],
+          "chain_id" : "fd97ad271afdbe74f317f9e63a1eaa1e",
+          "ink_models" : {
+
+          },
+          "position_x" : 80,
+          "position_y" : 470
+        }
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Logic",
+      "type" : "board"
+    },
+    "fd282645659ed3799375b118f6bf6560" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "SWI-Prolog",
+      "title" : "SWI-Prolog",
+      "type" : "url",
+      "url" : "https:\/\/www.swi-prolog.org\/"
+    },
+    "2ebe2fb6b90c31d57fbcd1d79ee5b105" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "excerpt_info" : {
+        "end_x" : 0.8954248366013072,
+        "end_y" : 0.20202020202020202,
+        "excerpted_id" : "f8c2aa92544366c34b7f2609722ef4d2",
+        "excerpted_page" : 1,
+        "start_x" : 0.10457516339869281,
+        "start_y" : 0.16666666666666666
+      },
+      "label" : "Strings under concatenation, with the empty string as the identity.",
+      "original_file" : "2ebe2fb6b90c31d57fbcd1d79ee5b105_original.png",
+      "type" : "image"
+    },
+    "382613a5ed1f936bfeda0551a70d1392" : {
+      "cards" : [
+        {
+          "card_id" : "1fa28f1e06a8bdb1bbeaaa23eef8d033",
+          "document_id" : "76cde050559d550f6ea9681e32ea683a",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 1
+        },
+        {
+          "card_id" : "2564a5f3677be9026a44bbdb1c8b6f6a",
+          "document_id" : "2ebe2fb6b90c31d57fbcd1d79ee5b105",
+          "position_x" : 80,
+          "position_y" : 160,
+          "size_height" : 31,
+          "size_width" : 532,
+          "z" : 2
+        },
+        {
+          "card_id" : "e1535d2231ebc6d0806349d5f8a9946f",
+          "document_id" : "96ef8d192ae1641f3af600655565c51d",
+          "position_x" : 80,
+          "position_y" : 221,
+          "size_height" : 31,
+          "size_width" : 532,
+          "z" : 3
+        },
+        {
+          "card_id" : "4e466a7f755508b9cc580649af7a6e23",
+          "document_id" : "3148a7d577321f0fdae83737cb35e289",
+          "position_x" : 80,
+          "position_y" : 282,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 4
+        },
+        {
+          "document_id" : "4aca4e9585db52cce3830466fa60bed5",
+          "position_x" : 80,
+          "position_y" : 362,
+          "size_height" : 50,
+          "size_width" : 532,
+          "z" : 5
+        },
+        {
+          "card_id" : "f7bbe5b56f7eb397b0dfc4bd34083c7d",
+          "document_id" : "62ac178284d2e67aae290cef05dc1855",
+          "position_x" : 700,
+          "position_y" : 80,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 6
+        }
+      ],
+      "chains" : [
+        {
+          "cards" : [
+            {
+              "card_id" : "f29356bb19e79cf1de28f72ffdd5aa1e",
+              "document_id" : "f200f34e029385b67a6e26b618476369",
+              "position_x" : 700,
+              "position_y" : 282,
+              "size_height" : 105,
+              "size_width" : 320,
+              "z" : 7
+            }
+          ],
+          "chain_id" : "211470306b9107505ab995928f3dcb56",
+          "ink_models" : {
+
+          },
+          "position_x" : 700,
+          "position_y" : 282
+        }
+      ],
+      "connections" : [
+        [
+          "1fa28f1e06a8bdb1bbeaaa23eef8d033",
+          "2564a5f3677be9026a44bbdb1c8b6f6a"
+        ],
+        [
+          "2564a5f3677be9026a44bbdb1c8b6f6a",
+          "e1535d2231ebc6d0806349d5f8a9946f"
+        ],
+        [
+          "f7bbe5b56f7eb397b0dfc4bd34083c7d",
+          "1fa28f1e06a8bdb1bbeaaa23eef8d033"
+        ],
+        [
+          "4e466a7f755508b9cc580649af7a6e23",
+          "f29356bb19e79cf1de28f72ffdd5aa1e"
+        ]
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Monoids",
+      "type" : "board"
+    },
+    "f75f13266058cf34deaa7f0e362e71d8" : {
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Learn OCaml",
+      "title" : "Learn OCaml",
+      "type" : "url",
+      "url" : "https:\/\/ocaml.org\/docs"
+    },
+    "0b92912e0774056fbb869596628560b7" : {
+      "cards" : [
+        {
+          "document_id" : "1641aad5fb464422acb7eeb712ba221d",
+          "position_x" : 80,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 1
+        },
+        {
+          "document_id" : "382613a5ed1f936bfeda0551a70d1392",
+          "position_x" : 636,
+          "position_y" : 80,
+          "size_height" : 345,
+          "size_width" : 516,
+          "z" : 2
+        },
+        {
+          "card_id" : "45a914c687494dee30e2ad84bc4abd23",
+          "document_id" : "c9673d8163fc28b84cb09998c66c5754",
+          "position_x" : 80,
+          "position_y" : 470,
+          "size_height" : 280,
+          "size_width" : 420,
+          "z" : 3
+        },
+        {
+          "card_id" : "65adbea011ab4798104495e6d1254b41",
+          "document_id" : "a4ab07620278d65538ebe9c42d7efa8c",
+          "position_x" : 540,
+          "position_y" : 470,
+          "size_height" : 208,
+          "size_width" : 565,
+          "z" : 4
+        },
+        {
+          "document_id" : "bae3837e1e629694792842291db914bf",
+          "position_x" : 1145,
+          "position_y" : 470,
+          "size_height" : 56,
+          "size_width" : 300,
+          "z" : 5
+        }
+      ],
+      "chains" : [
+        {
+          "cards" : [
+            {
+              "card_id" : "518d72aff6130c3d2de12ac5154615d0",
+              "document_id" : "b60b385b4577f51fe0bbe1d446adb3d1",
+              "position_x" : 1145,
+              "position_y" : 560,
+              "size_height" : 85,
+              "size_width" : 320,
+              "z" : 6
+            },
+            {
+              "document_id" : "b0132d2b19a8af36e9ebd3b97213d158",
+              "position_x" : 1145,
+              "position_y" : 655,
+              "size_height" : 85,
+              "size_width" : 320,
+              "z" : 7
+            }
+          ],
+          "chain_id" : "dc20c363bed433508c40edfe9e30348a",
+          "ink_models" : {
+
+          },
+          "position_x" : 1145,
+          "position_y" : 560
+        }
+      ],
+      "connections" : [
+        [
+          "45a914c687494dee30e2ad84bc4abd23",
+          "65adbea011ab4798104495e6d1254b41"
+        ],
+        [
+          "65adbea011ab4798104495e6d1254b41",
+          "518d72aff6130c3d2de12ac5154615d0"
+        ]
+      ],
+      "created_at" : "2026-10-30T18:42:07Z",
+      "label" : "Haskell",
+      "type" : "board"
+    }
+  },
+  "root" : "4bd3545d00af80ac6a2a84c38a3b0108",
+  "users" : {
+    "6e359fff87f142a83af6c8dc4418b494" : {
+      "color" : "#7fb3d5",
+      "device_ids" : [
+        "9620402c6b03b6be47ab0422b340e435",
+        "076363b8ef4f6c85ab80f1b89ba472d0"
+      ],
+      "user_full_name" : "Mira Okafor"
+    },
+    "332959f75362238fff3f70b336c407d5" : {
+      "color" : "#c39bd3",
+      "device_ids" : [
+        "c4c5145cef54af21420325ca131ae6af"
+      ],
+      "user_full_name" : "Jonas Berg"
+    }
+  }
+}

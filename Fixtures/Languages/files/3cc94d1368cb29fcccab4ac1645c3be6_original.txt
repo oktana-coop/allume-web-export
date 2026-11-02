@@ -1,0 +1,1 @@
+In logic programming, a program is a set of facts and rules, and running it means asking questions, as in ?- parent(tom, X).

@@ -1,0 +1,1 @@
+ML brought type inference to a wide audience. OCaml and Haskell both inherit it.

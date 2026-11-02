@@ -1,0 +1,4 @@
+Pure functions
+Same input, same output, no side effects.
+Laziness
+Evaluate only what is needed.

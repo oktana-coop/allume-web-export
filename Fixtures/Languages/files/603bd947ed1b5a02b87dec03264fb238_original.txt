@@ -1,0 +1,2 @@
+The Prelude is the module every Haskell program imports by default.
+It defines map, foldr and the basic type classes, and lambdas are written \x -> x + 1 (λx. x + 1 on paper).

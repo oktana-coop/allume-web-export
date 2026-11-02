@@ -1,0 +1,2 @@
+A paradigm is a style of programming.
+Most languages mix several: Haskell is functional, OCaml adds objects, and Prolog is built on logic.

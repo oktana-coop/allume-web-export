@@ -1,0 +1,13 @@
+{
+  "bundle_version" : 6,
+  "created_at" : "2026-10-30T18:42:07Z",
+  "device" : "MacBook",
+  "muse_build" : "10866",
+  "muse_bundle_id" : "com.musesoftware.museios-appstore",
+  "muse_version" : "4.0.3",
+  "os_version" : "26.6",
+  "resolution" : [
+    2560,
+    1440
+  ]
+}

@@ -1,0 +1,1 @@
+OCaml is strict, unlike Haskell, and allows mutation where it helps.

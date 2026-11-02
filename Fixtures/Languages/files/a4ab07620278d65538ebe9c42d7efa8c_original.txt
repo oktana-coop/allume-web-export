@@ -1,0 +1,3 @@
+Haskell is lazy: an expression is evaluated only when its value is needed.
+
+This makes infinite lists practical, as in take 5 [1..].
