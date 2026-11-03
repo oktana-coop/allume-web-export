@@ -19,6 +19,7 @@ let package = Package(
   targets: [
     .target(name: "AllumeWebModels"),
     .target(name: "AllumeWebBundleReader", dependencies: ["AllumeWebModels"]),
+    .target(name: "AllumeWebRendering", dependencies: ["AllumeWebModels"]),
     .target(name: "AllumeWeb"),
     .executableTarget(
       name: "AllumeWebCLI",
@@ -29,5 +30,6 @@ let package = Package(
     ),
     .testTarget(name: "AllumeWebModelsTests", dependencies: ["AllumeWebModels"]),
     .testTarget(name: "AllumeWebBundleReaderTests", dependencies: ["AllumeWebBundleReader"]),
+    .testTarget(name: "AllumeWebRenderingTests", dependencies: ["AllumeWebRendering"]),
   ]
 )
