@@ -124,7 +124,7 @@ extension Document.Board {
 }
 
 extension Card {
-  /// An unknown colour is left out.
+  /// An unknown color is left out.
   static func read(_ json: BundleCard, boardID: Document.ID) -> (
     card: Card, warnings: [BundleWarning]
   ) {
@@ -168,7 +168,7 @@ extension Chain {
 
 extension TextBlock {
   /// A missing text file leaves the text empty, as in the POC. Paragraphs are split on `\n` only, and
-  /// an unknown highlight colour is left out.
+  /// an unknown highlight color is left out.
   static func read(_ json: BundleChain, in bundle: AllumeBundle)
     -> (text: TextBlock, warnings: [BundleWarning])
   {

@@ -8,6 +8,7 @@ package enum BundleWarning: Equatable, Sendable {
   case missingFile(name: String)
   case missingExcerptSource(Document.ID, sourceID: Document.ID)
   case unknownCommentAuthor(Document.ID)
+  case invalidUserColor(User.ID, color: String)
   case invalidCommentDate(Document.ID, String)
   case unknownCardColor(boardID: Document.ID, documentID: Document.ID, color: String)
   case unknownHighlightColor(Chain.ID, color: String)
