@@ -10,7 +10,8 @@ public struct Contents: Equatable, Sendable {
   private let documentIndices: [Document.ID: Int]
 
   /// Throws if the root is missing or isn't a board, or if two documents share an ID. Whatever else
-  /// would make the contents inconsistent is left out, and recorded in `omissions`.
+  /// would make the contents inconsistent is left out, and recorded in `omissions`. A connection
+  /// repeated in either direction is left out too, but not recorded, since its ends stay connected.
   public init(
     rootID: Document.ID,
     documents: [Document],
@@ -67,6 +68,7 @@ public struct Contents: Equatable, Sendable {
     let steps: [([Document]) -> (documents: [Document], omissions: Omissions)] = [
       { documents in removingInvalidCards(from: documents) },
       { documents in removingRepeatedCards(from: documents) },
+      { documents in (removingRepeatedConnections(from: documents), .empty) },
       { documents in removingDocumentsOutsideRoot(from: documents, rootID: rootID) },
       { documents in removingMissingExcerptSources(from: documents) },
     ]
@@ -161,6 +163,23 @@ public struct Contents: Equatable, Sendable {
       })
 
     return (withoutRepeats, omissions)
+  }
+
+  /// Allume stores some connections in both directions. A board keeps the first connection for each
+  /// pair of ends.
+  private static func removingRepeatedConnections(from documents: [Document]) -> [Document] {
+    documents.map { document in
+      guard case .board(let board) = document else {
+        return document
+      }
+      let connections = board.connections.uniqued { connection in
+        Set([connection.from, connection.to])
+      }
+      return .board(
+        Document.Board(
+          id: board.id, label: board.label, cards: board.cards, chains: board.chains,
+          connections: connections, ink: board.ink))
+    }
   }
 
   /// The hierarchy only lists parents under the root.

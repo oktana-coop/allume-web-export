@@ -140,6 +140,29 @@ import Testing
       ])
   }
 
+  @Test func keepsOneConnectionForEachPairOfEndsWithoutRecordingIt() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        makeBoard(
+          "root", cards: ["a", "b", "c"],
+          connections: [("a", "b"), ("b", "a"), ("a", "c"), ("a", "b")]),
+        makeNote("a"),
+        makeNote("b"),
+        makeNote("c"),
+      ],
+      users: [:]
+    )
+
+    let connections = contents.board(Document.ID(rawValue: "root"))?.connections
+    #expect(
+      connections == [
+        Connection(from: .card(Document.ID(rawValue: "a")), to: .card(Document.ID(rawValue: "b"))),
+        Connection(from: .card(Document.ID(rawValue: "a")), to: .card(Document.ID(rawValue: "c"))),
+      ])
+    #expect(contents.omissions.isEmpty)
+  }
+
   @Test func omitsExcerptsWhoseSourceIsMissingOrOutsideTheRoot() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),

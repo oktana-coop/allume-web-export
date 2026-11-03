@@ -28,7 +28,7 @@ public struct Hierarchy: Equatable, Sendable {
     self.boardIDs = orderedBoards.map { entry in entry.board.id }
     self.parentIDs = Dictionary(grouping: childParentPairs, by: { pair in pair.childID })
       .mapValues { pairs in
-        pairs.uniqued(by: { pair in pair.parentID }).map { pair in pair.parentID }
+        pairs.uniqued(on: { pair in pair.parentID }).map { pair in pair.parentID }
       }
     self.primaryAncestorIDs = Dictionary(
       uniqueKeysWithValues: orderedBoards.map { entry in
@@ -73,7 +73,7 @@ public struct Hierarchy: Equatable, Sendable {
               board: child, primaryAncestorIDs: parent.primaryAncestorIDs + [parent.board.id])
           }
       }
-      .uniqued(by: { child in child.board.id })
+      .uniqued(on: { child in child.board.id })
       guard !nextLevel.isEmpty else {
         return []
       }
@@ -99,19 +99,5 @@ extension Document.Board {
       }
     }
     return cards + threadCards
-  }
-}
-
-extension Sequence {
-  /// Keeps the first element for each key, in order.
-  fileprivate func uniqued<Key: Hashable>(by key: (Element) -> Key) -> [Element] {
-    let elements = Array(self)
-    let firstIndices = Dictionary(
-      elements.enumerated().map { index, element in (key(element), index) },
-      uniquingKeysWith: { first, _ in first }
-    )
-    return elements.indices
-      .filter { index in firstIndices[key(elements[index])] == index }
-      .map { index in elements[index] }
   }
 }
