@@ -1,9 +1,9 @@
-/// A board, everything inside it, and the people who commented. The boards form
+/// A board, everything inside it, and the users who commented. The boards form
 /// a graph, not a tree, since a board can sit in several boards.
 public struct Contents: Equatable, Sendable {
   public let rootID: Document.ID
   public let documents: [Document]
-  public let people: [Person.ID: Person]
+  public let users: [User.ID: User]
   public let hierarchy: Hierarchy
   public let omissions: Omissions
 
@@ -14,7 +14,7 @@ public struct Contents: Equatable, Sendable {
   public init(
     rootID: Document.ID,
     documents: [Document],
-    people: [Person.ID: Person]
+    users: [User.ID: User]
   ) throws(InvalidContentsError) {
     let inputIndices = Dictionary(
       documents.enumerated().map { index, document in (document.id, index) },
@@ -38,7 +38,7 @@ public struct Contents: Equatable, Sendable {
 
     self.rootID = rootID
     self.documents = validDocuments
-    self.people = people
+    self.users = users
     self.hierarchy = Hierarchy(rootID: rootID, documents: validDocuments)
     self.omissions = omissions
     self.documentIndices = Dictionary(

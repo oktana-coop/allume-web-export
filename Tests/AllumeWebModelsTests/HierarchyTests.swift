@@ -13,7 +13,7 @@ import Testing
           makeBoard("near", cards: ["note"]),
           makeBoard("root", cards: ["middle", "near"]),
         ],
-        people: [:]
+        users: [:]
       )
 
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "note"))
@@ -25,7 +25,7 @@ import Testing
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeBoard("root", commentThread: ["comment"]), makeComment("comment")],
-        people: [:]
+        users: [:]
       )
 
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "comment"))
@@ -37,7 +37,7 @@ import Testing
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeBoard("root", cards: ["note", "note"]), makeNote("note")],
-        people: [:]
+        users: [:]
       )
 
       let parents = contents.hierarchy.parents(of: Document.ID(rawValue: "note"))
@@ -57,7 +57,7 @@ import Testing
           makeBoard("languages", cards: ["haskell"]),
           makeBoard("haskell"),
         ],
-        people: [:]
+        users: [:]
       )
 
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "haskell"))
@@ -76,7 +76,7 @@ import Testing
           makeBoard("haskell", cards: ["monads"]),
           makeBoard("monads"),
         ],
-        people: [:]
+        users: [:]
       )
 
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "monads"))
@@ -93,7 +93,7 @@ import Testing
           makeBoard("b", cards: ["c"]),
           makeBoard("c"),
         ],
-        people: [:]
+        users: [:]
       )
 
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "c"))
@@ -112,7 +112,7 @@ import Testing
           makeBoard("x", cards: ["z"]),
           makeBoard("z"),
         ],
-        people: [:]
+        users: [:]
       )
 
       let ancestors = contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "z"))
@@ -128,7 +128,7 @@ import Testing
           makeBoard("a", cards: ["b", "root"]),
           makeBoard("b", cards: ["a"]),
         ],
-        people: [:]
+        users: [:]
       )
 
       let hierarchy = contents.hierarchy
@@ -144,7 +144,7 @@ import Testing
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeBoard("root", cards: ["note"]), makeNote("note")],
-        people: [:]
+        users: [:]
       )
       #expect(contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "note")).isEmpty)
       #expect(contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "missing")).isEmpty)

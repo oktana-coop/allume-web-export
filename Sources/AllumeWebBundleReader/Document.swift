@@ -182,7 +182,7 @@ extension Document.Comment {
     }
 
     let authorID = bundle.userID(ofDevice: json.deviceID).map { userID in
-      Person.ID(rawValue: userID)
+      User.ID(rawValue: userID)
     }
     let comment = Document.Comment(
       id: id, text: json.text, authorID: authorID, modifiedAt: modifiedAt)

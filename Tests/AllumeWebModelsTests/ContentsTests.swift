@@ -6,7 +6,7 @@ import Testing
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", cards: ["b", "a"]), makeNote("b"), makeBoard("a")],
-      people: [:]
+      users: [:]
     )
 
     #expect(contents.documents.map(\.id.rawValue) == ["root", "b", "a"])
@@ -19,7 +19,7 @@ import Testing
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", cards: ["b"]), makeNote("b")],
-      people: [:]
+      users: [:]
     )
 
     #expect(contents.board(Document.ID(rawValue: "root"))?.id == Document.ID(rawValue: "root"))
@@ -31,7 +31,7 @@ import Testing
       try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeBoard("a")],
-        people: [:]
+        users: [:]
       )
     }
   }
@@ -41,7 +41,7 @@ import Testing
       try Contents(
         rootID: Document.ID(rawValue: "root"),
         documents: [makeNote("root")],
-        people: [:]
+        users: [:]
       )
     }
   }
@@ -51,7 +51,7 @@ import Testing
       try Contents(
         rootID: Document.ID(rawValue: "a"),
         documents: [makeBoard("a"), makeNote("a")],
-        people: [:]
+        users: [:]
       )
     }
   }
@@ -60,7 +60,7 @@ import Testing
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root"), makeBoard("a", cards: ["note"]), makeNote("note")],
-      people: [:]
+      users: [:]
     )
 
     #expect(contents.documents.map(\.id.rawValue) == ["root"])
@@ -71,7 +71,7 @@ import Testing
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", cards: ["note", "missing"]), makeNote("note")],
-      people: [:]
+      users: [:]
     )
 
     let cards = contents.board(Document.ID(rawValue: "root"))?.cards
@@ -87,7 +87,7 @@ import Testing
         makeComment("comment"),
         makeNote("note"),
       ],
-      people: [:]
+      users: [:]
     )
 
     #expect(
@@ -105,7 +105,7 @@ import Testing
         makeNote("note"),
         makeComment("comment"),
       ],
-      people: [:]
+      users: [:]
     )
 
     let board = contents.board(Document.ID(rawValue: "root"))
@@ -130,7 +130,7 @@ import Testing
         makeNote("a"),
         makeNote("b"),
       ],
-      people: [:]
+      users: [:]
     )
 
     let connections = contents.board(Document.ID(rawValue: "root"))?.connections
@@ -149,7 +149,7 @@ import Testing
         makeImage("second", excerptOf: "outside"),
         makeNote("outside"),
       ],
-      people: [:]
+      users: [:]
     )
 
     #expect(contents.document(Document.ID(rawValue: "first")) == makeImage("first"))
@@ -162,7 +162,7 @@ import Testing
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", commentThread: ["comment"]), makeComment("comment")],
-      people: [:]
+      users: [:]
     )
 
     #expect(contents.document(Document.ID(rawValue: "comment")) == makeComment("comment"))

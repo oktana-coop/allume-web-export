@@ -1,4 +1,4 @@
-public struct Person: Equatable, Sendable {
+public struct User: Equatable, Sendable {
   public let id: ID
   public let name: String
   public let color: RGBColor
