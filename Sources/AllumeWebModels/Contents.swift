@@ -5,42 +5,46 @@ public struct Contents: Equatable, Sendable {
   public let documents: [Document]
   public let people: [Person.ID: Person]
   public let hierarchy: Hierarchy
+  public let omissions: Omissions
 
   private let documentIndices: [Document.ID: Int]
 
-  /// Throws if the root is missing or isn't a board, if two documents share an ID, or if a document
-  /// isn't under the root. Other references between documents, like a card's `documentID`, aren't
-  /// checked.
+  /// Throws if the root is missing or isn't a board, or if two documents share an ID. Whatever else
+  /// would make the contents inconsistent is left out, and recorded in `omissions`.
   public init(
     rootID: Document.ID,
     documents: [Document],
     people: [Person.ID: Person]
   ) throws(InvalidContentsError) {
-    let documentIndices = Dictionary(
+    let inputIndices = Dictionary(
       documents.enumerated().map { index, document in (document.id, index) },
       // For duplicate IDs, use the first index the document is found at.
       uniquingKeysWith: { first, _ in first }
     )
     if let duplicateIndex = documents.indices.first(where: { index in
-      documentIndices[documents[index].id] != index
+      inputIndices[documents[index].id] != index
     }) {
       throw .duplicateDocument(documents[duplicateIndex].id)
     }
 
-    guard let rootIndex = documentIndices[rootID] else {
+    guard let rootIndex = inputIndices[rootID] else {
       throw .missingRoot(rootID)
     }
     guard case .board = documents[rootIndex] else {
       throw .rootNotABoard(rootID)
     }
 
-    let hierarchy = try Hierarchy(rootID: rootID, documents: documents)
+    let (validDocuments, omissions) = Self.removingInconsistencies(from: documents, rootID: rootID)
 
     self.rootID = rootID
-    self.documents = documents
+    self.documents = validDocuments
     self.people = people
-    self.hierarchy = hierarchy
-    self.documentIndices = documentIndices
+    self.hierarchy = Hierarchy(rootID: rootID, documents: validDocuments)
+    self.omissions = omissions
+    self.documentIndices = Dictionary(
+      uniqueKeysWithValues: validDocuments.enumerated().map { index, document in
+        (document.id, index)
+      })
   }
 
   public func document(_ id: Document.ID) -> Document? {
@@ -52,5 +56,138 @@ public struct Contents: Equatable, Sendable {
       return nil
     }
     return board
+  }
+
+  /// Each step can leave something for the next to remove: removing a card can leave its document
+  /// outside the root, and a document outside the root can be an excerpt's source.
+  private static func removingInconsistencies(from documents: [Document], rootID: Document.ID)
+    -> (documents: [Document], omissions: Omissions)
+  {
+    let steps: [([Document]) -> (documents: [Document], omissions: Omissions)] = [
+      { documents in removingInvalidCards(from: documents) },
+      { documents in removingDocumentsOutsideRoot(from: documents, rootID: rootID) },
+      { documents in removingMissingExcerptSources(from: documents) },
+    ]
+
+    return steps.reduce((documents: documents, omissions: .empty)) { result, step in
+      let (documents, omissions) = step(result.documents)
+      return (documents, result.omissions + omissions)
+    }
+  }
+
+  private static func removingInvalidCards(from documents: [Document])
+    -> (documents: [Document], omissions: Omissions)
+  {
+    let documentsByID = Dictionary(
+      uniqueKeysWithValues: documents.map { document in (document.id, document) })
+
+    let results = documents.map { document -> (document: Document, omissions: Omissions) in
+      guard case .board(let board) = document else {
+        return (document, .empty)
+      }
+      let (validBoard, omissions) = removingInvalidCards(from: board, among: documentsByID)
+      return (.board(validBoard), omissions)
+    }
+
+    return (
+      results.map { result in result.document },
+      results.map { result in result.omissions }.reduce(.empty, +)
+    )
+  }
+
+  /// The hierarchy only lists parents under the root.
+  private static func removingDocumentsOutsideRoot(from documents: [Document], rootID: Document.ID)
+    -> (documents: [Document], omissions: Omissions)
+  {
+    let hierarchy = Hierarchy(rootID: rootID, documents: documents)
+    let isUnderRoot = { (document: Document) in
+      document.id == rootID || !hierarchy.parents(of: document.id).isEmpty
+    }
+
+    return (
+      documents.filter(isUnderRoot),
+      Omissions(
+        documentsOutsideRoot: documents.filter { document in !isUnderRoot(document) }
+          .map { document in document.id })
+    )
+  }
+
+  /// An excerpt goes when its source is missing, or was outside the root. The image stays.
+  private static func removingMissingExcerptSources(from documents: [Document])
+    -> (documents: [Document], omissions: Omissions)
+  {
+    let documentIDs = Set(documents.map { document in document.id })
+
+    let results = documents.map { document -> (document: Document, omissions: Omissions) in
+      guard case .image(let image) = document, let sourceID = image.excerpt?.sourceID,
+        !documentIDs.contains(sourceID)
+      else {
+        return (document, .empty)
+      }
+      let withoutExcerpt = Document.Image(
+        id: image.id, label: image.label, file: image.file, excerpt: nil)
+      return (.image(withoutExcerpt), Omissions(excerptsWithMissingSources: [image.id]))
+    }
+
+    return (
+      results.map { result in result.document },
+      results.map { result in result.omissions }.reduce(.empty, +)
+    )
+  }
+
+  /// The board without its invalid cards, and without the connections to them, with the cards it
+  /// left out.
+  private static func removingInvalidCards(
+    from board: Document.Board, among documentsByID: [Document.ID: Document]
+  ) -> (board: Document.Board, omissions: Omissions) {
+    let boardCards = board.cards.map { card in
+      (card: card, reason: card.omissionReason(inThread: false, among: documentsByID))
+    }
+    let threadCards = board.chains.map { chain -> [(card: Card, reason: Omissions.Reason?)] in
+      guard case .comments(let thread) = chain else {
+        return []
+      }
+      return thread.cards.map { card in
+        (card: card, reason: card.omissionReason(inThread: true, among: documentsByID))
+      }
+    }
+
+    let validCards = boardCards.filter { entry in entry.reason == nil }.map { entry in entry.card }
+    let validChains = zip(board.chains, threadCards).map { chain, entries -> Chain in
+      guard case .comments(let thread) = chain else {
+        return chain
+      }
+      let valid = entries.filter { entry in entry.reason == nil }.map { entry in entry.card }
+      return .comments(CommentThread(id: thread.id, cards: valid))
+    }
+
+    // A connection goes with the cards it joins.
+    let endpoints = Set(
+      validCards.map { card in Connection.Endpoint.card(card.documentID) }
+        + validChains.flatMap { chain -> [Connection.Endpoint] in
+          switch chain {
+          case .text(let text): [.chain(text.id)]
+          case .comments(let thread):
+            [.chain(thread.id)] + thread.cards.map { card in .card(card.documentID) }
+          }
+        })
+    let validConnections = board.connections.filter { connection in
+      endpoints.contains(connection.from) && endpoints.contains(connection.to)
+    }
+
+    let checkedCards = boardCards + threadCards.flatMap { entries in entries }
+    let omitted = { (reason: Omissions.Reason) in
+      checkedCards.filter { entry in entry.reason == reason }.map { entry in
+        Omissions.Card(boardID: board.id, documentID: entry.card.documentID)
+      }
+    }
+
+    let validBoard = Document.Board(
+      id: board.id, label: board.label, cards: validCards, chains: validChains,
+      connections: validConnections, ink: board.ink)
+    let omissions = Omissions(
+      cardsForMissingDocuments: omitted(.missingDocument), cardsOfWrongKind: omitted(.wrongKind))
+
+    return (validBoard, omissions)
   }
 }

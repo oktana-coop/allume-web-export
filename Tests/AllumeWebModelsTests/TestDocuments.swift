@@ -4,18 +4,34 @@ import Foundation
 func makeBoard(
   _ id: String,
   cards documentIDs: [String] = [],
-  commentThread commentIDs: [String] = []
+  commentThread commentIDs: [String] = [],
+  connections cardPairs: [(String, String)] = []
 ) -> Document {
   let thread = CommentThread(
     id: Chain.ID(rawValue: "\(id) thread"), cards: commentIDs.map(makeCard))
+  let connections = cardPairs.map { from, to in
+    Connection(
+      from: .card(Document.ID(rawValue: from)), to: .card(Document.ID(rawValue: to)))
+  }
   return .board(
     Document.Board(
       id: Document.ID(rawValue: id), label: nil, cards: documentIDs.map(makeCard),
-      chains: commentIDs.isEmpty ? [] : [.comments(thread)], connections: [], ink: []))
+      chains: commentIDs.isEmpty ? [] : [.comments(thread)], connections: connections, ink: []))
 }
 
 func makeNote(_ id: String) -> Document {
   .note(Document.Note(id: Document.ID(rawValue: id), text: "A note"))
+}
+
+func makeImage(_ id: String, excerptOf sourceID: String? = nil) -> Document {
+  .image(
+    Document.Image(
+      id: Document.ID(rawValue: id), label: nil,
+      file: Asset(name: "\(id).png", url: URL(filePath: "/\(id).png")),
+      excerpt: sourceID.map { sourceID in
+        Document.Excerpt(sourceID: Document.ID(rawValue: sourceID))
+      }
+    ))
 }
 
 func makeComment(_ id: String) -> Document {

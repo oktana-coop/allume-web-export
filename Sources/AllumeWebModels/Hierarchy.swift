@@ -1,12 +1,12 @@
 public struct Hierarchy: Equatable, Sendable {
-  /// Each document's parents: the boards that have it as a card or a comment, in breadth-first order
-  /// from the root.
+  /// Each document's parents: the boards under the root that have it as a card or a comment, in
+  /// breadth-first order from the root.
   private let parentIDs: [Document.ID: [Document.ID]]
   /// Each board's primary ancestors, from the root down to its primary parent: the first of its
   /// parents in breadth-first order, so one of the closest to the root.
   private let primaryAncestorIDs: [Document.ID: [Document.ID]]
 
-  init(rootID: Document.ID, documents: [Document]) throws(InvalidContentsError) {
+  init(rootID: Document.ID, documents: [Document]) {
     let boardsByID = Dictionary(
       documents.compactMap { document -> (Document.ID, Document.Board)? in
         guard case .board(let board) = document else {
@@ -22,13 +22,6 @@ public struct Hierarchy: Equatable, Sendable {
       entry.board.allCards.map { card in (childID: card.documentID, parentID: entry.board.id) }
     }
 
-    let rootDescendantIDs = Set(childParentPairs.map { pair in pair.childID })
-    if let outsider = documents.first(where: { document in
-      document.id != rootID && !rootDescendantIDs.contains(document.id)
-    }) {
-      throw .documentOutsideRoot(outsider.id)
-    }
-
     self.parentIDs = Dictionary(grouping: childParentPairs, by: { pair in pair.childID })
       .mapValues { pairs in
         pairs.uniqued(by: { pair in pair.parentID }).map { pair in pair.parentID }
@@ -39,8 +32,8 @@ public struct Hierarchy: Equatable, Sendable {
       })
   }
 
-  /// The boards that have the document as a card or a comment, in breadth-first order from the root,
-  /// so a board's primary parent comes first.
+  /// The boards under the root that have the document as a card or a comment, in breadth-first order
+  /// from the root, so a board's primary parent comes first.
   public func parents(of documentID: Document.ID) -> [Document.ID] {
     parentIDs[documentID, default: []]
   }
