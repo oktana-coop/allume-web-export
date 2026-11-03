@@ -59,12 +59,14 @@ public struct Contents: Equatable, Sendable {
   }
 
   /// Each step can leave something for the next to remove: removing a card can leave its document
-  /// outside the root, and a document outside the root can be an excerpt's source.
+  /// outside the root, and a document outside the root can be an excerpt's source. Repeats are removed
+  /// after invalid cards, so a valid card is never dropped for repeating an invalid one.
   private static func removingInconsistencies(from documents: [Document], rootID: Document.ID)
     -> (documents: [Document], omissions: Omissions)
   {
     let steps: [([Document]) -> (documents: [Document], omissions: Omissions)] = [
       { documents in removingInvalidCards(from: documents) },
+      { documents in removingRepeatedCards(from: documents) },
       { documents in removingDocumentsOutsideRoot(from: documents, rootID: rootID) },
       { documents in removingMissingExcerptSources(from: documents) },
     ]
@@ -93,6 +95,72 @@ public struct Contents: Equatable, Sendable {
       results.map { result in result.document },
       results.map { result in result.omissions }.reduce(.empty, +)
     )
+  }
+
+  /// A board keeps the first card for each document: its own cards first, then its threads' cards.
+  private static func removingRepeatedCards(from documents: [Document])
+    -> (documents: [Document], omissions: Omissions)
+  {
+    let results = documents.map { document -> (document: Document, omissions: Omissions) in
+      guard case .board(let board) = document else {
+        return (document, .empty)
+      }
+      let (withoutRepeats, omissions) = removingRepeatedCards(from: board)
+      return (.board(withoutRepeats), omissions)
+    }
+
+    return (
+      results.map { result in result.document },
+      results.map { result in result.omissions }.reduce(.empty, +)
+    )
+  }
+
+  private static func removingRepeatedCards(from board: Document.Board)
+    -> (board: Document.Board, omissions: Omissions)
+  {
+    // Where each card is: nil for the board's own cards, else the index of its chain.
+    let locatedCards =
+      board.cards.enumerated().map { index, card in (chain: Int?.none, index: index, card: card) }
+      + board.chains.enumerated().flatMap { chainIndex, chain in
+        guard case .comments(let thread) = chain else {
+          return [(chain: Int?, index: Int, card: Card)]()
+        }
+        return thread.cards.enumerated().map { index, card in
+          (chain: Int?.some(chainIndex), index: index, card: card)
+        }
+      }
+    let firstPlaces = Dictionary(
+      locatedCards.map { located in (located.card.documentID, (located.chain, located.index)) },
+      uniquingKeysWith: { first, _ in first }
+    )
+    let isFirst = { (chain: Int?, index: Int, card: Card) in
+      firstPlaces[card.documentID].map { first in first == (chain, index) } ?? false
+    }
+
+    let cards = board.cards.enumerated().filter { index, card in isFirst(nil, index, card) }
+      .map { _, card in card }
+    let chains = board.chains.enumerated().map { chainIndex, chain -> Chain in
+      guard case .comments(let thread) = chain else {
+        return chain
+      }
+      let firstCards = thread.cards.enumerated().filter { index, card in
+        isFirst(chainIndex, index, card)
+      }.map { _, card in card }
+      return .comments(CommentThread(id: thread.id, cards: firstCards))
+    }
+    let repeats = locatedCards.filter { located in
+      !isFirst(located.chain, located.index, located.card)
+    }
+
+    let withoutRepeats = Document.Board(
+      id: board.id, label: board.label, cards: cards, chains: chains,
+      connections: board.connections, ink: board.ink)
+    let omissions = Omissions(
+      repeatedCards: repeats.map { located in
+        Omissions.Card(boardID: board.id, documentID: located.card.documentID)
+      })
+
+    return (withoutRepeats, omissions)
   }
 
   /// The hierarchy only lists parents under the root.

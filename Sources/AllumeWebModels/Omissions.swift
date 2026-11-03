@@ -4,6 +4,8 @@ extension Contents {
     public let cardsForMissingDocuments: [Card]
     /// A comment as one of a board's own cards, or anything but a comment in a comment thread.
     public let cardsOfWrongKind: [Card]
+    /// Every card after the first for the same document on a board.
+    public let repeatedCards: [Card]
     /// The images whose excerpt was left out.
     public let excerptsWithMissingSources: [Document.ID]
     public let documentsOutsideRoot: [Document.ID]
@@ -13,17 +15,19 @@ extension Contents {
     public init(
       cardsForMissingDocuments: [Card] = [],
       cardsOfWrongKind: [Card] = [],
+      repeatedCards: [Card] = [],
       excerptsWithMissingSources: [Document.ID] = [],
       documentsOutsideRoot: [Document.ID] = []
     ) {
       self.cardsForMissingDocuments = cardsForMissingDocuments
       self.cardsOfWrongKind = cardsOfWrongKind
+      self.repeatedCards = repeatedCards
       self.excerptsWithMissingSources = excerptsWithMissingSources
       self.documentsOutsideRoot = documentsOutsideRoot
     }
 
     public var isEmpty: Bool {
-      cardsForMissingDocuments.isEmpty && cardsOfWrongKind.isEmpty
+      cardsForMissingDocuments.isEmpty && cardsOfWrongKind.isEmpty && repeatedCards.isEmpty
         && excerptsWithMissingSources.isEmpty && documentsOutsideRoot.isEmpty
     }
 
@@ -31,6 +35,7 @@ extension Contents {
       Self(
         cardsForMissingDocuments: first.cardsForMissingDocuments + second.cardsForMissingDocuments,
         cardsOfWrongKind: first.cardsOfWrongKind + second.cardsOfWrongKind,
+        repeatedCards: first.repeatedCards + second.repeatedCards,
         excerptsWithMissingSources: first.excerptsWithMissingSources
           + second.excerptsWithMissingSources,
         documentsOutsideRoot: first.documentsOutsideRoot + second.documentsOutsideRoot)

@@ -97,6 +97,30 @@ import Testing
     #expect(contents.omissions.documentsOutsideRoot.map(\.rawValue) == ["comment", "note"])
   }
 
+  @Test func omitsRepeatedCards() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        makeBoard("root", cards: ["note", "note"], commentThread: ["comment", "comment"]),
+        makeNote("note"),
+        makeComment("comment"),
+      ],
+      people: [:]
+    )
+
+    let board = contents.board(Document.ID(rawValue: "root"))
+    guard case .comments(let thread) = board?.chains.first else {
+      Issue.record("Expected the comment thread")
+      return
+    }
+    #expect(board?.cards.map(\.documentID.rawValue) == ["note"])
+    #expect(thread.cards.map(\.documentID.rawValue) == ["comment"])
+    #expect(
+      contents.omissions.repeatedCards == [
+        omittedCard("root", "note"), omittedCard("root", "comment"),
+      ])
+  }
+
   @Test func omitsConnectionsToOmittedCards() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
