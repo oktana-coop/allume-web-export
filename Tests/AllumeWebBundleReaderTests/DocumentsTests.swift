@@ -11,7 +11,7 @@ import Testing
     let (documents, warnings) = readDocuments(in: bundle)
 
     let kinds = Dictionary(grouping: documents, by: kind).mapValues { group in group.count }
-    #expect(kinds == ["note": 7, "link": 10, "image": 18, "pdf": 2, "comment": 6])
+    #expect(kinds == ["board": 13, "note": 7, "link": 10, "image": 18, "pdf": 2, "comment": 6])
     #expect(warnings.isEmpty)
   }
 

@@ -39,3 +39,21 @@ func withBundle<T>(
 func makeContents(documents: String, users: String = "{}") -> String {
   #"{"documents" : {\#(documents)}, "root" : "root", "users" : \#(users)}"#
 }
+
+/// A card's JSON, with a fixed frame unless one is given.
+func makeCardJSON(
+  _ documentID: String, cardID: String? = nil, color: String? = nil,
+  frame: (x: Int, y: Int, width: Int, height: Int) = (0, 0, 100, 100), z: Int = 1
+) -> String {
+  let optional = [
+    cardID.map { cardID in #""card_id" : "\#(cardID)""# },
+    color.map { color in #""color" : "\#(color)""# },
+  ].compactMap { field in field }
+  let fields =
+    [
+      #""document_id" : "\#(documentID)""#, #""position_x" : \#(frame.x)"#,
+      #""position_y" : \#(frame.y)"#, #""size_width" : \#(frame.width)"#,
+      #""size_height" : \#(frame.height)"#, #""z" : \#(z)"#,
+    ] + optional
+  return "{" + fields.joined(separator: ", ") + "}"
+}

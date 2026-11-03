@@ -79,7 +79,7 @@ struct BundleComment: Decodable {
   }
 }
 
-/// Every document but the boards, as the models have them, in order of ID, since the export's order
+/// Every document, as the models have them, in order of ID, since the export's order
 /// means nothing, with what reading them left out or worked around.
 func readDocuments(in bundle: AllumeBundle) -> (documents: [Document], warnings: [BundleWarning]) {
   let results = bundle.contents.documents
@@ -93,14 +93,14 @@ func readDocuments(in bundle: AllumeBundle) -> (documents: [Document], warnings:
 }
 
 extension Document {
-  /// No document for boards, which come with their cards, chains and connections, nor for the
-  /// documents the reader leaves out.
+  /// No document for the documents the reader leaves out.
   static func read(_ json: BundleDocument, id: ID, in bundle: AllumeBundle)
     -> (document: Document?, warnings: [BundleWarning])
   {
     switch json {
-    case .board:
-      return (nil, [])
+    case .board(let json):
+      let (board, warnings) = Board.read(json, id: id, in: bundle)
+      return (.board(board), warnings)
 
     case .text(let json):
       let (note, warnings) = Note.read(json, id: id, in: bundle)
