@@ -22,7 +22,7 @@ import Testing
   @Test func decodesUnknownDocumentTypes() throws {
     let json = Data(#"{"type" : "video", "label" : "A talk"}"#.utf8)
 
-    let document = try JSONDecoder().decode(AllumeBundle.Document.self, from: json)
+    let document = try JSONDecoder().decode(BundleDocument.self, from: json)
 
     guard case .unknown(let type) = document else {
       Issue.record("Expected an unknown document")
@@ -38,16 +38,12 @@ import Testing
   }
 
   @Test func rejectsInvalidJSONSayingWhere() throws {
-    let folder = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-    defer { try? FileManager.default.removeItem(at: folder) }
+    let contents = #"{"documents" : {"a" : {"type" : "url"}}, "root" : "a"}"#
 
-    try Data(#"{"bundle_version" : 6}"#.utf8).write(to: folder.appending(path: "metadata.json"))
-    try Data(#"{"documents" : {"a" : {"type" : "url"}}, "root" : "a"}"#.utf8)
-      .write(to: folder.appending(path: "contents.json"))
-
-    let error = #expect(throws: UnreadableBundleError.self) {
-      try AllumeBundle(contentsOf: folder)
+    let error = try withBundleFolder(contents: contents) { folder in
+      #expect(throws: UnreadableBundleError.self) {
+        try AllumeBundle(contentsOf: folder)
+      }
     }
 
     guard case .invalidJSON(let file, let reason) = error else {
