@@ -1,4 +1,7 @@
 public struct Hierarchy: Equatable, Sendable {
+  /// The root and the boards under it, in breadth-first order: level by level, and within a level in
+  /// the order of the previous level's cards.
+  public let boardIDs: [Document.ID]
   /// Each document's parents: the boards under the root that have it as a card or a comment, in
   /// breadth-first order from the root.
   private let parentIDs: [Document.ID: [Document.ID]]
@@ -22,6 +25,7 @@ public struct Hierarchy: Equatable, Sendable {
       entry.board.allCards.map { card in (childID: card.documentID, parentID: entry.board.id) }
     }
 
+    self.boardIDs = orderedBoards.map { entry in entry.board.id }
     self.parentIDs = Dictionary(grouping: childParentPairs, by: { pair in pair.childID })
       .mapValues { pairs in
         pairs.uniqued(by: { pair in pair.parentID }).map { pair in pair.parentID }

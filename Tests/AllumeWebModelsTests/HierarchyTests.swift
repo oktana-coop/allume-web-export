@@ -2,6 +2,43 @@ import AllumeWebModels
 import Testing
 
 @Suite struct HierarchyTests {
+  @Suite struct BoardIDs {
+    @Test func followLevelsThenTheOrderOfCards() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [
+          makeBoard("root", cards: ["q", "note", "p"]),
+          makeBoard("p", cards: ["x"]),
+          makeBoard("q", cards: ["y"]),
+          makeBoard("x"),
+          makeBoard("y"),
+          makeNote("note"),
+        ],
+        users: [:]
+      )
+
+      let boardIDs = contents.hierarchy.boardIDs
+
+      #expect(boardIDs.map(\.rawValue) == ["root", "q", "p", "y", "x"])
+    }
+
+    @Test func listEachBoardOnce() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [
+          makeBoard("root", cards: ["a", "b"]),
+          makeBoard("a", cards: ["b", "root"]),
+          makeBoard("b", cards: ["a"]),
+        ],
+        users: [:]
+      )
+
+      let boardIDs = contents.hierarchy.boardIDs
+
+      #expect(boardIDs.map(\.rawValue) == ["root", "a", "b"])
+    }
+  }
+
   @Suite struct Parents {
     @Test func followBreadthFirstOrder() throws {
       let contents = try Contents(
