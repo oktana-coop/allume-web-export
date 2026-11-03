@@ -89,7 +89,7 @@ import Testing
     #expect(warnings == [.missingFile(name: "i.png")])
   }
 
-  @Test func dropsAnExcerptWhoseSourceIsMissing() throws {
+  @Test func keepsAnExcerptsSourceAsGiven() throws {
     let contents = makeContents(
       documents: #"""
         "i" : {
@@ -106,11 +106,8 @@ import Testing
       Issue.record("Expected the image")
       return
     }
-    #expect(image.excerpt == nil)
-    #expect(
-      warnings == [
-        .missingExcerptSource(Document.ID(rawValue: "i"), sourceID: Document.ID(rawValue: "gone"))
-      ])
+    #expect(image.excerpt?.sourceID == Document.ID(rawValue: "gone"))
+    #expect(warnings.isEmpty)
   }
 
   @Test func dropsACommentWithAnInvalidDate() throws {

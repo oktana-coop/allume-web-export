@@ -141,27 +141,21 @@ extension Document.Note {
 }
 
 extension Document.Image {
-  /// A missing file is kept, as the POC renders the card anyway. An excerpt whose source isn't in the
-  /// export is left out, but the image is kept.
+  /// A missing file is kept, as the POC renders the card anyway.
   static func read(_ json: BundleImage, id: Document.ID, in bundle: AllumeBundle)
     -> (image: Document.Image, warnings: [BundleWarning])
   {
-    let fileWarnings: [BundleWarning] =
-      bundle.hasFile(named: json.originalFile) ? [] : [.missingFile(name: json.originalFile)]
-
-    let (excerpt, excerptWarnings): (Document.Excerpt?, [BundleWarning]) =
-      switch json.excerptInfo.map({ info in Document.ID(rawValue: info.excerptedID) }) {
-      case .none: (nil, [])
-      case .some(let sourceID) where !bundle.hasDocument(sourceID.rawValue):
-        (nil, [.missingExcerptSource(id, sourceID: sourceID)])
-      case .some(let sourceID): (Document.Excerpt(sourceID: sourceID), [])
-      }
-
+    let excerpt = json.excerptInfo.map { info in
+      Document.Excerpt(sourceID: Document.ID(rawValue: info.excerptedID))
+    }
     let image = Document.Image(
       id: id, label: json.label.nonEmpty, file: bundle.asset(named: json.originalFile),
       excerpt: excerpt)
 
-    return (image, fileWarnings + excerptWarnings)
+    let warnings: [BundleWarning] =
+      bundle.hasFile(named: json.originalFile) ? [] : [.missingFile(name: json.originalFile)]
+
+    return (image, warnings)
   }
 }
 

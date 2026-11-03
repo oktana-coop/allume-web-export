@@ -21,10 +21,6 @@ struct AllumeBundle {
     self.contents = try decode(BundleContents.self, from: contentsJSON, file: "contents.json")
   }
 
-  func hasDocument(_ id: String) -> Bool {
-    contents.documents[id] != nil
-  }
-
   func hasFile(named name: String) -> Bool {
     FileManager.default.fileExists(atPath: files.appending(path: name).path(percentEncoded: false))
   }
