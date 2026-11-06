@@ -4,7 +4,7 @@ import AllumeWebRendering
 import Foundation
 import Testing
 
-@Suite struct LanguagesTests {
+@Suite struct SampleExportTests {
   @Test func rendersTheExpectedPagesAndFiles() throws {
     let (contents, _) = try readBundle(at: fixtureURL)
 
@@ -13,14 +13,15 @@ import Testing
     let output = [String: String](
       uniqueKeysWithValues: pages.map { page in (page.path, page.html) }
         + [("files.txt", files.map(\.path).joined(separator: "\n") + "\n")])
-    try compareWithExpectedFiles(output, in: expectedURL.appending(path: "Languages"))
+    try compareWithExpectedFiles(output, in: expectedURL.appending(path: "SampleExport"))
   }
 
   @Test func publishesItsSiteIntoAFolder() async throws {
     let (contents, _) = try readBundle(at: fixtureURL)
-    let folder = FileManager.default.temporaryDirectory.appending(path: "LanguagesTests-\(UUID())")
+    let folder = FileManager.default.temporaryDirectory.appending(
+      path: "SampleExportTests-\(UUID())")
     defer { try? FileManager.default.removeItem(at: folder) }
-    let expected = expectedURL.appending(path: "Languages")
+    let expected = expectedURL.appending(path: "SampleExport")
     let pages = try FileManager.default.contentsOfDirectory(
       atPath: expected.path(percentEncoded: false)
     )

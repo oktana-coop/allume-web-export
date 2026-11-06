@@ -127,7 +127,7 @@ extension Document {
 }
 
 extension Document.Note {
-  /// A missing text file leaves the note empty, as in the POC.
+  /// A missing text file leaves the note empty.
   static func read(_ json: BundleText, id: Document.ID, in bundle: AllumeBundle)
     -> (note: Document.Note, warnings: [BundleWarning])
   {
@@ -141,7 +141,7 @@ extension Document.Note {
 }
 
 extension Document.Image {
-  /// A missing file is kept, as the POC renders the card anyway.
+  /// A missing file is kept, so the card is still drawn.
   static func read(_ json: BundleImage, id: Document.ID, in bundle: AllumeBundle)
     -> (image: Document.Image, warnings: [BundleWarning])
   {

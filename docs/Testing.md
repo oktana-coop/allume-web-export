@@ -25,10 +25,10 @@ They check the module on its own, with small inputs written in the tests.
 
 ## Integration Tests
 
-`Tests/AllumeWebIntegrationTests/` reads the public fixture in `Fixtures/Languages/`, renders and
-publishes it, and compares the pages with the expected files in
-`Tests/AllumeWebIntegrationTests/Expected/Languages/`. These are the accepted output, so any change
-in the pages fails the tests.
+`Tests/AllumeWebIntegrationTests/` reads the public sample export in `Fixtures/SampleExport/`,
+renders and publishes it, and compares the pages with the expected files in
+`Tests/AllumeWebIntegrationTests/Expected/SampleExport/`. These are the accepted output, so any
+change in the pages fails the tests.
 
 ### Updating Expected Files
 

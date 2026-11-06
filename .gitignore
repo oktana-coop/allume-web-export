@@ -2,7 +2,7 @@
 .build/
 .swiftpm/
 
-# Private example exports, copied from the POC. Never commit them.
+# Private example exports. Never commit them.
 /example-boards/
 
 # Generated sites

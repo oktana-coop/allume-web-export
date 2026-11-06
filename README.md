@@ -60,11 +60,11 @@ and open <http://localhost:8000>.
 
 ### Run
 
-`swift run` builds the tool and runs it in one step. To try it on the public fixture export in
-`Fixtures/Languages/`, and view the result:
+`swift run` builds the tool and runs it in one step. To try it on the public sample export in
+`Fixtures/SampleExport/`, and view the result:
 
 ```sh
-swift run allume-web-export Fixtures/Languages --out out --replace
+swift run allume-web-export Fixtures/SampleExport --out out --replace
 python3 -m http.server --directory out
 ```
 

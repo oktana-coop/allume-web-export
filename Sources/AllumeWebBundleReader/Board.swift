@@ -167,8 +167,8 @@ extension Chain {
 }
 
 extension TextBlock {
-  /// A missing text file leaves the text empty, as in the POC. Paragraphs are split on `\n` only, and
-  /// an unknown highlight color is left out.
+  /// A missing text file leaves the text empty. Paragraphs are split on `\n` only, and an unknown
+  /// highlight color is left out.
   static func read(_ json: BundleChain, in bundle: AllumeBundle)
     -> (text: TextBlock, warnings: [BundleWarning])
   {
@@ -219,8 +219,8 @@ extension Connection {
 }
 
 extension Ink {
-  /// The size is the SVG's `width` and `height` times its scale, read as the POC does: a missing
-  /// attribute counts as 0. A missing SVG is left out, since its size can't be read.
+  /// The size is the SVG's `width` and `height` times its scale, a missing attribute counting as 0.
+  /// A missing SVG is left out, since its size can't be read.
   static func read(_ json: BundleInkModel, in bundle: AllumeBundle)
     -> (ink: Ink?, warnings: [BundleWarning])
   {

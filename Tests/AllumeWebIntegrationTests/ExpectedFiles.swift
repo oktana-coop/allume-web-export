@@ -1,12 +1,12 @@
 import Foundation
 import Testing
 
-/// The public fixture export, `Fixtures/Languages` at the root of the repository.
+/// The public sample export, `Fixtures/SampleExport` at the root of the repository.
 let fixtureURL = URL(filePath: #filePath)
   .deletingLastPathComponent()
   .deletingLastPathComponent()
   .deletingLastPathComponent()
-  .appending(path: "Fixtures/Languages")
+  .appending(path: "Fixtures/SampleExport")
 
 /// The accepted output, next to the tests so that `ACCEPT=1` can write it.
 let expectedURL = URL(filePath: #filePath).deletingLastPathComponent().appending(path: "Expected")

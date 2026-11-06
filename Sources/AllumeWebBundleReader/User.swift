@@ -26,7 +26,7 @@ func readUsers(in bundle: AllumeBundle) -> (users: [User.ID: User], warnings: [B
 }
 
 extension User {
-  /// The color the POC gives an author without one.
+  /// The color of a user whose own isn't a valid color.
   static let fallbackColor = RGBColor(red: 0xd8, green: 0xb6, blue: 0x82)
 
   /// A color that isn't `#rrggbb` falls back to `fallbackColor`, with a warning. The avatar is the

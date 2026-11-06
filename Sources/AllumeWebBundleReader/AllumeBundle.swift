@@ -61,7 +61,7 @@ struct BundleContents: Decodable {
 }
 
 extension Optional where Wrapped == String {
-  /// `nil` for an empty string too, as the POC treats `""` as missing.
+  /// `nil` for an empty string too, which the export writes for a label that isn't set.
   var nonEmpty: String? {
     flatMap { text in text.isEmpty ? nil : text }
   }
