@@ -39,7 +39,10 @@ import Testing
       return url
     }
     #expect(viewerURLs.map(\.lastPathComponent) == ["viewer.css", "viewer.js"])
-    #expect(viewerURLs.allSatisfy { url in FileManager.default.fileExists(atPath: url.path()) })
+    #expect(
+      viewerURLs.allSatisfy { url in
+        FileManager.default.fileExists(atPath: url.path(percentEncoded: false))
+      })
   }
 }
 

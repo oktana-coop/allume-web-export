@@ -28,7 +28,7 @@ let package = Package(
     .executableTarget(
       name: "AllumeWebCLI",
       dependencies: [
-        "AllumeWeb",
+        "AllumeWeb", "AllumeWebBundleReader", "AllumeWebModels",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ]
     ),

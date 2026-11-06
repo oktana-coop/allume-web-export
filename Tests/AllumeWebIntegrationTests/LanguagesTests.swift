@@ -21,8 +21,10 @@ import Testing
     let folder = FileManager.default.temporaryDirectory.appending(path: "LanguagesTests-\(UUID())")
     defer { try? FileManager.default.removeItem(at: folder) }
     let expected = expectedURL.appending(path: "Languages")
-    let pages = try FileManager.default.contentsOfDirectory(atPath: expected.path())
-      .filter { name in name.hasSuffix(".html") }
+    let pages = try FileManager.default.contentsOfDirectory(
+      atPath: expected.path(percentEncoded: false)
+    )
+    .filter { name in name.hasSuffix(".html") }
     let files = try String(contentsOf: expected.appending(path: "files.txt"), encoding: .utf8)
       .split(separator: "\n").map { path in "files/\(path)" }
 
@@ -40,7 +42,8 @@ import Testing
 
 /// The paths of the files in the folder and the folders inside it.
 private func filePaths(in folder: URL) throws -> [String] {
-  try (FileManager.default.subpathsOfDirectory(atPath: folder.path())).filter { path in
+  try (FileManager.default.subpathsOfDirectory(atPath: folder.path(percentEncoded: false))).filter {
+    path in
     try folder.appending(path: path).resourceValues(forKeys: [.isDirectoryKey]).isDirectory
       == false
   }

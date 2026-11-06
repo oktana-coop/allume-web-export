@@ -55,7 +55,10 @@ import Testing
       [SiteFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
       replacingContents: true)
 
-    #expect(try FileManager.default.contentsOfDirectory(atPath: root.path()) == ["index.html"])
+    #expect(
+      try FileManager.default.contentsOfDirectory(atPath: root.path(percentEncoded: false)) == [
+        "index.html"
+      ])
   }
 
   @Test func refusesAFileInPlaceOfTheFolder() throws {
@@ -80,7 +83,8 @@ import Testing
         [SiteFile(path: "files/../../escaped.txt", source: .text("Out"))], to: folder,
         replacingContents: false)
     }
-    #expect(try FileManager.default.contentsOfDirectory(atPath: root.path()).isEmpty)
+    #expect(
+      try FileManager.default.contentsOfDirectory(atPath: root.path(percentEncoded: false)).isEmpty)
   }
 
   @Test func goesWithoutAMissingFileWithAWarning() throws {
@@ -97,7 +101,10 @@ import Testing
       to: folder, replacingContents: false)
 
     #expect(warnings == [.missingFile(path: "files/missing.png", source: missing)])
-    #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path()) == ["index.html"])
+    #expect(
+      try FileManager.default.contentsOfDirectory(atPath: folder.path(percentEncoded: false)) == [
+        "index.html"
+      ])
   }
 
   @Test func leavesTheFolderAsItWasWhenAWriteFails() throws {
@@ -114,13 +121,16 @@ import Testing
         ],
         to: root, replacingContents: true)
     }
-    #expect(try FileManager.default.contentsOfDirectory(atPath: root.path()) == ["index.html"])
+    #expect(
+      try FileManager.default.contentsOfDirectory(atPath: root.path(percentEncoded: false)) == [
+        "index.html"
+      ])
     #expect(try text(of: "index.html", in: root) == "Old")
   }
 }
 
 private func makeTemporaryFolder() throws -> URL {
-  let folder = FileManager.default.temporaryDirectory.appending(path: "FolderWriterTests-\(UUID())")
+  let folder = FileManager.default.temporaryDirectory.appending(path: "Folder writer \(UUID())")
   try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
   return folder
 }

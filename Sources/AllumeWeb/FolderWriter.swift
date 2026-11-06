@@ -49,7 +49,7 @@ private func checkCanWrite(to folder: URL, replacingContents: Bool)
     throw .notAFolder(folder)
   case true?:
     let contents = try attempt(at: folder) {
-      try FileManager.default.contentsOfDirectory(atPath: folder.path())
+      try FileManager.default.contentsOfDirectory(atPath: folder.path(percentEncoded: false))
     }
     guard contents.isEmpty || replacingContents else {
       throw .notEmpty(folder)
@@ -78,7 +78,7 @@ private func write(_ file: SiteFile, into folder: URL)
     return nil
 
   case .copy(let source):
-    guard FileManager.default.fileExists(atPath: source.path()) else {
+    guard FileManager.default.fileExists(atPath: source.path(percentEncoded: false)) else {
       return .missingFile(path: file.path, source: source)
     }
     try attempt(at: destination) {

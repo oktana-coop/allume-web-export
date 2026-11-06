@@ -23,7 +23,8 @@ func compareWithExpectedFiles(_ output: [String: String], in folder: URL) throws
     return
   }
 
-  let expectedNames = try FileManager.default.contentsOfDirectory(atPath: folder.path())
+  let expectedNames = try FileManager.default.contentsOfDirectory(
+    atPath: folder.path(percentEncoded: false))
   let differences = output.sorted { a, b in a.key < b.key }.compactMap { name, text in
     let expected = (try? String(contentsOf: folder.appending(path: name), encoding: .utf8)) ?? ""
     return firstDifference(between: text, and: expected).map { difference in
