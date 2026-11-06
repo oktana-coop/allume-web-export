@@ -59,6 +59,22 @@ export const scrollBoard = async ({
   await page.mouse.wheel(x, y);
 };
 
+/** Drags the mouse from the point on the screen, by the distances. */
+export const drag = async ({
+  page,
+  from,
+  by,
+}: {
+  page: Page;
+  from: Point;
+  by: Point;
+}) => {
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(from.x + by.x, from.y + by.y, { steps: 5 });
+  await page.mouse.up();
+};
+
 const center = async ({ of: element }: { of: Locator }): Promise<Point> => {
   const box = await element.boundingBox();
   if (!box) throw new Error(`${element} isn't shown`);
