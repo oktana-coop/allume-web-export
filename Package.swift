@@ -38,7 +38,7 @@ let package = Package(
     .testTarget(name: "AllumeWebTests", dependencies: ["AllumeWeb", "AllumeWebModels"]),
     .testTarget(
       name: "AllumeWebIntegrationTests",
-      dependencies: ["AllumeWebBundleReader", "AllumeWebRendering"],
+      dependencies: ["AllumeWeb", "AllumeWebBundleReader", "AllumeWebRendering"],
       exclude: ["Expected"]
     ),
   ]
