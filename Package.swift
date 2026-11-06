@@ -31,5 +31,10 @@ let package = Package(
     .testTarget(name: "AllumeWebModelsTests", dependencies: ["AllumeWebModels"]),
     .testTarget(name: "AllumeWebBundleReaderTests", dependencies: ["AllumeWebBundleReader"]),
     .testTarget(name: "AllumeWebRenderingTests", dependencies: ["AllumeWebRendering"]),
+    .testTarget(
+      name: "AllumeWebIntegrationTests",
+      dependencies: ["AllumeWebBundleReader", "AllumeWebRendering"],
+      exclude: ["Expected"]
+    ),
   ]
 )

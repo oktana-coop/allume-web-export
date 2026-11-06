@@ -1,6 +1,6 @@
 extension Sequence {
   /// Keeps the first element for each key, in order.
-  func uniqued<Key: Hashable>(on key: (Element) -> Key) -> [Element] {
+  package func uniqued<Key: Hashable>(on key: (Element) -> Key) -> [Element] {
     let elements = Array(self)
     let firstIndices = Dictionary(
       elements.enumerated().map { index, element in (key(element), index) },
