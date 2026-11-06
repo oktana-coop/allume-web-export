@@ -16,7 +16,7 @@ import Testing
     try compareWithExpectedFiles(output, in: expectedURL.appending(path: "Languages"))
   }
 
-  @Test func publishesItsSiteIntoAFolder() throws {
+  @Test func publishesItsSiteIntoAFolder() async throws {
     let (contents, _) = try readBundle(at: fixtureURL)
     let folder = FileManager.default.temporaryDirectory.appending(path: "LanguagesTests-\(UUID())")
     defer { try? FileManager.default.removeItem(at: folder) }
@@ -28,7 +28,8 @@ import Testing
     let files = try String(contentsOf: expected.appending(path: "files.txt"), encoding: .utf8)
       .split(separator: "\n").map { path in "files/\(path)" }
 
-    let warnings = try publishSite(contents, to: folder, replacingContents: false)
+    let (_, warnings) = try await publishSite(
+      contents, to: folder, replacingContents: false, faviconCache: nil)
 
     #expect(warnings.isEmpty)
     #expect(Set(try filePaths(in: folder)) == Set(pages + files + ["viewer.css", "viewer.js"]))

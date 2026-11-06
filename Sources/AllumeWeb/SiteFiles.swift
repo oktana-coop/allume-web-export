@@ -16,9 +16,9 @@ public struct SiteFile: Equatable, Sendable {
 }
 
 /// Every file of the standalone site: a page for each board, the files the pages refer to, under
-/// `files/`, and the viewer's style sheet and script.
-public func siteFiles(for contents: Contents) -> [SiteFile] {
-  let (pages, files) = renderBoards(contents, favicons: [:])
+/// `files/`, and the viewer's style sheet and script. The favicons are each link host's icon.
+public func siteFiles(for contents: Contents, favicons: [String: Asset]) -> [SiteFile] {
+  let (pages, files) = renderBoards(contents, favicons: favicons)
 
   return pages.map { page in SiteFile(path: page.path, source: .text(page.html)) }
     + files.map { file in SiteFile(path: "files/\(file.path)", source: .copy(file.source)) }

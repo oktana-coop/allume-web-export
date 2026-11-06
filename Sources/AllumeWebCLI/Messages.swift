@@ -55,12 +55,11 @@ func warningMessage(for warning: PublishingWarning) -> String {
   switch warning {
   case .missingFile(_, let source):
     "Couldn't copy \(source.lastPathComponent), which is missing, so the site goes without it."
+  case .faviconCacheUnwritable(let cache, let reason):
+    "Couldn't keep favicons in \(shownPath(of: cache)), so they'll be fetched again next time. "
+      + reason
   }
 }
-
-let faviconsNotFetched =
-  "Favicons aren't fetched yet, so link cards show the generic link icon. Use --no-favicons to "
-  + "hide this."
 
 func errorMessage(for error: UnreadableBundleError) -> String {
   switch error {

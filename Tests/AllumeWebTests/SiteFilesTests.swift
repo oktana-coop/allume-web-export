@@ -6,17 +6,17 @@ import Testing
 
 @Suite struct SiteFilesTests {
   @Test func areThePagesThenTheFilesTheyReferToThenTheViewer() throws {
-    let contents = try makeContents()
+    let contents = try makeContents(with: [makeImage("image.png")])
 
-    let files = siteFiles(for: contents)
+    let files = siteFiles(for: contents, favicons: [:])
 
     #expect(files.map(\.path) == ["index.html", "files/image.png", "viewer.css", "viewer.js"])
   }
 
   @Test func holdThePagesTextAndCopyEverythingElse() throws {
-    let contents = try makeContents()
+    let contents = try makeContents(with: [makeImage("image.png")])
 
-    let files = siteFiles(for: contents)
+    let files = siteFiles(for: contents, favicons: [:])
 
     let sources = files.map(\.source)
     guard case .text(let page) = sources.first else {
@@ -27,10 +27,20 @@ import Testing
     #expect(sources.dropFirst().first == .copy(URL(filePath: "/bundle/files/image.png")))
   }
 
-  @Test func copyThePackagesViewerFiles() throws {
-    let contents = try makeContents()
+  @Test func copyTheLinksFavicons() throws {
+    let contents = try makeContents(with: [makeLink("link", url: "https://ocaml.org/docs")])
+    let icon = URL(filePath: "/cache/favicons/ocaml.org.png")
 
-    let files = siteFiles(for: contents)
+    let files = siteFiles(
+      for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)])
+
+    #expect(files.contains(SiteFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
+  }
+
+  @Test func copyThePackagesViewerFiles() throws {
+    let contents = try makeContents(with: [makeImage("image.png")])
+
+    let files = siteFiles(for: contents, favicons: [:])
 
     let viewerURLs = files.suffix(2).compactMap { file -> URL? in
       guard case .copy(let url) = file.source else {
@@ -44,28 +54,4 @@ import Testing
         FileManager.default.fileExists(atPath: url.path(percentEncoded: false))
       })
   }
-}
-
-/// A root board with an image on it.
-private func makeContents() throws -> Contents {
-  try Contents(
-    rootID: Document.ID(rawValue: "root"),
-    documents: [
-      .board(
-        Document.Board(
-          id: Document.ID(rawValue: "root"), label: "Languages",
-          cards: [
-            Card(
-              documentID: Document.ID(rawValue: "image"),
-              frame: Rect(x: 0, y: 0, width: 100, height: 100), zIndex: 0, color: nil)
-          ],
-          chains: [], connections: [], ink: [])),
-      .image(
-        Document.Image(
-          id: Document.ID(rawValue: "image"), label: nil,
-          file: Asset(name: "image.png", url: URL(filePath: "/bundle/files/image.png")),
-          excerpt: nil)),
-    ],
-    users: [:]
-  )
 }

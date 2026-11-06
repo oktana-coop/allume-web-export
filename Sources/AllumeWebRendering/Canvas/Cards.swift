@@ -62,7 +62,7 @@ var copyButton: HTML {
 }
 
 /// The host whose favicon a link shows, lowercased. Nil when the link isn't a web address.
-func faviconHost(of url: String) -> String? {
+package func faviconHost(of url: String) -> String? {
   guard let parsed = URL(string: url), ["http", "https"].contains(parsed.scheme?.lowercased()),
     let host = parsed.host(), !host.isEmpty
   else {
