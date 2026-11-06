@@ -1,25 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { type Board } from '../shared/boards';
-import { boardCard, expectHeading } from '../shared/helpers';
-
-/**
- * Enters a board through its card on the current board, and waits for its
- * page.
- */
-export const enterBoard = async ({
-  page,
-  board,
-}: {
-  page: Page;
-  board: Board;
-}) => {
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: board.label, exact: true })
-    .click();
-  await expect(page).toHaveURL(board.url);
-};
+import { boardCard, enterBoard, expectHeading } from '../shared/helpers';
 
 /**
  * Enters each board in the path in turn, each through its card on the one

@@ -17,6 +17,9 @@ export default defineConfig({
   ],
   use: {
     baseURL: `http://localhost:${PORT}`,
+    // A click or drag that can't find its target fails as soon as an
+    // assertion would, rather than at the test's timeout.
+    actionTimeout: 5_000,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',

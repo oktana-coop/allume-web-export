@@ -10,6 +10,24 @@ export const boardCard = ({ page, board }: { page: Page; board: Board }) =>
   page.locator(`#card-${board.id}`);
 
 /**
+ * Enters a board through its card on the current board, and waits for its
+ * page.
+ */
+export const enterBoard = async ({
+  page,
+  board,
+}: {
+  page: Page;
+  board: Board;
+}) => {
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: board.label, exact: true })
+    .click();
+  await expect(page).toHaveURL(board.url);
+};
+
+/**
  * Checks the page's heading is the board's label. A linked board's heading
  * also holds its menu, hidden until opened, so only the visible text counts.
  */
