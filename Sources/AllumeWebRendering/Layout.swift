@@ -25,9 +25,9 @@ func layout(of board: Document.Board) -> BoardLayout {
     contentBounds: contentBounds(of: board), connectionLines: connectionLines(of: board))
 }
 
-/// A board's preview is scaled so that its contents, and the empty margin between the board's origin
-/// and its nearest card, fit the card. It's capped at 0.8, so that it never exceeds the board's
-/// actual size.
+/// A board's preview is scaled so that its contents, and the empty margin between the board's
+/// origin and its nearest card, fit the card. It's capped at 0.8, so that it never exceeds the
+/// board's actual size.
 func previewScale(of contentBounds: Rect, in frame: Rect) -> Double {
   guard contentBounds.maxX > 0 && contentBounds.maxY > 0 else {
     return 0.8

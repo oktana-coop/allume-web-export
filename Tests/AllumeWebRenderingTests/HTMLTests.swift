@@ -8,14 +8,18 @@ import Testing
   @Suite struct Rendering {
     @Test func escapesTextAndAttributeValues() {
       let html = HTML.element(
-        "p", ["title": "Tom & Jerry's <\"show\">"], [.text("Tom & Jerry's <\"show\">")])
+        "p", ["title": #"Tom & Jerry's <"show">"#], [.text(#"Tom & Jerry's <"show">"#)])
 
       let rendered = html.rendered(resolving: describe)
 
       #expect(
         rendered
-          == "<p title=\"Tom &amp; Jerry&#39;s &lt;&quot;show&quot;&gt;\">"
-          + "Tom &amp; Jerry&#39;s &lt;&quot;show&quot;&gt;</p>")
+          == markup(
+            #"""
+            <p title="Tom &amp; Jerry&#39;s &lt;&quot;show&quot;&gt;">
+              Tom &amp; Jerry&#39;s &lt;&quot;show&quot;&gt;
+            </p>
+            """#))
     }
 
     @Test func keepsTheOrderOfAttributesAndLeavesOutNilOnes() {
@@ -23,7 +27,12 @@ import Testing
 
       let rendered = html.rendered(resolving: describe)
 
-      #expect(rendered == "<a href=\"#top\" class=\"up\">Top</a>")
+      #expect(
+        rendered
+          == markup(
+            #"""
+            <a href="#top" class="up">Top</a>
+            """#))
     }
 
     @Test func rendersAnEmptyAttributeAsItsName() {
@@ -31,7 +40,7 @@ import Testing
 
       let rendered = html.rendered(resolving: describe)
 
-      #expect(rendered == "<div popover id=\"menu\"></div>")
+      #expect(rendered == #"<div popover id="menu"></div>"#)
     }
 
     @Test func rendersVoidElementsWithoutEndTags() {
@@ -40,7 +49,7 @@ import Testing
 
       let rendered = html.rendered(resolving: describe)
 
-      #expect(rendered == "<p><img src=\"a.png\" alt=\"\"><br></p>")
+      #expect(rendered == #"<p><img src="a.png" alt=""><br></p>"#)
     }
 
     @Test func closesSVGElementsWithoutChildrenThemselves() {
@@ -55,8 +64,13 @@ import Testing
 
       #expect(
         rendered
-          == "<span><svg width=\"14\"><use href=\"#icon-copy\"/></svg>"
-          + "<span class=\"avatar\"></span></span>")
+          == markup(
+            #"""
+            <span>
+              <svg width="14"><use href="#icon-copy"/></svg>
+              <span class="avatar"></span>
+            </span>
+            """#))
     }
 
     @Test func rendersReferencesAsTheResolverSays() {
@@ -67,7 +81,7 @@ import Testing
 
       let rendered = html.rendered(resolving: describe)
 
-      #expect(rendered == "<a href=\"board:b#c\"><img src=\"file:a&amp;b.png\"></a>")
+      #expect(rendered == #"<a href="board:b#c"><img src="file:a&amp;b.png"></a>"#)
     }
 
     @Test func rendersTheDoctypeAndComments() {
@@ -101,16 +115,6 @@ import Testing
 
       #expect(files.isEmpty)
     }
-  }
-}
-
-/// A resolver that shows which reference it was given.
-private func describe(_ reference: Reference) -> String {
-  switch reference {
-  case .board(let boardID, let cardID):
-    "board:\(boardID.rawValue)" + (cardID.map { cardID in "#\(cardID.rawValue)" } ?? "")
-  case .file(let file):
-    "file:\(file.path)"
   }
 }
 

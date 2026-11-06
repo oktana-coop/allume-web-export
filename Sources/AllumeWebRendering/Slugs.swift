@@ -6,7 +6,7 @@ import Foundation
 /// only on its board. Boards that would share a slug get their whole ID instead of the code.
 func slugs(in contents: Contents) -> [Document.ID: String] {
   let boards = contents.hierarchy.boardIDs.map { boardID in
-    (id: boardID, label: slugify(contents.board(boardID)?.label ?? "Untitled board"))
+    (id: boardID, label: slugify(contents.board(boardID)?.displayLabel ?? ""))
   }
   let codedSlugs = boards.map { board in "\(board.label)-\(slugCode(of: board.id))" }
   let counts = Dictionary(codedSlugs.map { slug in (slug, 1) }, uniquingKeysWith: +)
@@ -17,8 +17,8 @@ func slugs(in contents: Contents) -> [Document.ID: String] {
     })
 }
 
-/// Lowercase ASCII letters and digits, with `-` between runs of them, at most 60 characters long, or
-/// `board` when nothing is left. Accented letters keep their base letter.
+/// Lowercase ASCII letters and digits, with `-` between runs of them, at most 60 characters long,
+/// or `board` when nothing is left. Accented letters keep their base letter.
 func slugify(_ text: String) -> String {
   let withoutMarks = text.decomposedStringWithCompatibilityMapping.unicodeScalars.filter {
     scalar in !(0x300...0x36F).contains(scalar.value)
