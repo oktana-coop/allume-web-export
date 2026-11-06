@@ -1,8 +1,7 @@
 import AllumeWebModels
 
-/// What's on a board, at its depth: 0 on its own page, more inside previews. In drawing order: the
-/// connection lines, the cards by z-index, the chains, the ink. Each piece is on a line of its own,
-/// so that a page's source reads, and compares, a piece at a time.
+/// What's on a board, at its depth: 0 in its own view, more inside previews. In drawing order: the
+/// connection lines, the cards by z-index, the chains, the ink.
 func drawBoardContents(
   _ board: Document.Board, depth: Int, contents: Contents, layouts: [Document.ID: BoardLayout],
   favicons: [String: Asset]
@@ -21,8 +20,7 @@ func drawBoardContents(
   }
   let ink = board.ink.map { ink in drawInk(ink) }
 
-  let pieces = [connectionLines].compactMap { $0 } + cards + chains + ink
-  return Array(pieces.map { piece in [piece] }.joined(separator: [.text("\n")]))
+  return [connectionLines].compactMap { $0 } + cards + chains + ink
 }
 
 private func drawChain(_ chain: Chain, contents: Contents, interactive: Bool) -> [HTML] {

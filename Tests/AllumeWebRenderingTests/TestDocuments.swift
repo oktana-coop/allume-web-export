@@ -79,12 +79,12 @@ func drawn(
   }
 }
 
-/// What the renderer draws for the board's contents, with references described.
-func drawnContents(of boardID: String, in contents: Contents, depth: Int = 0) -> String? {
+/// What the renderer draws for the board's contents, piece by piece, with references described.
+func drawnContents(of boardID: String, in contents: Contents, depth: Int = 0) -> [String]? {
   contents.board(Document.ID(rawValue: boardID)).map { board in
     drawBoardContents(
       board, depth: depth, contents: contents, layouts: layouts(in: contents), favicons: [:]
     )
-    .map { piece in piece.rendered(resolving: describe) }.joined()
+    .map { piece in piece.rendered(resolving: describe) }
   }
 }

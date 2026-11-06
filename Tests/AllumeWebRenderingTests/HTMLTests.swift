@@ -93,6 +93,24 @@ import Testing
     }
   }
 
+  @Suite struct LineBreaks {
+    @Test func goBetweenNodes() {
+      let nodes = separatedByLineBreaks([.text("A"), .text("B"), .text("C")])
+
+      let rendered = nodes.map { node in node.rendered(resolving: describe) }.joined()
+
+      #expect(rendered == "A\nB\nC")
+    }
+
+    @Test func putNodesOnLinesOfTheirOwnInsideTheirParent() {
+      let html = HTML.element("p", [:], onLinesOfTheirOwn([.text("A"), .text("B")]))
+
+      let rendered = html.rendered(resolving: describe)
+
+      #expect(rendered == "<p>\nA\nB\n</p>")
+    }
+  }
+
   @Suite struct Files {
     @Test func listTheFileReferencesInOrderWithRepeats() {
       let html = HTML.element(

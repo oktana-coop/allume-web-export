@@ -62,6 +62,17 @@ enum AttributeValue: ExpressibleByStringInterpolation {
   }
 }
 
+/// The nodes with a line break between each, `A\nB\nC`, so that the source shows them, and diffs
+/// them, one per line.
+func separatedByLineBreaks(_ nodes: [HTML]) -> [HTML] {
+  Array(nodes.map { node in [node] }.joined(separator: [.text("\n")]))
+}
+
+/// The nodes each on a line of its own inside their parent: `\nA\nB\nC\n`.
+func onLinesOfTheirOwn(_ nodes: [HTML]) -> [HTML] {
+  [.text("\n")] + separatedByLineBreaks(nodes) + [.text("\n")]
+}
+
 /// HTML elements with no end tag, rendered as `<img …>`.
 private let voidElements: Set = [
   "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track",

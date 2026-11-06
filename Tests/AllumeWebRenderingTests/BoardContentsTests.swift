@@ -4,7 +4,7 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct BoardContentsTests {
-  @Test func areConnectionLinesThenCardsByZIndexThenChainsThenInkOnALineEach() throws {
+  @Test func areConnectionLinesThenCardsByZIndexThenChainsThenInk() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -35,14 +35,14 @@ import Testing
       users: [:]
     )
 
-    let lines = try #require(drawnContents(of: "root", in: contents)).split(separator: "\n")
+    let pieces = try #require(drawnContents(of: "root", in: contents))
 
     #expect(
-      lines.compactMap { line in line.firstMatch(of: /^<\w+ class="([^"]*)"/)?.1 } == [
+      pieces.compactMap { piece in piece.firstMatch(of: /^<\w+ class="([^"]*)"/)?.1 } == [
         "connections", "card card--text", "card card--text", "chain", "comment", "ink",
       ])
     #expect(
-      lines.compactMap { line in line.firstMatch(of: /^<div [^>]*data-doc="([^"]*)"/)?.1 } == [
+      pieces.compactMap { piece in piece.firstMatch(of: /^<div [^>]*data-doc="([^"]*)"/)?.1 } == [
         "below", "above",
       ])
   }
@@ -56,10 +56,10 @@ import Testing
       users: [:]
     )
 
-    let lines = try #require(drawnContents(of: "root", in: contents)).split(separator: "\n")
+    let pieces = try #require(drawnContents(of: "root", in: contents))
 
     #expect(
-      lines.compactMap { line in line.firstMatch(of: /data-doc="([^"]*)"/)?.1 } == [
+      pieces.compactMap { piece in piece.firstMatch(of: /data-doc="([^"]*)"/)?.1 } == [
         "c", "a", "b",
       ])
   }

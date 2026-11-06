@@ -75,9 +75,31 @@ import Testing
       users: [:]
     )
 
-    let html = try #require(drawnContents(of: "root", in: contents))
+    let html = try #require(drawnContents(of: "root", in: contents)).joined()
 
     #expect(html.components(separatedBy: #"<div class="preview""#).count - 1 == 3)
     #expect(html.contains(#"<div class="body panel"></div>"#))
+  }
+
+  @Test func putEachPieceOnALineOfItsOwn() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        makeBoard("root", cards: ["child"]), makeBoard("child", cards: ["a", "b"]),
+        makeNote("a"), makeNote("b"),
+      ],
+      users: [:]
+    )
+    let child = try #require(contents.board(Document.ID(rawValue: "child")))
+
+    let html = drawPreview(
+      of: child, in: Rect(x: 0, y: 0, width: 100, height: 100), depth: 1, contents: contents,
+      layouts: layouts(in: contents), favicons: [:]
+    )?
+    .rendered(resolving: describe)
+
+    #expect(
+      html?.contains(#"</div>"# + "\n" + #"<div class="card card--text" data-doc="b""#) == true)
+    #expect(html?.hasSuffix("</div></div>") == true)
   }
 }

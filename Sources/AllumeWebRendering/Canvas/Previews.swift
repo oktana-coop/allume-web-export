@@ -21,6 +21,7 @@ func drawPreview(
 
   return .element(
     "div", ["class": "preview", "style": .text(style)],
-    drawBoardContents(
-      board, depth: depth, contents: contents, layouts: layouts, favicons: favicons))
+    separatedByLineBreaks(
+      drawBoardContents(
+        board, depth: depth, contents: contents, layouts: layouts, favicons: favicons)))
 }
