@@ -1,0 +1,608 @@
+:root {
+  --canvas: #e0dfde;
+  --panel: #efefed;
+  --card: #ffffff;
+  --card-muted: #e9e8e7;
+  --hairline: rgb(0 0 0 / 0.07);
+  --text: #1d1d1c;
+  --muted: #7b7b78;
+  --connection: #c2c0c0;
+  /* Cards and comments barely lift off the canvas, as in Muse. */
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  /* Boards float a little higher than the cards on them. */
+  --board-shadow:
+    0 2px 4px rgb(0 0 0 / 0.04),
+    0 6px 20px rgb(0 0 0 / 0.08);
+  --bar-height: 48px;
+
+  --green: #36884a;
+
+  /* Colors tint cards and highlight canvas text. Muse's purple highlight is
+     sampled from a screenshot; the others share its lightness and chroma. */
+  --purple-tint: #e4defb;
+  --purple-highlight: oklch(86.5% 0.056 300);
+  --red-tint: #fadcd8;
+  --red-highlight: oklch(86.5% 0.056 25);
+  --green-tint: #d8efdc;
+  --green-highlight: oklch(86.5% 0.056 150);
+  --yellow-tint: #faefbd;
+  --yellow-highlight: oklch(86.5% 0.056 95);
+  --blue-tint: #dbe7fb;
+  --blue-highlight: oklch(86.5% 0.056 255);
+  /* Muse's gray is its plain card color. */
+  --gray-tint: var(--card-muted);
+  --gray-highlight: oklch(86.5% 0 0);
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+}
+
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Header */
+
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--hairline);
+  z-index: 1;
+}
+
+/* Long trails shrink their ancestors first, keeping the board's title. */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.crumbs a {
+  flex-shrink: 100;
+  min-width: 1.5em;
+  overflow: hidden;
+  color: var(--muted);
+  text-decoration: none;
+  text-overflow: ellipsis;
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.crumbs .separator {
+  flex: none;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .crumbs a:not([rel='up']),
+  .crumbs a:not([rel='up']) + .separator {
+    display: none;
+  }
+}
+
+.crumbs h1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.crumbs h1 span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zoom {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoom button {
+  min-width: 32px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.zoom output {
+  min-width: 48px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+html:not(.js) .zoom {
+  display: none;
+}
+
+/* Canvas. Without JS the board scrolls at its natural size. */
+
+.viewport {
+  position: fixed;
+  inset: var(--bar-height) 0 0;
+  overflow: auto;
+}
+
+.js .viewport {
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.js .viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.world {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.world a,
+.world img {
+  -webkit-user-drag: none;
+}
+
+.world a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Cards: the outer element is placed on the board, .body draws it. */
+
+.card {
+  position: absolute;
+}
+
+.card > .body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.card--text > .body {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--card-muted);
+  box-shadow: var(--card-shadow);
+  /* Muse sizes text cards to fit their text; with the system font, this
+     size reproduces its line breaks without clipping. */
+  font-size: 13.5px;
+  letter-spacing: -0.1px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.card--image > .body {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  object-fit: cover;
+}
+
+/* Link and PDF cards: the icon sits on the title's line, the host at the
+   bottom, at Muse's sizes. */
+.card--url > .body,
+.card--pdf > .body {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 13px;
+  align-content: space-between;
+  padding: 10px 12px 9px 11px;
+  border-radius: 8px;
+  background: var(--card-muted);
+  box-shadow: var(--card-shadow);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card--url svg,
+.card--url .favicon,
+.card--pdf svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--muted);
+}
+
+.card--url .favicon {
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.card--url .title,
+.card--pdf .title {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card--url .host,
+.card--pdf .host {
+  grid-column: 2;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--muted);
+}
+
+/* A PDF tile takes its height from the title, which may wrap once. */
+.card--pdf > .body {
+  position: relative;
+  min-height: 56px;
+}
+
+.card--pdf .title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+/* Board cards: the title sits above a panel previewing the board. */
+
+.card--board > .panel {
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: var(--board-shadow);
+}
+
+.board-title {
+  position: absolute;
+  bottom: 100%;
+  left: 2px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.board-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* Named card colors tint the card. */
+
+.card[data-color] > .body {
+  --tint: var(--gray-tint);
+}
+.card[data-color='purple'] > .body {
+  --tint: var(--purple-tint);
+}
+.card[data-color='red'] > .body {
+  --tint: var(--red-tint);
+}
+.card[data-color='green'] > .body {
+  --tint: var(--green-tint);
+}
+.card[data-color='yellow'] > .body {
+  --tint: var(--yellow-tint);
+}
+.card[data-color='blue'] > .body {
+  --tint: var(--blue-tint);
+}
+.card[data-color]:not(.card--image) > .body {
+  background: var(--tint);
+}
+.card--image[data-color] > .body {
+  box-shadow: 0 0 0 3px var(--tint);
+}
+
+/* Canvas text, comments, connections and ink. */
+
+.chain {
+  position: absolute;
+  width: max-content;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  white-space: pre-wrap;
+  z-index: 8000;
+}
+
+.chain p {
+  margin: 0;
+}
+
+/* Colored paragraphs are highlighted like labels. */
+.chain [data-color] {
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 4px;
+  background: var(--highlight);
+}
+.chain [data-color='purple'] {
+  --highlight: var(--purple-highlight);
+}
+.chain [data-color='red'] {
+  --highlight: var(--red-highlight);
+}
+.chain [data-color='green'] {
+  --highlight: var(--green-highlight);
+}
+.chain [data-color='yellow'] {
+  --highlight: var(--yellow-highlight);
+}
+.chain [data-color='blue'] {
+  --highlight: var(--blue-highlight);
+}
+.chain [data-color='gray'] {
+  --highlight: var(--gray-highlight);
+}
+
+/* Comments are tinted with their author's color, like in Muse. */
+.comment {
+  position: absolute;
+  padding: 12px 14px 12px 56px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--author, #d8b682) 38%, white);
+  box-shadow: var(--card-shadow);
+  /* Calibrated like text cards to fit the size Muse gave each comment. */
+  font-size: 13.5px;
+  letter-spacing: -0.1px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.comment .avatar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--author, #d8b682);
+  object-fit: cover;
+}
+
+.comment .text {
+  white-space: pre-wrap;
+}
+
+.comment time {
+  display: block;
+  color: rgb(0 0 0 / 0.5);
+}
+
+.connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.connections line {
+  stroke: var(--connection);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  pointer-events: none;
+  z-index: 9500;
+}
+
+/* Text on the page's board can be selected; previews stay inert. */
+
+.world > .card--text > .body,
+.world > .comment > .text,
+.world > .chain {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+.copy {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow:
+    0 0 0 1px var(--hairline),
+    0 1px 2px rgb(0 0 0 / 0.08);
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 1;
+}
+
+.card:has(> button.linked) > .copy {
+  right: 18px;
+}
+
+/* Canvas text has no box to hold the button, so it sits beside the first
+   line, with an invisible bridge so it stays shown on the way to it. */
+.chain > .copy {
+  top: -1px;
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.chain > .copy::before {
+  content: '';
+  position: absolute;
+  inset: 0 100% 0 -8px;
+}
+
+.card:hover > .copy,
+.comment:hover > .copy,
+.chain:hover > .copy,
+.copy:focus-visible,
+.copy[data-copied] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .copy {
+    opacity: 1;
+  }
+}
+
+.copy:hover {
+  color: var(--text);
+}
+
+.copy .icon-copied,
+.copy[data-copied] .icon-copy {
+  display: none;
+}
+
+.copy[data-copied] .icon-copied {
+  display: block;
+}
+
+.copy[data-copied] {
+  color: var(--green);
+}
+
+/* Linked cards: an icon that opens the list of boards showing the card. */
+
+.linked {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+}
+
+button.linked {
+  cursor: pointer;
+}
+
+.card:not(.card--board) > button.linked {
+  position: absolute;
+  top: -11px;
+  right: -11px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  z-index: 1;
+}
+
+.linked-menu {
+  position: fixed;
+  inset: auto;
+  min-width: 220px;
+  max-width: min(360px, 100vw - 32px);
+  margin: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 10px 32px rgb(0 0 0 / 0.2);
+  font-size: 15px;
+  line-height: 20px;
+  user-select: none;
+}
+
+.linked-menu p {
+  margin: 4px 10px 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.linked-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linked-menu a {
+  position: relative;
+  display: block;
+  padding: 7px 10px 7px 30px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.linked-menu a:hover {
+  background: var(--panel);
+}
+
+.linked-menu a[aria-current]::before {
+  content: '✓';
+  position: absolute;
+  left: 11px;
+  font-weight: 600;
+}

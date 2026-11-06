@@ -20,7 +20,11 @@ let package = Package(
     .target(name: "AllumeWebModels"),
     .target(name: "AllumeWebBundleReader", dependencies: ["AllumeWebModels"]),
     .target(name: "AllumeWebRendering", dependencies: ["AllumeWebModels"]),
-    .target(name: "AllumeWeb"),
+    .target(
+      name: "AllumeWeb",
+      dependencies: ["AllumeWebModels", "AllumeWebRendering"],
+      resources: [.copy("Viewer")]
+    ),
     .executableTarget(
       name: "AllumeWebCLI",
       dependencies: [
@@ -31,6 +35,7 @@ let package = Package(
     .testTarget(name: "AllumeWebModelsTests", dependencies: ["AllumeWebModels"]),
     .testTarget(name: "AllumeWebBundleReaderTests", dependencies: ["AllumeWebBundleReader"]),
     .testTarget(name: "AllumeWebRenderingTests", dependencies: ["AllumeWebRendering"]),
+    .testTarget(name: "AllumeWebTests", dependencies: ["AllumeWeb", "AllumeWebModels"]),
     .testTarget(
       name: "AllumeWebIntegrationTests",
       dependencies: ["AllumeWebBundleReader", "AllumeWebRendering"],
