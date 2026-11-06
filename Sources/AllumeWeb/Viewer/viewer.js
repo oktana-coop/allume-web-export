@@ -472,6 +472,18 @@
       separator.textContent = '/';
       heading.before(link, separator);
     });
+    markParent(heading, trail.at(-1));
+  }
+
+  // The page marks the main path's parent in the heading's linked card menu,
+  // so a different path moves the mark to its own parent.
+  function markParent(heading, parent) {
+    if (!parent) return;
+    const path = new URL(parent.href).pathname;
+    for (const link of heading.querySelectorAll('.linked-menu a')) {
+      if (link.pathname === path) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    }
   }
 
   // Following a link records how the next page is reached: down into a
