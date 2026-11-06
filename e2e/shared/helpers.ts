@@ -1,6 +1,8 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 import { type Board } from './boards';
+
+export type Point = { x: number; y: number };
 
 /**
  * The board's card on the current page's board. Other cards' previews also
@@ -27,6 +29,53 @@ export const enterBoard = async ({
   await expect(page).toHaveURL(board.url);
 };
 
+/** The "Appears in N boards" button of a board's card on the current board. */
+export const linkedCardButton = ({ page, card }: { page: Page; card: Board }) =>
+  boardCard({ page, board: card }).getByRole('button', {
+    name: /^Appears in \d+ boards$/,
+  });
+
+/**
+ * Opens a menu with its button, and returns the menu. The viewer places an open
+ * menu on its `toggle` event, which comes after the click, so this waits for
+ * the event too, listening from before the click.
+ */
+export const openMenu = async ({
+  button,
+  menu,
+}: {
+  button: Locator;
+  menu: Locator;
+}) => {
+  const toggle = await menu.evaluateHandle((element) => ({
+    fired: new Promise<void>((resolve) =>
+      element.addEventListener('toggle', () => resolve(), { once: true })
+    ),
+  }));
+
+  await button.click();
+  await toggle.evaluate(({ fired }) => fired);
+  await expect(menu).toBeVisible();
+
+  return menu;
+};
+
+/**
+ * Opens the "Appears in N boards" menu of a board's card on the current board,
+ * and returns the menu.
+ */
+export const openLinkedCardMenu = async ({
+  page,
+  card,
+}: {
+  page: Page;
+  card: Board;
+}) =>
+  openMenu({
+    button: linkedCardButton({ page, card }),
+    menu: page.locator(`#linked-${card.id}`),
+  });
+
 /**
  * Checks the page's heading is the board's label. A linked board's heading
  * also holds its menu, hidden until opened, so only the visible text counts.
@@ -41,3 +90,68 @@ export const expectHeading = async ({
   expect(page.getByRole('heading', { level: 1 })).toHaveText(board.label, {
     useInnerText: true,
   });
+
+/**
+ * The element's bounding box, as Playwright gives it, failing if the element
+ * isn't shown.
+ */
+export const boundingBox = async ({ of: element }: { of: Locator }) => {
+  const box = await element.boundingBox();
+  if (!box) throw new Error(`${element} isn't shown`);
+
+  return box;
+};
+
+/** The middle of the board's card, on the screen. */
+export const cardCenter = async ({
+  page,
+  board,
+}: {
+  page: Page;
+  board: Board;
+}) => center({ of: boardCard({ page, board }) });
+
+/** The middle of the view that shows the board, below the header. */
+export const viewCenter = async ({ page }: { page: Page }) =>
+  center({ of: page.getByRole('main') });
+
+/** Checks the board's card is in the middle of the view. */
+export const expectCardCentered = async ({
+  page,
+  board,
+}: {
+  page: Page;
+  board: Board;
+}) => {
+  const card = await cardCenter({ page, board });
+  const view = await viewCenter({ page });
+
+  expect(card.x).toBeCloseTo(view.x, 0);
+  expect(card.y).toBeCloseTo(view.y, 0);
+};
+
+/**
+ * Scrolls by the amounts, with the mouse over the middle of the view. The mouse
+ * starts at the top left, over the header, where scrolling doesn't reach the
+ * board.
+ */
+export const scrollBoard = async ({
+  page,
+  x,
+  y,
+}: {
+  page: Page;
+  x: number;
+  y: number;
+}) => {
+  const middle = await viewCenter({ page });
+
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.wheel(x, y);
+};
+
+const center = async ({ of: element }: { of: Locator }): Promise<Point> => {
+  const box = await boundingBox({ of: element });
+
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+};

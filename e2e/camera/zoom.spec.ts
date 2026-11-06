@@ -1,13 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { haskell, haskellNotes, ocaml, ocamlNotes } from '../shared/boards';
-import { boardCard } from '../shared/helpers';
 import {
+  boardCard,
   cardCenter,
-  expectZoomLevel,
   scrollBoard,
   viewCenter,
-} from './helpers';
+} from '../shared/helpers';
+import { expectZoomLevel } from './helpers';
 
 // OCaml opens at 100%, so its zoom levels are round numbers. Haskell is too
 // wide to fit at 100%, so fitting it differs from 100%.

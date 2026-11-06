@@ -1,7 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { type Board } from '../shared/boards';
-import { boardCard, enterBoard, expectHeading } from '../shared/helpers';
+import {
+  enterBoard,
+  expectHeading,
+  openLinkedCardMenu,
+} from '../shared/helpers';
 
 /**
  * Enters each board in the path in turn, each through its card on the one
@@ -32,14 +36,8 @@ export const jumpToLinkedCard = async ({
   card: Board;
   board: Board;
 }) => {
-  await boardCard({ page, board: card })
-    .getByRole('button', { name: /^Appears in \d+ boards$/ })
-    .click();
-  await page
-    .locator('.linked-menu')
-    .filter({ visible: true })
-    .getByRole('link', { name: board.label, exact: true })
-    .click();
+  const menu = await openLinkedCardMenu({ page, card });
+  await menu.getByRole('link', { name: board.label, exact: true }).click();
   await expect(page).toHaveURL(`${board.url}#card-${card.id}`);
 };
 

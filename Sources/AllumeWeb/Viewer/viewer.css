@@ -600,8 +600,12 @@ button.linked {
   background: var(--panel);
 }
 
+/* The check mark only shows the current board, which aria-current already
+   names, so its empty alternative text keeps it out of the link's name.
+   Browsers without alternative text keep the first declaration. */
 .linked-menu a[aria-current]::before {
   content: '✓';
+  content: '✓' / '';
   position: absolute;
   left: 11px;
   font-weight: 600;

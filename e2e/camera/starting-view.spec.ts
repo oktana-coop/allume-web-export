@@ -1,14 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 import { functional, haskell, haskellNotes } from '../shared/boards';
-import { boardCard, enterBoard } from '../shared/helpers';
 import {
-  cardCenter,
-  expectFullyInView,
-  expectZoomLevel,
+  boardCard,
+  enterBoard,
+  expectCardCentered,
   scrollBoard,
-  viewCenter,
-} from './helpers';
+} from '../shared/helpers';
+import { expectFullyInView, expectZoomLevel } from './helpers';
 
 test.describe('starting view', () => {
   test('a first visit frames the whole board', async ({ page }) => {
@@ -57,9 +56,6 @@ test.describe('starting view', () => {
 
     await page.goto(`${functional.url}#card-${haskell.id}`);
 
-    const card = await cardCenter({ page, board: haskell });
-    const view = await viewCenter({ page });
-    expect(card.x).toBeCloseTo(view.x, 0);
-    expect(card.y).toBeCloseTo(view.y, 0);
+    await expectCardCentered({ page, board: haskell });
   });
 });

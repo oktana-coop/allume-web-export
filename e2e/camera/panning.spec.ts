@@ -1,8 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { haskell, ocaml, ocamlNotes } from '../shared/boards';
-import { boardCard } from '../shared/helpers';
-import { cardCenter, drag, scrollBoard } from './helpers';
+import {
+  boardCard,
+  boundingBox,
+  cardCenter,
+  scrollBoard,
+} from '../shared/helpers';
+import { drag } from './helpers';
 
 // OCaml opens at 100%, so the board moves as far as the mouse does. Its Notes
 // card is its leftmost.
@@ -49,11 +54,11 @@ test.describe('panning', () => {
   }) => {
     await page.goto(haskell.url);
     const text = page.getByText('Haskell is lazy');
-    const before = await text.boundingBox();
+    const before = await boundingBox({ of: text });
 
     await drag({
       page,
-      from: { x: before!.x + 5, y: before!.y + 10 },
+      from: { x: before.x + 5, y: before.y + 10 },
       by: { x: 200, y: 0 },
     });
 
