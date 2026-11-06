@@ -70,8 +70,21 @@ func drawn(
 
   return board.flatMap { board in
     card.flatMap { card in
-      drawCard(card, on: board, depth: depth, contents: contents, favicons: favicons)?
-        .rendered(resolving: describe)
+      drawCard(
+        card, on: board, depth: depth, contents: contents, layouts: layouts(in: contents),
+        favicons: favicons
+      )?
+      .rendered(resolving: describe)
     }
+  }
+}
+
+/// What the renderer draws for the board's contents, with references described.
+func drawnContents(of boardID: String, in contents: Contents, depth: Int = 0) -> String? {
+  contents.board(Document.ID(rawValue: boardID)).map { board in
+    drawBoardContents(
+      board, depth: depth, contents: contents, layouts: layouts(in: contents), favicons: [:]
+    )
+    .map { piece in piece.rendered(resolving: describe) }.joined()
   }
 }

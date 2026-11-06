@@ -5,7 +5,7 @@ import Foundation
 /// which leave out whatever can be clicked.
 func drawCard(
   _ card: Card, on board: Document.Board, depth: Int, contents: Contents,
-  favicons: [String: Asset]
+  layouts: [Document.ID: BoardLayout], favicons: [String: Asset]
 ) -> HTML? {
   let interactive = depth == 0
   let menu =
@@ -17,8 +17,12 @@ func drawCard(
 
   switch contents.document(card.documentID) {
   case .board(let child)?:
+    let preview = drawPreview(
+      of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
+      favicons: favicons)
     return drawBoardCard(
-      card, showing: child, menu: menu, interactive: interactive, contents: contents)
+      card, showing: child, preview: preview, menu: menu, interactive: interactive,
+      contents: contents)
 
   case .note(let note)?:
     let body = HTML.element("div", ["class": "body"], [.text(note.text)])
@@ -83,9 +87,8 @@ private func cardElement(
     children)
 }
 
-/// The board's preview comes inside the panel.
 private func drawBoardCard(
-  _ card: Card, showing child: Document.Board, menu: [HTML], interactive: Bool,
+  _ card: Card, showing child: Document.Board, preview: HTML?, menu: [HTML], interactive: Bool,
   contents: Contents
 ) -> HTML {
   let linkedIcon: [HTML] =
@@ -94,6 +97,7 @@ private func drawBoardCard(
   let title = HTML.element(
     "div", ["class": "board-title"],
     linkedIcon + [.element("span", [:], [.text(child.displayLabel)])])
+  let panelContents = preview.map { preview in [preview] } ?? []
   let panel: HTML =
     interactive
     ? .element(
@@ -101,8 +105,8 @@ private func drawBoardCard(
       [
         "class": "body panel", "href": .reference(.board(child.id)),
         "aria-label": .text(child.displayLabel),
-      ], [])
-    : .element("div", ["class": "body panel"], [])
+      ], panelContents)
+    : .element("div", ["class": "body panel"], panelContents)
 
   return cardElement(
     card, kind: "board", style: boxStyle(card.frame), interactive: interactive,

@@ -154,8 +154,10 @@ import Testing
         zIndex: 3, color: nil)
       let board = try #require(contents.board(Document.ID(rawValue: "root")))
 
-      let html = drawCard(wide, on: board, depth: 1, contents: contents, favicons: [:])?
-        .rendered(resolving: describe)
+      let html = drawCard(
+        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:]
+      )?
+      .rendered(resolving: describe)
 
       #expect(
         html
@@ -190,7 +192,9 @@ import Testing
             <div class="card card--board" data-doc="child" id="card-child"
               style="left:0px;top:0px;width:100px;height:100px;z-index:0">
               <div class="board-title"><span>Untitled board</span></div>
-              <a class="body panel" href="board:child" aria-label="Untitled board"></a>
+              <a class="body panel" href="board:child" aria-label="Untitled board">
+                <div class="preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+              </a>
             </div>
             """#))
     }
@@ -215,7 +219,9 @@ import Testing
               <span class="linked">\#(iconMarkup("linked"))</span>
               <span>Monoids</span>
             </div>
-            <div class="body panel"></div>
+            <div class="body panel">
+              <div class="preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+            </div>
             """#)) == true)
     }
   }
