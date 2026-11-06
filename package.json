@@ -1,0 +1,21 @@
+{
+  "name": "allume-web-export",
+  "private": true,
+  "description": "Development tools for allume-web-export: its end-to-end tests",
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --headed --debug",
+    "test:e2e:report": "playwright show-report e2e-results/html",
+    "format": "prettier --write e2e playwright.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "prettier": "^3.9.10",
+    "serve": "^14.2.6"
+  },
+  "overrides": {
+    "compression": "1.8.2"
+  }
+}

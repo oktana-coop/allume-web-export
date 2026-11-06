@@ -89,8 +89,8 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 ### Testing
 
-Run `swift test`. See [docs/Testing.md](docs/Testing.md) for the unit and integration tests, how to
-run some of them, and how to update the expected output.
+Run `swift test`. See [docs/Testing.md](docs/Testing.md) for the unit, integration and
+end-to-end tests, how to run some of them, and how to update the expected output.
 
 ## License
 
