@@ -1,0 +1,34 @@
+/* Comments are tinted with their author's color, like in Allume. */
+.comment {
+  position: absolute;
+  padding: 12px 14px 12px 56px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--author, #d8b682) 38%, white);
+  box-shadow: var(--card-shadow);
+  /* Calibrated like text cards to fit the size Allume gave each comment. */
+  font-size: 13.5px;
+  letter-spacing: -0.1px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.comment .avatar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--author, #d8b682);
+  object-fit: cover;
+}
+
+.comment .text {
+  white-space: pre-wrap;
+}
+
+.comment time {
+  display: block;
+  color: rgb(0 0 0 / 0.5);
+}

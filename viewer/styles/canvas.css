@@ -1,0 +1,33 @@
+/* Without JS the board scrolls at its natural size. */
+
+.viewport {
+  position: fixed;
+  inset: var(--bar-height) 0 0;
+  overflow: auto;
+}
+
+.js .viewport {
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.js .viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.world {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.world a,
+.world img {
+  -webkit-user-drag: none;
+}
+
+.world a {
+  color: inherit;
+  text-decoration: none;
+}

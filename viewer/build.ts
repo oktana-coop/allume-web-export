@@ -11,7 +11,7 @@ await build({
   absWorkingDir: fileURLToPath(new URL('..', import.meta.url)),
   entryPoints: [
     { in: 'viewer/main.ts', out: 'viewer' },
-    { in: 'viewer/styles/viewer.css', out: 'viewer' },
+    { in: 'viewer/styles/main.css', out: 'viewer' },
   ],
   outdir: 'Sources/AllumeWeb/Viewer',
   bundle: true,

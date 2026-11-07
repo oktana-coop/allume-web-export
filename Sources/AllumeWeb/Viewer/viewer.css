@@ -1,5 +1,5 @@
 /* Built from viewer/ by `npm run build:viewer`. Edit it there. */
-/* viewer/styles/viewer.css */
+/* viewer/styles/base.css */
 :root {
   --canvas: #e0dfde;
   --panel: #efefed;
@@ -39,12 +39,16 @@ body {
   margin: 0;
   background: var(--canvas);
 }
+
+/* viewer/styles/icons.css */
 .icon-sprite {
   position: absolute;
   width: 0;
   height: 0;
   overflow: hidden;
 }
+
+/* viewer/styles/bar.css */
 .bar {
   position: fixed;
   inset: 0 0 auto;
@@ -58,6 +62,8 @@ body {
   border-bottom: 1px solid var(--hairline);
   z-index: 1;
 }
+
+/* viewer/styles/breadcrumbs.css */
 .crumbs {
   display: flex;
   align-items: center;
@@ -101,6 +107,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* viewer/styles/zoom-controls.css */
 .zoom {
   flex: none;
   display: flex;
@@ -128,6 +136,8 @@ body {
 html:not(.js) .zoom {
   display: none;
 }
+
+/* viewer/styles/canvas.css */
 .viewport {
   position: fixed;
   inset: var(--bar-height) 0 0;
@@ -154,6 +164,8 @@ html:not(.js) .zoom {
   color: inherit;
   text-decoration: none;
 }
+
+/* viewer/styles/cards.css */
 .card {
   position: absolute;
 }
@@ -181,6 +193,8 @@ html:not(.js) .zoom {
   box-shadow: var(--card-shadow);
   object-fit: cover;
 }
+
+/* viewer/styles/link-and-pdf-cards.css */
 .card--url > .body,
 .card--pdf > .body {
   display: grid;
@@ -232,6 +246,8 @@ html:not(.js) .zoom {
   -webkit-line-clamp: 2;
   white-space: normal;
 }
+
+/* viewer/styles/board-cards.css */
 .card--board > .panel {
   border-radius: 14px;
   background: var(--panel);
@@ -262,6 +278,8 @@ html:not(.js) .zoom {
   transform-origin: 0 0;
   pointer-events: none;
 }
+
+/* viewer/styles/card-colors.css */
 .card[data-color] > .body {
   --tint: var(--gray-tint);
 }
@@ -286,6 +304,8 @@ html:not(.js) .zoom {
 .card--image[data-color] > .body {
   box-shadow: 0 0 0 3px var(--tint);
 }
+
+/* viewer/styles/text-blocks.css */
 .chain {
   position: absolute;
   width: max-content;
@@ -322,6 +342,8 @@ html:not(.js) .zoom {
 .chain [data-color=gray] {
   --highlight: var(--gray-highlight);
 }
+
+/* viewer/styles/comments.css */
 .comment {
   position: absolute;
   padding: 12px 14px 12px 56px;
@@ -351,6 +373,8 @@ html:not(.js) .zoom {
   display: block;
   color: rgb(0 0 0 / 0.5);
 }
+
+/* viewer/styles/connections.css */
 .connections {
   position: absolute;
   top: 0;
@@ -364,6 +388,8 @@ html:not(.js) .zoom {
   stroke-width: 2;
   stroke-linecap: round;
 }
+
+/* viewer/styles/ink.css */
 .ink {
   position: absolute;
   top: 0;
@@ -372,6 +398,8 @@ html:not(.js) .zoom {
   pointer-events: none;
   z-index: 9500;
 }
+
+/* viewer/styles/selectable-text.css */
 .world > .card--text > .body,
 .world > .comment > .text,
 .world > .chain {
@@ -379,6 +407,8 @@ html:not(.js) .zoom {
   user-select: text;
   cursor: text;
 }
+
+/* viewer/styles/copy-buttons.css */
 .copy {
   position: absolute;
   top: 6px;
@@ -436,6 +466,8 @@ html:not(.js) .zoom {
 .copy[data-copied] {
   color: var(--green);
 }
+
+/* viewer/styles/linked-card-menus.css */
 .linked {
   display: inline-grid;
   place-items: center;
@@ -503,3 +535,5 @@ button.linked {
   left: 11px;
   font-weight: 600;
 }
+
+/* viewer/styles/main.css */

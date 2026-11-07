@@ -1,0 +1,34 @@
+/* Cards: the outer element is placed on the board, .body draws it. */
+
+.card {
+  position: absolute;
+}
+
+.card > .body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.card--text > .body {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--card-muted);
+  box-shadow: var(--card-shadow);
+  /* Allume sizes text cards to fit their text; with the system font, this
+     size reproduces its line breaks without clipping. */
+  font-size: 13.5px;
+  letter-spacing: -0.1px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.card--image > .body {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  object-fit: cover;
+}

@@ -1,0 +1,9 @@
+/* Text on the page's board can be selected; previews stay inert. */
+
+.world > .card--text > .body,
+.world > .comment > .text,
+.world > .chain {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}

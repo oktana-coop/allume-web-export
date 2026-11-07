@@ -1,0 +1,50 @@
+/* Long trails shrink their ancestors first, keeping the board's title. */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.crumbs a {
+  flex-shrink: 100;
+  min-width: 1.5em;
+  overflow: hidden;
+  color: var(--muted);
+  text-decoration: none;
+  text-overflow: ellipsis;
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.crumbs .separator {
+  flex: none;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .crumbs a:not([rel='up']),
+  .crumbs a:not([rel='up']) + .separator {
+    display: none;
+  }
+}
+
+.crumbs h1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.crumbs h1 span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

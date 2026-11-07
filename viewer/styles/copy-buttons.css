@@ -1,0 +1,70 @@
+.copy {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow:
+    0 0 0 1px var(--hairline),
+    0 1px 2px rgb(0 0 0 / 0.08);
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 1;
+}
+
+.card:has(> button.linked) > .copy {
+  right: 18px;
+}
+
+/* Canvas text has no box to hold the button, so it sits beside the first
+   line, with an invisible bridge so it stays shown on the way to it. */
+.chain > .copy {
+  top: -1px;
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.chain > .copy::before {
+  content: '';
+  position: absolute;
+  inset: 0 100% 0 -8px;
+}
+
+.card:hover > .copy,
+.comment:hover > .copy,
+.chain:hover > .copy,
+.copy:focus-visible,
+.copy[data-copied] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .copy {
+    opacity: 1;
+  }
+}
+
+.copy:hover {
+  color: var(--text);
+}
+
+.copy .icon-copied,
+.copy[data-copied] .icon-copy {
+  display: none;
+}
+
+.copy[data-copied] .icon-copied {
+  display: block;
+}
+
+.copy[data-copied] {
+  color: var(--green);
+}

@@ -1,0 +1,60 @@
+/* Link and PDF cards: the icon sits on the title's line, the host at the
+   bottom, at Allume's sizes. */
+.card--url > .body,
+.card--pdf > .body {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 13px;
+  align-content: space-between;
+  padding: 10px 12px 9px 11px;
+  border-radius: 8px;
+  background: var(--card-muted);
+  box-shadow: var(--card-shadow);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card--url svg,
+.card--url .favicon,
+.card--pdf svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--muted);
+}
+
+.card--url .favicon {
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.card--url .title,
+.card--pdf .title {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card--url .host,
+.card--pdf .host {
+  grid-column: 2;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--muted);
+}
+
+/* A PDF tile takes its height from the title, which may wrap once. */
+.card--pdf > .body {
+  position: relative;
+  min-height: 56px;
+}
+
+.card--pdf .title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}

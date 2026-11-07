@@ -1,0 +1,24 @@
+.card[data-color] > .body {
+  --tint: var(--gray-tint);
+}
+.card[data-color='purple'] > .body {
+  --tint: var(--purple-tint);
+}
+.card[data-color='red'] > .body {
+  --tint: var(--red-tint);
+}
+.card[data-color='green'] > .body {
+  --tint: var(--green-tint);
+}
+.card[data-color='yellow'] > .body {
+  --tint: var(--yellow-tint);
+}
+.card[data-color='blue'] > .body {
+  --tint: var(--blue-tint);
+}
+.card[data-color]:not(.card--image) > .body {
+  background: var(--tint);
+}
+.card--image[data-color] > .body {
+  box-shadow: 0 0 0 3px var(--tint);
+}

@@ -1,0 +1,14 @@
+.connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.connections line {
+  stroke: var(--connection);
+  stroke-width: 2;
+  stroke-linecap: round;
+}

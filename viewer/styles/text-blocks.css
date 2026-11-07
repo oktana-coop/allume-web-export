@@ -1,0 +1,39 @@
+.chain {
+  position: absolute;
+  width: max-content;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  white-space: pre-wrap;
+  z-index: 8000;
+}
+
+.chain p {
+  margin: 0;
+}
+
+/* Colored paragraphs are highlighted like labels. */
+.chain [data-color] {
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 4px;
+  background: var(--highlight);
+}
+.chain [data-color='purple'] {
+  --highlight: var(--purple-highlight);
+}
+.chain [data-color='red'] {
+  --highlight: var(--red-highlight);
+}
+.chain [data-color='green'] {
+  --highlight: var(--green-highlight);
+}
+.chain [data-color='yellow'] {
+  --highlight: var(--yellow-highlight);
+}
+.chain [data-color='blue'] {
+  --highlight: var(--blue-highlight);
+}
+.chain [data-color='gray'] {
+  --highlight: var(--gray-highlight);
+}
