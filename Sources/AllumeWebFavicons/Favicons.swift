@@ -12,15 +12,12 @@ func fetchFavicons(for hosts: Set<String>, cache: URL, session: URLSession) asyn
   -> (favicons: [String: URL], warnings: [FaviconWarning])
 {
   let known = readManifest(in: cache)
-  let unknown = hosts.filter { host in
-    isFetchable(host) && (known[host] == nil || (known[host] == true && !isCached(host, in: cache)))
-  }
+  let toFetch = hosts.filter { host in needsFetching(host, known: known, cache: cache) }
 
-  let fetched = await fetchIcons(of: unknown.sorted(), session: session)
-  let icons = fetched.compactMapValues { $0 }
-  let warnings = write(
-    icons, manifest: known.merging(fetched.mapValues { icon in icon != nil }) { _, new in new },
-    in: cache)
+  let fetched = await fetchIcons(of: toFetch.sorted(), session: session)
+  let icons = fetched.compactMapValues { icon in icon }
+  let manifest = known.merging(fetched.mapValues { icon in icon != nil }) { _, new in new }
+  let warnings = write(icons, manifest: manifest, in: cache)
 
   let favicons = hosts.filter { host in isCached(host, in: cache) }
     .map { host in (host, iconURL(of: host, in: cache)) }
@@ -52,6 +49,20 @@ private let maxIconBytes = 256 * 1024
 /// How many hosts are fetched at once.
 private let batchSize = 8
 
+/// Whether to fetch the host's icon: a public name the cache doesn't know, or one whose icon has
+/// gone from the cache.
+private func needsFetching(_ host: String, known: [String: Bool], cache: URL) -> Bool {
+  guard isFetchable(host) else {
+    return false
+  }
+
+  switch known[host] {
+  case nil: return true
+  case true?: return !isCached(host, in: cache)
+  case false?: return false
+  }
+}
+
 private func isCached(_ host: String, in cache: URL) -> Bool {
   FileManager.default.fileExists(atPath: iconURL(of: host, in: cache).path(percentEncoded: false))
 }
@@ -62,12 +73,12 @@ private func fetchIcons(of hosts: [String], session: URLSession) async -> [Strin
     return [:]
   }
 
-  let batch = await withTaskGroup(of: (String, Data?).self) { group in
+  let batch = await withTaskGroup(of: (host: String, icon: Data?).self) { group in
     for host in hosts.prefix(batchSize) {
       group.addTask { (host, await fetchIcon(of: host, session: session)) }
     }
     return await group.reduce(into: [String: Data?]()) { icons, result in
-      icons[result.0] = .some(result.1)
+      icons.updateValue(result.icon, forKey: result.host)
     }
   }
   let rest = await fetchIcons(of: Array(hosts.dropFirst(batchSize)), session: session)

@@ -5,13 +5,16 @@ import Foundation
 /// reach into it.
 func isFetchable(_ host: String) -> Bool {
   let labels = host.split(separator: ".", omittingEmptySubsequences: false)
-
-  return host.count <= 253 && labels.count >= 2
+  let wellFormed =
+    host.count <= 253 && labels.count >= 2
     && labels.allSatisfy { label in
       !label.isEmpty && label.count <= 63 && label.allSatisfy(hostCharacters.contains)
     }
-    && labels.last?.first.map(("a"..."z").contains) == true
-    && !localSuffixes.contains { suffix in host.hasSuffix(suffix) }
+  // A name's last label starts with a letter, and an IP address's with a digit.
+  let isName = labels.last?.first.map(("a"..."z").contains) == true
+  let isLocal = localSuffixes.contains { suffix in host.hasSuffix(suffix) }
+
+  return wellFormed && isName && !isLocal
 }
 
 /// Whether the URL is HTTPS on its default port, on a fetchable host, with no user or password.
