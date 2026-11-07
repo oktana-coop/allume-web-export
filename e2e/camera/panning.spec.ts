@@ -80,7 +80,7 @@ test.describe('panning', () => {
     expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
   });
 
-  test('pushing past an edge stretches the board, which then springs back', async ({
+  test('pushing past an edge moves the board past it, then it bounces back', async ({
     page,
   }) => {
     await page.clock.install();
@@ -90,8 +90,8 @@ test.describe('panning', () => {
 
     await scrollBoard({ page, x: -40, y: 0 });
 
-    const stretched = await cardCenter({ page, board: ocamlNotes });
-    expect(stretched.x).toBeGreaterThan(atEdge.x + 1);
+    const pastEdge = await cardCenter({ page, board: ocamlNotes });
+    expect(pastEdge.x).toBeGreaterThan(atEdge.x + 1);
     await settle({ page });
     expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
   });
@@ -116,7 +116,7 @@ test.describe('panning', () => {
   test.describe('with reduced motion', () => {
     test.use({ reducedMotion: 'reduce' });
 
-    test('the board stops at an edge without stretching', async ({ page }) => {
+    test('the board stops at an edge without bouncing', async ({ page }) => {
       await page.clock.install();
       await page.goto(ocaml.url);
       await scrollToEdge({ page });
@@ -139,7 +139,7 @@ const scrollToEdge = async ({ page }: { page: Page }) => {
 };
 
 /**
- * Runs the page's clock, installed by the test, long enough for a stretched
- * board to spring back.
+ * Runs the page's clock, installed by the test, long enough for the board to
+ * bounce back.
  */
 const settle = async ({ page }: { page: Page }) => page.clock.runFor(1000);

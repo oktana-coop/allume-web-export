@@ -10,9 +10,9 @@
     const MIN_SCALE = 0.5;
     const MAX_SCALE = 4;
     const PAN_MARGIN = 120;
-    const STRETCH = 80;
+    const MAX_BOUNCE = 80;
     const SPRING = 0.8;
-    const ELASTIC = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const BOUNCES = !matchMedia("(prefers-reduced-motion: reduce)").matches;
     const PUSH_TIME = 100;
     const SCROLL_PAUSE = 300;
     const DRAG_THRESHOLD = 4;
@@ -22,7 +22,7 @@
     const zoomLevel = document.querySelector(".zoom-level");
     const cameraKey = `camera:${location.pathname}`;
     let camera = { x: 0, y: 0, scale: 1 };
-    let springFrame = 0;
+    let bounceFrame = 0;
     let lastWheel = 0;
     const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
     function panLimits() {
@@ -35,20 +35,20 @@
         y: [marginY - maxY * scale, height - marginY - minY * scale]
       };
     }
-    function apply({ elastic = false } = {}) {
+    function apply({ bouncing = false } = {}) {
       const limits = panLimits();
-      const bound = elastic && ELASTIC ? rubberBand : clamp;
+      const bound = bouncing && BOUNCES ? bounce : clamp;
       const x = bound(camera.x, ...limits.x);
       const y = bound(camera.y, ...limits.y);
       if (bound === clamp) Object.assign(camera, { x, y });
       world.style.transform = `translate(${x}px, ${y}px) scale(${camera.scale})`;
       if (zoomLevel) zoomLevel.textContent = `${Math.round(camera.scale * 100)}%`;
     }
-    function springBack() {
-      if (springFrame) return;
+    function startBounceBack() {
+      if (bounceFrame) return;
       let last = performance.now();
       const step = (now) => {
-        springFrame = 0;
+        bounceFrame = 0;
         if (gesture) return;
         const keep = SPRING ** (Math.max(0, now - last) / 16);
         last = now;
@@ -59,18 +59,18 @@
         };
         camera.x = pull(camera.x, limits.x);
         camera.y = pull(camera.y, limits.y);
-        apply({ elastic: true });
-        const stretched = camera.x !== clamp(camera.x, ...limits.x) || camera.y !== clamp(camera.y, ...limits.y);
-        if (stretched) springFrame = requestAnimationFrame(step);
+        apply({ bouncing: true });
+        const stillBouncing = camera.x !== clamp(camera.x, ...limits.x) || camera.y !== clamp(camera.y, ...limits.y);
+        if (stillBouncing) bounceFrame = requestAnimationFrame(step);
       };
-      springFrame = requestAnimationFrame(step);
+      bounceFrame = requestAnimationFrame(step);
     }
     function clamp(value, min, max) {
       return Math.min(max, Math.max(min, value));
     }
-    function rubberBand(value, min, max) {
+    function bounce(value, min, max) {
       const over = value < min ? value - min : value > max ? value - max : 0;
-      return clamp(value, min, max) + STRETCH * over / (Math.abs(over) + STRETCH);
+      return clamp(value, min, max) + MAX_BOUNCE * over / (Math.abs(over) + MAX_BOUNCE);
     }
     function clampScale(scale) {
       return clamp(scale, Math.min(MIN_SCALE, fitScale()), MAX_SCALE);
@@ -172,8 +172,8 @@
             x: pan("x", event.deltaX * unit),
             y: pan("y", event.deltaY * unit)
           };
-          apply({ elastic: true });
-          springBack();
+          apply({ bouncing: true });
+          startBounceBack();
         }
       },
       { passive: false }
@@ -245,7 +245,7 @@
         y: now.y - (start.y - gesture.camera.y) * ratio,
         scale
       };
-      apply({ elastic: true });
+      apply({ bouncing: true });
     });
     function endPointer(event) {
       if (!pointers.delete(event.pointerId)) return;
@@ -256,7 +256,7 @@
       suppressClick = Boolean(gesture?.dragging);
       gesture = null;
       viewport.classList.remove("is-dragging");
-      springBack();
+      startBounceBack();
     }
     viewport.addEventListener("pointerup", endPointer);
     viewport.addEventListener("pointercancel", endPointer);

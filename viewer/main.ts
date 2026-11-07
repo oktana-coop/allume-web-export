@@ -49,13 +49,13 @@ interface HTMLElementEventMap {
   const MIN_SCALE = 0.5;
   const MAX_SCALE = 4;
   // Panning stops while this much of the board's contents is still in view.
-  // Pulling further stretches the board, by at most STRETCH, and unless a
-  // drag holds it there it springs back, keeping SPRING of the stretch each
-  // frame (at 60 fps). Reduced motion turns the stretching off.
+  // Pulling further bounces the board past the edge, by at most MAX_BOUNCE,
+  // and unless a drag holds it there it bounces back, keeping SPRING of the
+  // bounce each frame (at 60 fps). Reduced motion turns bouncing off.
   const PAN_MARGIN = 120;
-  const STRETCH = 80;
+  const MAX_BOUNCE = 80;
   const SPRING = 0.8;
-  const ELASTIC = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const BOUNCES = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Past an edge, a scroll only pushes for PUSH_TIME. The rest of it, usually
   // trackpad momentum, is ignored, so the board bounces back like on a Mac.
   // A new push starts after panning clear of the edge, after a pause of
@@ -72,7 +72,7 @@ interface HTMLElementEventMap {
   const cameraKey = `camera:${location.pathname}`;
 
   let camera: Camera = { x: 0, y: 0, scale: 1 };
-  let springFrame = 0;
+  let bounceFrame = 0;
   let lastWheel = 0;
   const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
 
@@ -89,10 +89,10 @@ interface HTMLElementEventMap {
   }
 
   // Places the board, keeping the camera within the panning limits. While
-  // panning (elastic), the camera may go past them and the board stretches.
-  function apply({ elastic = false }: { elastic?: boolean } = {}) {
+  // panning (bouncing), the camera may go past them and the board bounces.
+  function apply({ bouncing = false }: { bouncing?: boolean } = {}) {
     const limits = panLimits();
-    const bound = elastic && ELASTIC ? rubberBand : clamp;
+    const bound = bouncing && BOUNCES ? bounce : clamp;
     const x = bound(camera.x, ...limits.x);
     const y = bound(camera.y, ...limits.y);
     if (bound === clamp) Object.assign(camera, { x, y });
@@ -100,15 +100,15 @@ interface HTMLElementEventMap {
     if (zoomLevel) zoomLevel.textContent = `${Math.round(camera.scale * 100)}%`;
   }
 
-  // Pulls a stretched board back within the limits, frame by frame. Scrolling
-  // pushes against the pull, so the stretch follows how hard you push, and
+  // Brings a bouncing board back within the limits, frame by frame. Scrolling
+  // pushes against the pull, so the bounce follows how hard you push, and
   // trackpad momentum ends in a bounce.
-  function springBack() {
-    if (springFrame) return;
+  function startBounceBack() {
+    if (bounceFrame) return;
     let last = performance.now();
     const step = (now: number) => {
-      springFrame = 0;
-      if (gesture) return; // A drag holds the stretch until it's let go.
+      bounceFrame = 0;
+      if (gesture) return; // A drag holds the bounce until it's let go.
       const keep = SPRING ** (Math.max(0, now - last) / 16);
       last = now;
       const limits = panLimits();
@@ -120,13 +120,13 @@ interface HTMLElementEventMap {
       };
       camera.x = pull(camera.x, limits.x);
       camera.y = pull(camera.y, limits.y);
-      apply({ elastic: true });
-      const stretched =
+      apply({ bouncing: true });
+      const stillBouncing =
         camera.x !== clamp(camera.x, ...limits.x) ||
         camera.y !== clamp(camera.y, ...limits.y);
-      if (stretched) springFrame = requestAnimationFrame(step);
+      if (stillBouncing) bounceFrame = requestAnimationFrame(step);
     };
-    springFrame = requestAnimationFrame(step);
+    bounceFrame = requestAnimationFrame(step);
   }
 
   function clamp(value: number, min: number, max: number) {
@@ -134,10 +134,11 @@ interface HTMLElementEventMap {
   }
 
   // Past a limit, the board gives less the further it's pulled.
-  function rubberBand(value: number, min: number, max: number) {
+  function bounce(value: number, min: number, max: number) {
     const over = value < min ? value - min : value > max ? value - max : 0;
     return (
-      clamp(value, min, max) + (STRETCH * over) / (Math.abs(over) + STRETCH)
+      clamp(value, min, max) +
+      (MAX_BOUNCE * over) / (Math.abs(over) + MAX_BOUNCE)
     );
   }
 
@@ -260,8 +261,8 @@ interface HTMLElementEventMap {
           x: pan('x', event.deltaX * unit),
           y: pan('y', event.deltaY * unit),
         };
-        apply({ elastic: true });
-        springBack();
+        apply({ bouncing: true });
+        startBounceBack();
       }
     },
     { passive: false }
@@ -353,7 +354,7 @@ interface HTMLElementEventMap {
       y: now.y - (start.y - gesture.camera.y) * ratio,
       scale,
     };
-    apply({ elastic: true });
+    apply({ bouncing: true });
   });
 
   function endPointer(event: PointerEvent) {
@@ -365,7 +366,7 @@ interface HTMLElementEventMap {
     suppressClick = Boolean(gesture?.dragging);
     gesture = null;
     viewport.classList.remove('is-dragging');
-    springBack();
+    startBounceBack();
   }
   viewport.addEventListener('pointerup', endPointer);
   viewport.addEventListener('pointercancel', endPointer);
