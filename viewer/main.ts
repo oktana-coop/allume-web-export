@@ -20,7 +20,7 @@ type Gesture = {
 };
 
 /** A board in the breadcrumbs. */
-type Crumb = { href: string; label: string };
+type Breadcrumb = { href: string; label: string };
 
 /** How a page was reached. */
 type Arrival = 'down' | 'across' | 'up';
@@ -491,11 +491,11 @@ interface HTMLElementEventMap {
       history.back();
       return true;
     }
-    const parent = crumbs?.querySelector<HTMLAnchorElement>(
+    const parent = breadcrumbs?.querySelector<HTMLAnchorElement>(
       ':scope > a[rel="up"]'
     );
     if (!parent) return false;
-    recordArrival(parent.href, 'up', crumbTrail().slice(0, -1));
+    recordArrival(parent.href, 'up', breadcrumbTrail().slice(0, -1));
     location.href = parent.href;
     return true;
   }
@@ -503,26 +503,28 @@ interface HTMLElementEventMap {
   // Breadcrumbs follow the path taken, like in Muse: entering a board extends
   // the breadcrumbs it was entered from, and going up a breadcrumb keeps the
   // ones before it. Arriving any other way shows the board's main path.
-  const crumbs = document.querySelector('.crumbs');
+  const breadcrumbs = document.querySelector('.crumbs');
 
-  function crumbLinks() {
+  function breadcrumbLinks() {
     return [
-      ...(crumbs?.querySelectorAll<HTMLAnchorElement>(':scope > a') ?? []),
+      ...(breadcrumbs?.querySelectorAll<HTMLAnchorElement>(':scope > a') ?? []),
     ];
   }
 
   /** The boards in the breadcrumbs, from the root to the parent. */
-  function crumbTrail(): Crumb[] {
-    return crumbLinks().map((link) => ({
+  function breadcrumbTrail(): Breadcrumb[] {
+    return breadcrumbLinks().map((link) => ({
       href: link.href,
       label: link.textContent,
     }));
   }
 
-  function showTrail(trail: Crumb[]) {
-    const heading = crumbs?.querySelector(':scope > h1');
+  function showTrail(trail: Breadcrumb[]) {
+    const heading = breadcrumbs?.querySelector(':scope > h1');
     if (!heading) return;
-    const shown = crumbs!.querySelectorAll(':scope > a, :scope > .separator');
+    const shown = breadcrumbs!.querySelectorAll(
+      ':scope > a, :scope > .separator'
+    );
     for (const element of shown) element.remove();
     trail.forEach(({ href, label }, index) => {
       const link = document.createElement('a');
@@ -540,7 +542,7 @@ interface HTMLElementEventMap {
 
   // The page marks the main path's parent in the heading's linked card menu,
   // so a different path moves the mark to its own parent.
-  function markParent(heading: Element, parent: Crumb | undefined) {
+  function markParent(heading: Element, parent: Breadcrumb | undefined) {
     if (!parent) return;
     const path = new URL(parent.href).pathname;
     for (const link of heading.querySelectorAll<HTMLAnchorElement>(
@@ -564,9 +566,9 @@ interface HTMLElementEventMap {
     const modified =
       event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
     if (!link || link.target || modified || event.defaultPrevented) return;
-    const crumb = crumbLinks().indexOf(link);
-    if (crumb >= 0) {
-      recordArrival(link.href, 'up', crumbTrail().slice(0, crumb));
+    const breadcrumb = breadcrumbLinks().indexOf(link);
+    if (breadcrumb >= 0) {
+      recordArrival(link.href, 'up', breadcrumbTrail().slice(0, breadcrumb));
     } else if (link.closest('.crumbs')) {
       recordArrival(link.href, 'up');
     } else if (link.closest('.linked-menu')) {
@@ -574,13 +576,14 @@ interface HTMLElementEventMap {
     } else if (link.matches('.panel')) {
       const here = {
         href: location.href.split('#')[0],
-        label: crumbs?.querySelector(':scope > h1 > span')?.textContent ?? '',
+        label:
+          breadcrumbs?.querySelector(':scope > h1 > span')?.textContent ?? '',
       };
-      recordArrival(link.href, 'down', [...crumbTrail(), here]);
+      recordArrival(link.href, 'down', [...breadcrumbTrail(), here]);
     }
   });
 
-  function recordArrival(url: string, how: Arrival, trail?: Crumb[]) {
+  function recordArrival(url: string, how: Arrival, trail?: Breadcrumb[]) {
     try {
       const path = new URL(url).pathname;
       sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify({ path, how, trail }));

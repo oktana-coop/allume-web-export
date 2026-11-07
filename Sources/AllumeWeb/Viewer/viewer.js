@@ -353,30 +353,32 @@
         history.back();
         return true;
       }
-      const parent = crumbs?.querySelector(
+      const parent = breadcrumbs?.querySelector(
         ':scope > a[rel="up"]'
       );
       if (!parent) return false;
-      recordArrival(parent.href, "up", crumbTrail().slice(0, -1));
+      recordArrival(parent.href, "up", breadcrumbTrail().slice(0, -1));
       location.href = parent.href;
       return true;
     }
-    const crumbs = document.querySelector(".crumbs");
-    function crumbLinks() {
+    const breadcrumbs = document.querySelector(".crumbs");
+    function breadcrumbLinks() {
       return [
-        ...crumbs?.querySelectorAll(":scope > a") ?? []
+        ...breadcrumbs?.querySelectorAll(":scope > a") ?? []
       ];
     }
-    function crumbTrail() {
-      return crumbLinks().map((link) => ({
+    function breadcrumbTrail() {
+      return breadcrumbLinks().map((link) => ({
         href: link.href,
         label: link.textContent
       }));
     }
     function showTrail(trail) {
-      const heading = crumbs?.querySelector(":scope > h1");
+      const heading = breadcrumbs?.querySelector(":scope > h1");
       if (!heading) return;
-      const shown = crumbs.querySelectorAll(":scope > a, :scope > .separator");
+      const shown = breadcrumbs.querySelectorAll(
+        ":scope > a, :scope > .separator"
+      );
       for (const element of shown) element.remove();
       trail.forEach(({ href, label }, index) => {
         const link = document.createElement("a");
@@ -408,9 +410,9 @@
       );
       const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
       if (!link || link.target || modified || event.defaultPrevented) return;
-      const crumb = crumbLinks().indexOf(link);
-      if (crumb >= 0) {
-        recordArrival(link.href, "up", crumbTrail().slice(0, crumb));
+      const breadcrumb = breadcrumbLinks().indexOf(link);
+      if (breadcrumb >= 0) {
+        recordArrival(link.href, "up", breadcrumbTrail().slice(0, breadcrumb));
       } else if (link.closest(".crumbs")) {
         recordArrival(link.href, "up");
       } else if (link.closest(".linked-menu")) {
@@ -418,9 +420,9 @@
       } else if (link.matches(".panel")) {
         const here = {
           href: location.href.split("#")[0],
-          label: crumbs?.querySelector(":scope > h1 > span")?.textContent ?? ""
+          label: breadcrumbs?.querySelector(":scope > h1 > span")?.textContent ?? ""
         };
-        recordArrival(link.href, "down", [...crumbTrail(), here]);
+        recordArrival(link.href, "down", [...breadcrumbTrail(), here]);
       }
     });
     function recordArrival(url, how, trail) {
