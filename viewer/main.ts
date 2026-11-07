@@ -3,6 +3,7 @@
 // so the first camera is in place before the page is shown.
 
 import { focusCard, setUpCanvas } from './canvas';
+import { makeCommentDatesRelative } from './comment-dates';
 import { setUpGestures } from './gestures';
 import { setUpNavigation } from './navigation';
 import { setUpScrolling } from './scrolling';
@@ -31,30 +32,7 @@ import { setUpZoomControls } from './zoom-controls';
     }
   }
 
-  // Comment dates read like Allume's ("last year", "5 months ago"), counted
-  // when the page is viewed. Like Allume, only whole units count: 23 months
-  // ago is "last year".
-  const relativeTime = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-  const DAY = 24 * 60 * 60 * 1000;
-  const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-    ['year', 365 * DAY],
-    ['month', 30 * DAY],
-    ['week', 7 * DAY],
-    ['day', DAY],
-    ['hour', DAY / 24],
-    ['minute', DAY / 1440],
-  ];
-
-  for (const time of document.querySelectorAll<HTMLTimeElement>(
-    '.comment time'
-  )) {
-    const elapsed = Date.now() - Date.parse(time.dateTime);
-    if (!Number.isFinite(elapsed)) continue;
-
-    const [unit, length] =
-      UNITS.find(([, length]) => elapsed >= length) ?? UNITS.at(-1)!;
-    time.textContent = relativeTime.format(-Math.trunc(elapsed / length), unit);
-  }
+  makeCommentDatesRelative(document);
 
   // Copy buttons copy a text card's or comment's full text, including any
   // part the card's size cuts off, or all of a canvas text.

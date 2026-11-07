@@ -296,6 +296,37 @@
     return { x: point.x - left, y: point.y - top };
   }
 
+  // viewer/comment-dates.ts
+  var MINUTE = 60 * 1e3;
+  var HOUR = 60 * MINUTE;
+  var DAY = 24 * HOUR;
+  var SMALLEST = ["minute", MINUTE];
+  var UNITS = [
+    ["year", 365 * DAY],
+    ["month", 30 * DAY],
+    ["week", 7 * DAY],
+    ["day", DAY],
+    ["hour", HOUR],
+    SMALLEST
+  ];
+  var relativeTime = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  function makeCommentDatesRelative(root) {
+    const now = Date.now();
+    for (const time of root.querySelectorAll(".comment time")) {
+      const date = relativeDate({ written: Date.parse(time.dateTime), now });
+      if (date) time.textContent = date;
+    }
+  }
+  function relativeDate({
+    written,
+    now
+  }) {
+    const elapsed = now - written;
+    if (!Number.isFinite(elapsed)) return null;
+    const [unit, length] = UNITS.find(([, length2]) => elapsed >= length2) ?? SMALLEST;
+    return relativeTime.format(-Math.trunc(elapsed / length), unit);
+  }
+
   // viewer/gestures.ts
   var DRAG_THRESHOLD = 4;
   var SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
@@ -805,24 +836,7 @@
         menu.hidePopover();
       }
     }
-    const relativeTime = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-    const DAY = 24 * 60 * 60 * 1e3;
-    const UNITS = [
-      ["year", 365 * DAY],
-      ["month", 30 * DAY],
-      ["week", 7 * DAY],
-      ["day", DAY],
-      ["hour", DAY / 24],
-      ["minute", DAY / 1440]
-    ];
-    for (const time of document.querySelectorAll(
-      ".comment time"
-    )) {
-      const elapsed = Date.now() - Date.parse(time.dateTime);
-      if (!Number.isFinite(elapsed)) continue;
-      const [unit, length] = UNITS.find(([, length2]) => elapsed >= length2) ?? UNITS.at(-1);
-      time.textContent = relativeTime.format(-Math.trunc(elapsed / length), unit);
-    }
+    makeCommentDatesRelative(document);
     const copiedTimers = /* @__PURE__ */ new WeakMap();
     canvas.element.addEventListener("click", async (event) => {
       const button = event.target.closest(".copy");
