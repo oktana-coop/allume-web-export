@@ -96,6 +96,30 @@ test.describe('panning', () => {
     expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
   });
 
+  test("grabbing a bouncing board holds it until it's let go", async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(ocaml.url);
+    await scrollToEdge({ page });
+    const atEdge = await cardCenter({ page, board: ocamlNotes });
+    await scrollBoard({ page, x: -40, y: 0 });
+    // On the empty canvas, left of the board, which the edge keeps on the right.
+    await page.mouse.move(200, 400);
+    await page.mouse.down();
+    // Measured once grabbed, since the clock runs on its own until settled, and
+    // the bounce may already have started coming back.
+    const held = await cardCenter({ page, board: ocamlNotes });
+
+    await settle({ page });
+
+    expect(held.x).toBeGreaterThan(atEdge.x + 1);
+    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(held);
+    await page.mouse.up();
+    await settle({ page });
+    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+  });
+
   test("trackpad momentum past an edge doesn't push, so the board bounces back", async ({
     page,
   }) => {
