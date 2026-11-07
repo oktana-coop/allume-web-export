@@ -13,67 +13,68 @@ import {
   withinLimits,
   zoomAt,
   type Camera,
-  type Scene,
 } from './camera';
 import { type Point } from './geometry';
 
 // A board whose contents start 20 px from the canvas's origin, and fit the
 // viewport twice over. At 100%, its pan limits are -360 to 860 across and
 // -160 to 460 down.
-const scene: Scene = {
-  viewport: { width: 1000, height: 600 },
-  contentBounds: { x: 20, y: 20, width: 460, height: 260 },
-};
+const viewport = { width: 1000, height: 600 };
+const contentBounds = { x: 20, y: 20, width: 460, height: 260 };
 
 // A board four times as wide as the viewport, which fits at 25%.
-const wideBoard: Scene = {
-  ...scene,
-  contentBounds: { x: 0, y: 0, width: 4000, height: 600 },
-};
+const wideBounds = { x: 0, y: 0, width: 4000, height: 600 };
 
 const atOrigin: Camera = { x: 0, y: 0, scale: 1 };
 
 describe('fitScale', () => {
   it('is 100% for a board that fits', () => {
-    expect(fitScale(scene)).toBe(1);
+    expect(fitScale({ viewport, contentBounds })).toBe(1);
   });
 
   it('shrinks a board larger than the viewport', () => {
-    expect(fitScale(wideBoard)).toBe(0.25);
+    expect(fitScale({ viewport, contentBounds: wideBounds })).toBe(0.25);
   });
 
   it('leaves the margin at the origin on the far side too', () => {
-    const offset: Scene = {
-      viewport: { width: 500, height: 600 },
-      contentBounds: { x: 100, y: 0, width: 800, height: 100 },
-    };
+    const offset = { x: 100, y: 0, width: 800, height: 100 };
 
-    expect(fitScale(offset)).toBe(0.5);
+    expect(
+      fitScale({ viewport: { width: 500, height: 600 }, contentBounds: offset })
+    ).toBe(0.5);
   });
 });
 
 describe('clampScale', () => {
   it('stops zooming out at 50%', () => {
-    expect(clampScale({ scale: 0.2, ...scene })).toBe(0.5);
+    expect(clampScale({ scale: 0.2, viewport, contentBounds })).toBe(0.5);
   });
 
   it('stops zooming in at 400%', () => {
-    expect(clampScale({ scale: 5, ...scene })).toBe(4);
+    expect(clampScale({ scale: 5, viewport, contentBounds })).toBe(4);
   });
 
   it('leaves a scale in between as it is', () => {
-    expect(clampScale({ scale: 1.5, ...scene })).toBe(1.5);
+    expect(clampScale({ scale: 1.5, viewport, contentBounds })).toBe(1.5);
   });
 
   it('goes below 50% as far as a board needs to fit', () => {
-    expect(clampScale({ scale: 0.1, ...wideBoard })).toBe(0.25);
-    expect(clampScale({ scale: 0.3, ...wideBoard })).toBe(0.3);
+    expect(
+      clampScale({ scale: 0.1, viewport, contentBounds: wideBounds })
+    ).toBe(0.25);
+    expect(
+      clampScale({ scale: 0.3, viewport, contentBounds: wideBounds })
+    ).toBe(0.3);
   });
 });
 
 describe('fit', () => {
   it('shows the whole board from the canvas origin', () => {
-    expect(fit(wideBoard)).toEqual({ x: 0, y: 0, scale: 0.25 });
+    expect(fit({ viewport, contentBounds: wideBounds })).toEqual({
+      x: 0,
+      y: 0,
+      scale: 0.25,
+    });
   });
 });
 
@@ -81,7 +82,7 @@ describe('focus', () => {
   it('centers the frame in the viewport', () => {
     const frame = { x: 100, y: 100, width: 200, height: 100 };
 
-    const camera = focus({ frame, ...scene });
+    const camera = focus({ frame, viewport, contentBounds });
 
     expect(viewportPoint({ camera, of: { x: 200, y: 150 } })).toEqual({
       x: 500,
@@ -92,7 +93,7 @@ describe('focus', () => {
   it('shrinks a large frame to leave 80 px around it', () => {
     const frame = { x: 0, y: 0, width: 1680, height: 440 };
 
-    const camera = focus({ frame, ...scene });
+    const camera = focus({ frame, viewport, contentBounds });
 
     expect(camera.scale).toBe(0.5);
     expect(viewportPoint({ camera, of: { x: 0, y: 0 } }).x).toBe(80);
@@ -101,7 +102,7 @@ describe('focus', () => {
   it("doesn't zoom in past 100%", () => {
     const frame = { x: 0, y: 0, width: 10, height: 10 };
 
-    expect(focus({ frame, ...scene }).scale).toBe(1);
+    expect(focus({ frame, viewport, contentBounds }).scale).toBe(1);
   });
 });
 
@@ -110,7 +111,7 @@ describe('zoomAt', () => {
     const camera = { x: 100, y: 50, scale: 1 };
     const point = { x: 400, y: 300 };
 
-    const zoomed = zoomAt({ camera, point, scale: 2, ...scene });
+    const zoomed = zoomAt({ camera, point, scale: 2, viewport, contentBounds });
 
     expect(zoomed.scale).toBe(2);
     expect(canvasPoint({ camera: zoomed, under: point })).toEqual(
@@ -121,7 +122,13 @@ describe('zoomAt', () => {
   it('stays within the zoom limits', () => {
     const point = { x: 400, y: 300 };
 
-    const zoomed = zoomAt({ camera: atOrigin, point, scale: 10, ...scene });
+    const zoomed = zoomAt({
+      camera: atOrigin,
+      point,
+      scale: 10,
+      viewport,
+      contentBounds,
+    });
 
     expect(zoomed.scale).toBe(4);
   });
@@ -153,46 +160,48 @@ describe('pinch', () => {
 
 describe('panLimits', () => {
   it('keeps 120 px of the board in view at each edge', () => {
-    expect(panLimits({ scale: 1, ...scene })).toEqual({
+    expect(panLimits({ scale: 1, viewport, contentBounds })).toEqual({
       x: [-360, 860],
       y: [-160, 460],
     });
   });
 
   it('keeps all of a narrower board in view', () => {
-    const narrow: Scene = {
-      ...scene,
-      contentBounds: { x: 20, y: 20, width: 50, height: 260 },
-    };
+    const narrow = { x: 20, y: 20, width: 50, height: 260 };
 
-    expect(panLimits({ scale: 1, ...narrow }).x).toEqual([-20, 930]);
+    expect(panLimits({ scale: 1, viewport, contentBounds: narrow }).x).toEqual([
+      -20, 930,
+    ]);
   });
 
   it('measures the board at the scale', () => {
-    const narrow: Scene = {
-      ...scene,
-      contentBounds: { x: 20, y: 20, width: 50, height: 260 },
-    };
+    const narrow = { x: 20, y: 20, width: 50, height: 260 };
 
-    expect(panLimits({ scale: 0.5, ...narrow }).x).toEqual([-10, 965]);
+    expect(
+      panLimits({ scale: 0.5, viewport, contentBounds: narrow }).x
+    ).toEqual([-10, 965]);
   });
 
   it('keeps no more than half a small viewport', () => {
-    const small: Scene = { ...scene, viewport: { width: 200, height: 600 } };
+    const small = { width: 200, height: 600 };
 
-    expect(panLimits({ scale: 1, ...small }).x).toEqual([-380, 80]);
+    expect(panLimits({ scale: 1, viewport: small, contentBounds }).x).toEqual([
+      -380, 80,
+    ]);
   });
 });
 
 describe('withinLimits', () => {
   it('leaves a camera within the pan limits as it is', () => {
-    expect(withinLimits({ camera: atOrigin, ...scene })).toEqual(atOrigin);
+    expect(withinLimits({ camera: atOrigin, viewport, contentBounds })).toEqual(
+      atOrigin
+    );
   });
 
   it('moves a camera past them to the nearest limit', () => {
     const camera = { x: 1000, y: -500, scale: 1 };
 
-    expect(withinLimits({ camera, ...scene })).toEqual({
+    expect(withinLimits({ camera, viewport, contentBounds })).toEqual({
       x: 860,
       y: -160,
       scale: 1,
@@ -202,19 +211,23 @@ describe('withinLimits', () => {
 
 describe('isBouncing', () => {
   it('is false within the pan limits', () => {
-    expect(isBouncing({ camera: atOrigin, ...scene })).toBe(false);
+    expect(isBouncing({ camera: atOrigin, viewport, contentBounds })).toBe(
+      false
+    );
   });
 
   it('is true past them', () => {
     const camera = { x: 900, y: 0, scale: 1 };
 
-    expect(isBouncing({ camera, ...scene })).toBe(true);
+    expect(isBouncing({ camera, viewport, contentBounds })).toBe(true);
   });
 });
 
 describe('bounce', () => {
   it('draws a camera within the pan limits where it is', () => {
-    expect(bounce({ camera: atOrigin, ...scene })).toEqual(atOrigin);
+    expect(bounce({ camera: atOrigin, viewport, contentBounds })).toEqual(
+      atOrigin
+    );
   });
 
   it.each([
@@ -225,20 +238,22 @@ describe('bounce', () => {
     ({ pulled, drawn }) => {
       const camera = { x: 860 + pulled, y: 0, scale: 1 };
 
-      expect(bounce({ camera, ...scene }).x).toBe(860 + drawn);
+      expect(bounce({ camera, viewport, contentBounds }).x).toBe(860 + drawn);
     }
   );
 
   it('never draws the board 80 px past an edge', () => {
     const camera = { x: 860 + 1_000_000, y: 0, scale: 1 };
 
-    expect(bounce({ camera, ...scene }).x).toBeLessThan(860 + 80);
+    expect(bounce({ camera, viewport, contentBounds }).x).toBeLessThan(
+      860 + 80
+    );
   });
 
   it('bounces the same way past the opposite edge', () => {
     const camera = { x: -360 - 80, y: 0, scale: 1 };
 
-    expect(bounce({ camera, ...scene }).x).toBe(-360 - 40);
+    expect(bounce({ camera, viewport, contentBounds }).x).toBe(-360 - 40);
   });
 });
 
@@ -251,7 +266,7 @@ describe('bounceBack', () => {
     ({ elapsed, left }) => {
       const camera = { x: 860 + 100, y: 0, scale: 1 };
 
-      const back = bounceBack({ camera, elapsed, ...scene });
+      const back = bounceBack({ camera, elapsed, viewport, contentBounds });
 
       expect(back.x).toBeCloseTo(860 + left);
     }
@@ -260,19 +275,23 @@ describe('bounceBack', () => {
   it('reaches the limit once within half a pixel of it', () => {
     const camera = { x: 860.4, y: 0, scale: 1 };
 
-    expect(bounceBack({ camera, elapsed: 16, ...scene }).x).toBe(860);
+    expect(bounceBack({ camera, elapsed: 16, viewport, contentBounds }).x).toBe(
+      860
+    );
   });
 
   it('leaves the bounce as it is for a negative elapsed time', () => {
     const camera = { x: 860 + 100, y: 0, scale: 1 };
 
-    expect(bounceBack({ camera, elapsed: -16, ...scene })).toEqual(camera);
+    expect(
+      bounceBack({ camera, elapsed: -16, viewport, contentBounds })
+    ).toEqual(camera);
   });
 
   it('leaves a camera within the pan limits as it is', () => {
-    expect(bounceBack({ camera: atOrigin, elapsed: 16, ...scene })).toEqual(
-      atOrigin
-    );
+    expect(
+      bounceBack({ camera: atOrigin, elapsed: 16, viewport, contentBounds })
+    ).toEqual(atOrigin);
   });
 });
 

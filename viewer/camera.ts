@@ -12,9 +12,6 @@ export type Camera = { x: number; y: number; scale: number };
 
 export type Interval = [min: number, max: number];
 
-/** What the camera shows: the board's contents, through the viewport. */
-export type Scene = { viewport: Size; contentBounds: Rect };
-
 // Zooming out stops at 50%, or lower when the whole board needs it to fit.
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
@@ -30,7 +27,13 @@ const FOCUS_PADDING = 80;
  * The scale that frames the board the way its card previews it: from the
  * canvas's origin, with everything in view, at most 100%.
  */
-export function fitScale({ viewport, contentBounds }: Scene) {
+export function fitScale({
+  viewport,
+  contentBounds,
+}: {
+  viewport: Size;
+  contentBounds: Rect;
+}) {
   return Math.min(
     1,
     viewport.width / (maxX(contentBounds) + contentBounds.x),
@@ -39,28 +42,52 @@ export function fitScale({ viewport, contentBounds }: Scene) {
 }
 
 /** The scale within the zoom limits. */
-export function clampScale({ scale, ...scene }: { scale: number } & Scene) {
-  return clamp(scale, Math.min(MIN_SCALE, fitScale(scene)), MAX_SCALE);
+export function clampScale({
+  scale,
+  viewport,
+  contentBounds,
+}: {
+  scale: number;
+  viewport: Size;
+  contentBounds: Rect;
+}) {
+  const fit = fitScale({ viewport, contentBounds });
+  return clamp(scale, Math.min(MIN_SCALE, fit), MAX_SCALE);
 }
 
 /** The camera that shows the whole board, from the canvas's origin. */
-export function fit(scene: Scene): Camera {
-  return { x: 0, y: 0, scale: fitScale(scene) };
+export function fit({
+  viewport,
+  contentBounds,
+}: {
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
+  return { x: 0, y: 0, scale: fitScale({ viewport, contentBounds }) };
 }
 
 /**
  * The camera that centers the frame, with FOCUS_PADDING around it, at no more
  * than 100%.
  */
-export function focus({ frame, ...scene }: { frame: Rect } & Scene): Camera {
-  const { width, height } = scene.viewport;
+export function focus({
+  frame,
+  viewport,
+  contentBounds,
+}: {
+  frame: Rect;
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
+  const { width, height } = viewport;
   const scale = clampScale({
     scale: Math.min(
       1,
       (width - FOCUS_PADDING * 2) / frame.width,
       (height - FOCUS_PADDING * 2) / frame.height
     ),
-    ...scene,
+    viewport,
+    contentBounds,
   });
   return {
     x: width / 2 - (frame.x + frame.width / 2) * scale,
@@ -77,13 +104,20 @@ export function zoomAt({
   camera,
   point,
   scale,
-  ...scene
-}: { camera: Camera; point: Point; scale: number } & Scene): Camera {
+  viewport,
+  contentBounds,
+}: {
+  camera: Camera;
+  point: Point;
+  scale: number;
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
   return pinch({
     camera,
     from: point,
     to: point,
-    scale: clampScale({ scale, ...scene }),
+    scale: clampScale({ scale, viewport, contentBounds }),
   });
 }
 
@@ -115,7 +149,11 @@ export function panLimits({
   scale,
   viewport,
   contentBounds,
-}: { scale: number } & Scene): { x: Interval; y: Interval } {
+}: {
+  scale: number;
+  viewport: Size;
+  contentBounds: Rect;
+}): { x: Interval; y: Interval } {
   const marginX = Math.min(
     PAN_MARGIN,
     viewport.width / 2,
@@ -141,9 +179,14 @@ export function panLimits({
 /** The camera within the pan limits. */
 export function withinLimits({
   camera,
-  ...scene
-}: { camera: Camera } & Scene): Camera {
-  const limits = panLimits({ scale: camera.scale, ...scene });
+  viewport,
+  contentBounds,
+}: {
+  camera: Camera;
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
+  const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
   return {
     x: clamp(camera.x, ...limits.x),
     y: clamp(camera.y, ...limits.y),
@@ -152,8 +195,16 @@ export function withinLimits({
 }
 
 /** Whether the camera is past the pan limits. */
-export function isBouncing({ camera, ...scene }: { camera: Camera } & Scene) {
-  const within = withinLimits({ camera, ...scene });
+export function isBouncing({
+  camera,
+  viewport,
+  contentBounds,
+}: {
+  camera: Camera;
+  viewport: Size;
+  contentBounds: Rect;
+}) {
+  const within = withinLimits({ camera, viewport, contentBounds });
   return camera.x !== within.x || camera.y !== within.y;
 }
 
@@ -163,9 +214,14 @@ export function isBouncing({ camera, ...scene }: { camera: Camera } & Scene) {
  */
 export function bounce({
   camera,
-  ...scene
-}: { camera: Camera } & Scene): Camera {
-  const limits = panLimits({ scale: camera.scale, ...scene });
+  viewport,
+  contentBounds,
+}: {
+  camera: Camera;
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
+  const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
   const bounced = (value: number, [min, max]: Interval) => {
     const over = value < min ? value - min : value > max ? value - max : 0;
     return (
@@ -188,10 +244,16 @@ export function bounce({
 export function bounceBack({
   camera,
   elapsed,
-  ...scene
-}: { camera: Camera; elapsed: number } & Scene): Camera {
+  viewport,
+  contentBounds,
+}: {
+  camera: Camera;
+  elapsed: number;
+  viewport: Size;
+  contentBounds: Rect;
+}): Camera {
   const keep = SPRING ** (Math.max(0, elapsed) / 16);
-  const limits = panLimits({ scale: camera.scale, ...scene });
+  const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
   const pulled = (value: number, [min, max]: Interval) => {
     const edge = clamp(value, min, max);
     return Math.abs(value - edge) < 0.5 ? edge : edge + (value - edge) * keep;

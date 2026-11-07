@@ -19,28 +19,44 @@
   var MAX_BOUNCE = 80;
   var SPRING = 0.8;
   var FOCUS_PADDING = 80;
-  function fitScale({ viewport, contentBounds }) {
+  function fitScale({
+    viewport,
+    contentBounds
+  }) {
     return Math.min(
       1,
       viewport.width / (maxX(contentBounds) + contentBounds.x),
       viewport.height / (maxY(contentBounds) + contentBounds.y)
     );
   }
-  function clampScale({ scale, ...scene }) {
-    return clamp(scale, Math.min(MIN_SCALE, fitScale(scene)), MAX_SCALE);
+  function clampScale({
+    scale,
+    viewport,
+    contentBounds
+  }) {
+    const fit2 = fitScale({ viewport, contentBounds });
+    return clamp(scale, Math.min(MIN_SCALE, fit2), MAX_SCALE);
   }
-  function fit(scene) {
-    return { x: 0, y: 0, scale: fitScale(scene) };
+  function fit({
+    viewport,
+    contentBounds
+  }) {
+    return { x: 0, y: 0, scale: fitScale({ viewport, contentBounds }) };
   }
-  function focus({ frame, ...scene }) {
-    const { width, height } = scene.viewport;
+  function focus({
+    frame,
+    viewport,
+    contentBounds
+  }) {
+    const { width, height } = viewport;
     const scale = clampScale({
       scale: Math.min(
         1,
         (width - FOCUS_PADDING * 2) / frame.width,
         (height - FOCUS_PADDING * 2) / frame.height
       ),
-      ...scene
+      viewport,
+      contentBounds
     });
     return {
       x: width / 2 - (frame.x + frame.width / 2) * scale,
@@ -52,13 +68,14 @@
     camera,
     point,
     scale,
-    ...scene
+    viewport,
+    contentBounds
   }) {
     return pinch({
       camera,
       from: point,
       to: point,
-      scale: clampScale({ scale, ...scene })
+      scale: clampScale({ scale, viewport, contentBounds })
     });
   }
   function pinch({
@@ -102,24 +119,30 @@
   }
   function withinLimits({
     camera,
-    ...scene
+    viewport,
+    contentBounds
   }) {
-    const limits = panLimits({ scale: camera.scale, ...scene });
+    const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
     return {
       x: clamp(camera.x, ...limits.x),
       y: clamp(camera.y, ...limits.y),
       scale: camera.scale
     };
   }
-  function isBouncing({ camera, ...scene }) {
-    const within = withinLimits({ camera, ...scene });
+  function isBouncing({
+    camera,
+    viewport,
+    contentBounds
+  }) {
+    const within = withinLimits({ camera, viewport, contentBounds });
     return camera.x !== within.x || camera.y !== within.y;
   }
   function bounce({
     camera,
-    ...scene
+    viewport,
+    contentBounds
   }) {
-    const limits = panLimits({ scale: camera.scale, ...scene });
+    const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
     const bounced = (value, [min, max]) => {
       const over = value < min ? value - min : value > max ? value - max : 0;
       return clamp(value, min, max) + MAX_BOUNCE * over / (Math.abs(over) + MAX_BOUNCE);
@@ -133,10 +156,11 @@
   function bounceBack({
     camera,
     elapsed,
-    ...scene
+    viewport,
+    contentBounds
   }) {
     const keep = SPRING ** (Math.max(0, elapsed) / 16);
-    const limits = panLimits({ scale: camera.scale, ...scene });
+    const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
     const pulled = (value, [min, max]) => {
       const edge = clamp(value, min, max);
       return Math.abs(value - edge) < 0.5 ? edge : edge + (value - edge) * keep;
@@ -148,80 +172,118 @@
     };
   }
 
+  // viewer/canvas.ts
+  var reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function setUpCanvas(root) {
+    const viewport = root.querySelector(".viewport");
+    const element = viewport?.querySelector(".world");
+    if (!viewport || !element) return null;
+    viewport.addEventListener("scroll", () => {
+      viewport.scrollTop = 0;
+      viewport.scrollLeft = 0;
+    });
+    const [minX, minY, maxX2, maxY2] = element.dataset.bounds.split(",").map(Number);
+    return {
+      viewport,
+      element,
+      contentBounds: {
+        x: minX,
+        y: minY,
+        width: maxX2 - minX,
+        height: maxY2 - minY
+      },
+      camera: { x: 0, y: 0, scale: 1 },
+      gesture: null,
+      bouncingBack: false
+    };
+  }
+  function measure(canvas) {
+    const { clientWidth: width, clientHeight: height } = canvas.viewport;
+    return { viewport: { width, height }, contentBounds: canvas.contentBounds };
+  }
+  function moveCamera({
+    canvas,
+    camera,
+    bouncing = false
+  }) {
+    const showBounce = bouncing && !reducedMotion;
+    const shown = showBounce ? bounce({ camera, ...measure(canvas) }) : withinLimits({ camera, ...measure(canvas) });
+    canvas.camera = showBounce ? camera : shown;
+    canvas.element.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
+  }
+  function startBounceBack(canvas) {
+    if (canvas.bouncingBack) return;
+    let last = performance.now();
+    const step = (now) => {
+      canvas.bouncingBack = false;
+      if (canvas.gesture) return;
+      const camera = bounceBack({
+        camera: canvas.camera,
+        elapsed: now - last,
+        ...measure(canvas)
+      });
+      last = now;
+      moveCamera({ canvas, camera, bouncing: true });
+      if (isBouncing({ camera: canvas.camera, ...measure(canvas) })) {
+        canvas.bouncingBack = true;
+        requestAnimationFrame(step);
+      }
+    };
+    canvas.bouncingBack = true;
+    requestAnimationFrame(step);
+  }
+  function cardFrame({
+    canvas,
+    id
+  }) {
+    const card = id && document.getElementById(id);
+    if (!card || !canvas.element.contains(card)) return null;
+    return {
+      x: card.offsetLeft,
+      y: card.offsetTop,
+      width: card.offsetWidth,
+      height: card.offsetHeight
+    };
+  }
+
   // viewer/main.ts
   (() => {
-    const viewport = document.querySelector(".viewport");
-    const world = viewport?.querySelector(".world");
-    if (!viewport || !world) return;
+    const canvas = setUpCanvas(document);
+    if (!canvas) return;
+    const { viewport } = canvas;
     document.documentElement.classList.add("js");
-    const BOUNCES = !matchMedia("(prefers-reduced-motion: reduce)").matches;
     const PUSH_TIME = 100;
     const SCROLL_PAUSE = 300;
     const DRAG_THRESHOLD = 4;
     const SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
-    const [minX, minY, maxX2, maxY2] = world.dataset.bounds.split(",").map(Number);
-    const contentBounds = {
-      x: minX,
-      y: minY,
-      width: maxX2 - minX,
-      height: maxY2 - minY
-    };
     const zoomLevel = document.querySelector(".zoom-level");
     const cameraKey = `camera:${location.pathname}`;
-    let camera = { x: 0, y: 0, scale: 1 };
-    let bounceFrame = 0;
     let lastWheel = 0;
     const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
-    function scene() {
-      return {
-        viewport: { width: viewport.clientWidth, height: viewport.clientHeight },
-        contentBounds
-      };
-    }
-    function apply({ bouncing = false } = {}) {
-      const showBounce = bouncing && BOUNCES;
-      const shown = showBounce ? bounce({ camera, ...scene() }) : withinLimits({ camera, ...scene() });
-      if (!showBounce) camera = shown;
-      world.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
-      if (zoomLevel) zoomLevel.textContent = `${Math.round(camera.scale * 100)}%`;
-    }
-    function startBounceBack() {
-      if (bounceFrame) return;
-      let last = performance.now();
-      const step = (now) => {
-        bounceFrame = 0;
-        if (gesture) return;
-        camera = bounceBack({ camera, elapsed: now - last, ...scene() });
-        last = now;
-        apply({ bouncing: true });
-        if (isBouncing({ camera, ...scene() })) {
-          bounceFrame = requestAnimationFrame(step);
-        }
-      };
-      bounceFrame = requestAnimationFrame(step);
+    function apply({
+      camera,
+      bouncing = false
+    }) {
+      moveCamera({ canvas, camera, bouncing });
+      if (zoomLevel) {
+        zoomLevel.textContent = `${Math.round(canvas.camera.scale * 100)}%`;
+      }
     }
     function home() {
-      camera = fit(scene());
-      apply();
+      apply({ camera: fit(measure(canvas)) });
     }
     function zoomAtCenter(scale) {
-      const current = scene();
-      const { width, height } = current.viewport;
+      const measured = measure(canvas);
+      const { width, height } = measured.viewport;
       const point = { x: width / 2, y: height / 2 };
-      camera = zoomAt({ camera, point, scale, ...current });
-      apply();
+      apply({
+        camera: zoomAt({ camera: canvas.camera, point, scale, ...measured })
+      });
     }
     function focusCard(id) {
-      const card = id && document.getElementById(id);
-      if (!card || !world.contains(card)) return false;
-      const frame = {
-        x: card.offsetLeft,
-        y: card.offsetTop,
-        width: card.offsetWidth,
-        height: card.offsetHeight
-      };
-      camera = focus({ frame, ...scene() });
-      apply();
+      const frame = cardFrame({ canvas, id });
+      if (!frame) return false;
+      apply({ camera: focus({ frame, ...measure(canvas) }) });
       return true;
     }
     function closeMenus() {
@@ -244,17 +306,26 @@
         if (event.ctrlKey || event.metaKey) {
           const delta = Math.max(-50, Math.min(50, event.deltaY * unit));
           const point = viewportPoint(event.clientX, event.clientY);
-          const scale = camera.scale * Math.exp(-delta * 0.01);
-          camera = zoomAt({ camera, point, scale, ...scene() });
-          apply();
+          const scale = canvas.camera.scale * Math.exp(-delta * 0.01);
+          apply({
+            camera: zoomAt({
+              camera: canvas.camera,
+              point,
+              scale,
+              ...measure(canvas)
+            })
+          });
         } else {
           const now = performance.now();
           const paused = now - lastWheel > SCROLL_PAUSE;
           lastWheel = now;
-          const limits = panLimits({ scale: camera.scale, ...scene() });
+          const limits = panLimits({
+            scale: canvas.camera.scale,
+            ...measure(canvas)
+          });
           const pan = (axis, delta) => {
             const [min, max] = limits[axis];
-            const value = camera[axis];
+            const value = canvas.camera[axis];
             const next = value - delta;
             const push = pushes[axis];
             const speed = Math.abs(delta);
@@ -270,13 +341,15 @@
             const outward = Math.abs(next - clamp(next, min, max)) > Math.abs(value - clamp(value, min, max));
             return outward && now - push.start > PUSH_TIME ? value : next;
           };
-          camera = {
-            ...camera,
-            x: pan("x", event.deltaX * unit),
-            y: pan("y", event.deltaY * unit)
-          };
-          apply({ bouncing: true });
-          startBounceBack();
+          apply({
+            camera: {
+              ...canvas.camera,
+              x: pan("x", event.deltaX * unit),
+              y: pan("y", event.deltaY * unit)
+            },
+            bouncing: true
+          });
+          startBounceBack(canvas);
         }
       },
       { passive: false }
@@ -284,18 +357,23 @@
     let gestureStartScale = 1;
     viewport.addEventListener("gesturestart", (event) => {
       event.preventDefault();
-      gestureStartScale = camera.scale;
+      gestureStartScale = canvas.camera.scale;
     });
     viewport.addEventListener("gesturechange", (event) => {
       event.preventDefault();
       if (pointers.size > 1) return;
       const point = viewportPoint(event.clientX, event.clientY);
       const scale = gestureStartScale * event.scale;
-      camera = zoomAt({ camera, point, scale, ...scene() });
-      apply();
+      apply({
+        camera: zoomAt({
+          camera: canvas.camera,
+          point,
+          scale,
+          ...measure(canvas)
+        })
+      });
     });
     const pointers = /* @__PURE__ */ new Map();
-    let gesture = null;
     let suppressClick = false;
     function midpoint(points) {
       const x = points.reduce((sum, p) => sum + p.x, 0) / points.length;
@@ -307,11 +385,11 @@
     }
     function startGesture() {
       const points = [...pointers.values()];
-      gesture = {
-        camera: { ...camera },
+      canvas.gesture = {
+        camera: { ...canvas.camera },
         center: midpoint(points),
         distance: spread(points),
-        dragging: Boolean(gesture?.dragging) || points.length > 1
+        dragging: Boolean(canvas.gesture?.dragging) || points.length > 1
       };
     }
     viewport.addEventListener("pointerdown", (event) => {
@@ -325,6 +403,7 @@
       startGesture();
     });
     viewport.addEventListener("pointermove", (event) => {
+      const { gesture } = canvas;
       if (!gesture || !pointers.has(event.pointerId)) return;
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       const points = [...pointers.values()];
@@ -343,12 +422,14 @@
       }
       const scale = points.length > 1 && gesture.distance > 0 ? clampScale({
         scale: gesture.camera.scale * spread(points) / gesture.distance,
-        ...scene()
+        ...measure(canvas)
       }) : gesture.camera.scale;
       const from = viewportPoint(gesture.center.x, gesture.center.y);
       const to = viewportPoint(center.x, center.y);
-      camera = pinch({ camera: gesture.camera, from, to, scale });
-      apply({ bouncing: true });
+      apply({
+        camera: pinch({ camera: gesture.camera, from, to, scale }),
+        bouncing: true
+      });
     });
     function endPointer(event) {
       if (!pointers.delete(event.pointerId)) return;
@@ -356,10 +437,10 @@
         startGesture();
         return;
       }
-      suppressClick = Boolean(gesture?.dragging);
-      gesture = null;
+      suppressClick = Boolean(canvas.gesture?.dragging);
+      canvas.gesture = null;
       viewport.classList.remove("is-dragging");
-      startBounceBack();
+      startBounceBack(canvas);
     }
     viewport.addEventListener("pointerup", endPointer);
     viewport.addEventListener("pointercancel", endPointer);
@@ -374,14 +455,10 @@
       true
     );
     viewport.addEventListener("dragstart", (event) => event.preventDefault());
-    viewport.addEventListener("scroll", () => {
-      viewport.scrollTop = 0;
-      viewport.scrollLeft = 0;
-    });
     document.querySelector(".zoom")?.addEventListener("click", (event) => {
       const action = event.target.closest("[data-zoom]")?.dataset.zoom;
-      if (action === "in") zoomAtCenter(camera.scale * 1.25);
-      else if (action === "out") zoomAtCenter(camera.scale * 0.8);
+      if (action === "in") zoomAtCenter(canvas.camera.scale * 1.25);
+      else if (action === "out") zoomAtCenter(canvas.camera.scale * 0.8);
       else if (action === "home") home();
     });
     const relativeTime = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
@@ -403,7 +480,7 @@
       time.textContent = relativeTime.format(-Math.trunc(elapsed / length), unit);
     }
     const copiedTimers = /* @__PURE__ */ new WeakMap();
-    world.addEventListener("click", async (event) => {
+    canvas.element.addEventListener("click", async (event) => {
       const button = event.target.closest(".copy");
       const owner = button?.parentElement;
       const source = owner?.matches(".chain") ? owner : owner?.querySelector(":scope > .body, :scope > .text");
@@ -442,8 +519,8 @@
       if (event.altKey) return;
       const command = event.ctrlKey || event.metaKey;
       if (event.key === "+" || event.key === "=")
-        zoomAtCenter(camera.scale * 1.25);
-      else if (event.key === "-") zoomAtCenter(camera.scale * 0.8);
+        zoomAtCenter(canvas.camera.scale * 1.25);
+      else if (event.key === "-") zoomAtCenter(canvas.camera.scale * 0.8);
       else if (event.key === "0") zoomAtCenter(1);
       else if (event.shiftKey && event.code === "Digit1") home();
       else if (event.key !== "Escape" || command || !goToParent()) return;
@@ -575,7 +652,7 @@
     addEventListener("hashchange", () => focusCard(location.hash.slice(1)));
     addEventListener("pagehide", () => {
       try {
-        sessionStorage.setItem(cameraKey, JSON.stringify(camera));
+        sessionStorage.setItem(cameraKey, JSON.stringify(canvas.camera));
       } catch {
       }
     });
@@ -585,11 +662,12 @@
         if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
           return false;
         }
-        camera = {
-          ...saved,
-          scale: clampScale({ scale: saved.scale, ...scene() })
-        };
-        apply();
+        apply({
+          camera: {
+            ...saved,
+            scale: clampScale({ scale: saved.scale, ...measure(canvas) })
+          }
+        });
         return true;
       } catch {
         return false;
