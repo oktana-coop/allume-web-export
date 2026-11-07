@@ -58,4 +58,16 @@ test.describe('starting view', () => {
 
     await expectCardCentered({ page, board: haskell });
   });
+
+  test('changing the URL to a card on the open board centers the card', async ({
+    page,
+  }) => {
+    await page.goto(functional.url);
+    await scrollBoard({ page, x: 300, y: 200 });
+
+    // The same page, so only its hash changes, without loading it again.
+    await page.goto(`${functional.url}#card-${haskell.id}`);
+
+    await expectCardCentered({ page, board: haskell });
+  });
 });
