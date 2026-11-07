@@ -187,7 +187,6 @@
   }
 
   // viewer/canvas.ts
-  var reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   function setUpCanvas(root) {
     const viewport = root.querySelector(".viewport");
     const element = viewport?.querySelector(".world");
@@ -207,6 +206,7 @@
         width: maxX2 - minX,
         height: maxY2 - minY
       },
+      reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
       camera: { x: 0, y: 0, scale: 1 },
       gesture: null,
       bouncingBack: false
@@ -221,7 +221,7 @@
     camera,
     bouncing = false
   }) {
-    const showBounce = bouncing && !reducedMotion;
+    const showBounce = bouncing && !canvas.reducedMotion;
     const shown = showBounce ? bounce({ camera, ...measure(canvas) }) : withinLimits({ camera, ...measure(canvas) });
     canvas.camera = showBounce ? camera : shown;
     canvas.element.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
@@ -510,6 +510,68 @@
   }
   function spread(points) {
     return points.length > 1 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : 0;
+  }
+
+  // viewer/linked-card-menus.ts
+  var GAP = 6;
+  var WINDOW_MARGIN = 16;
+  function setUpLinkedCardMenus(canvas) {
+    canvas.viewport.addEventListener("wheel", closeOpenMenus, { passive: true });
+    for (const menu of document.querySelectorAll(".linked-menu")) {
+      const button = document.querySelector(`[popovertarget="${menu.id}"]`);
+      menu.addEventListener("beforetoggle", (event) => {
+        if (event.newState !== "open" || !button) return;
+        const to = initialMenuPosition({
+          button: button.getBoundingClientRect()
+        });
+        moveMenu({ menu, to });
+      });
+      menu.addEventListener("toggle", (event) => {
+        if (event.newState !== "open" || !button) return;
+        const to = menuPosition({
+          button: button.getBoundingClientRect(),
+          menu: menu.getBoundingClientRect(),
+          windowSize: { width: innerWidth, height: innerHeight }
+        });
+        moveMenu({ menu, to });
+      });
+      menu.addEventListener("click", (event) => {
+        const link = event.target.closest("a");
+        if (!link || link.pathname !== location.pathname) return;
+        event.preventDefault();
+        menu.hidePopover();
+        history.replaceState(history.state, "", link.hash);
+        focusCard({ canvas, id: link.hash.slice(1) });
+      });
+    }
+  }
+  function initialMenuPosition({ button }) {
+    return { x: Math.max(WINDOW_MARGIN, button.x), y: maxY(button) + GAP };
+  }
+  function menuPosition({
+    button,
+    menu,
+    windowSize
+  }) {
+    const x = Math.max(
+      WINDOW_MARGIN,
+      Math.min(button.x, windowSize.width - menu.width - WINDOW_MARGIN)
+    );
+    const below = maxY(button) + GAP;
+    const fitsBelow = below + menu.height <= windowSize.height - WINDOW_MARGIN;
+    const above = Math.max(WINDOW_MARGIN, button.y - menu.height - GAP);
+    return { x, y: fitsBelow ? below : above };
+  }
+  function closeOpenMenus() {
+    for (const menu of document.querySelectorAll(
+      ".linked-menu:popover-open"
+    )) {
+      menu.hidePopover();
+    }
+  }
+  function moveMenu({ menu, to }) {
+    menu.style.left = `${to.x}px`;
+    menu.style.top = `${to.y}px`;
   }
 
   // viewer/breadcrumbs.ts
@@ -875,44 +937,10 @@
     setUpScrolling(canvas);
     setUpGestures(canvas);
     setUpZoomControls(canvas);
-    canvas.viewport.addEventListener("wheel", closeMenus, { passive: true });
-    function closeMenus() {
-      for (const menu of document.querySelectorAll(
-        ".linked-menu:popover-open"
-      )) {
-        menu.hidePopover();
-      }
-    }
     makeCommentDatesRelative(document);
     setUpCopyButtons(canvas);
+    setUpLinkedCardMenus(canvas);
     setUpNavigation();
-    for (const menu of document.querySelectorAll(".linked-menu")) {
-      const button = document.querySelector(`[popovertarget="${menu.id}"]`);
-      menu.addEventListener("beforetoggle", (event) => {
-        if (event.newState !== "open" || !button) return;
-        const anchor = button.getBoundingClientRect();
-        menu.style.left = `${Math.max(16, anchor.left)}px`;
-        menu.style.top = `${anchor.bottom + 6}px`;
-      });
-      menu.addEventListener("toggle", (event) => {
-        if (event.newState !== "open" || !button) return;
-        const anchor = button.getBoundingClientRect();
-        const { width, height } = menu.getBoundingClientRect();
-        const left = Math.max(16, Math.min(anchor.left, innerWidth - width - 16));
-        const below = anchor.bottom + 6;
-        const top = below + height > innerHeight - 16 ? Math.max(16, anchor.top - height - 6) : below;
-        menu.style.left = `${left}px`;
-        menu.style.top = `${top}px`;
-      });
-      menu.addEventListener("click", (event) => {
-        const link = event.target.closest("a");
-        if (!link || link.pathname !== location.pathname) return;
-        event.preventDefault();
-        menu.hidePopover();
-        history.replaceState(history.state, "", link.hash);
-        focusCard({ canvas, id: link.hash.slice(1) });
-      });
-    }
     setUpStartingView(canvas);
   })();
 })();

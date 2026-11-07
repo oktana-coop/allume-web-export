@@ -27,13 +27,11 @@ export type Canvas = {
   element: HTMLElement;
   zoomLevelLabel: HTMLElement | null;
   contentBounds: Rect;
+  reducedMotion: boolean;
   camera: Camera;
   gesture: Gesture | null;
   bouncingBack: boolean;
 };
-
-// Reduced motion turns bouncing off, so panning stops at the edges.
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * The canvas in the root, with the camera at the canvas's origin, or null if
@@ -64,6 +62,7 @@ export function setUpCanvas(root: ParentNode): Canvas | null {
       width: maxX - minX,
       height: maxY - minY,
     },
+    reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
     camera: { x: 0, y: 0, scale: 1 },
     gesture: null,
     bouncingBack: false,
@@ -93,7 +92,8 @@ export function moveCamera({
   camera: Camera;
   bouncing?: boolean;
 }) {
-  const showBounce = bouncing && !reducedMotion;
+  // Reduced motion turns bouncing off, so panning stops at the edges.
+  const showBounce = bouncing && !canvas.reducedMotion;
   const shown = showBounce
     ? bounce({ camera, ...measure(canvas) })
     : withinLimits({ camera, ...measure(canvas) });
