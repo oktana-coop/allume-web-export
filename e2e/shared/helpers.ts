@@ -102,7 +102,7 @@ export const boundingBox = async ({ of: element }: { of: Locator }) => {
   return box;
 };
 
-/** The middle of the board's card, on the screen. */
+/** The center of the board's card, on the screen. */
 export const cardCenter = async ({
   page,
   board,
@@ -111,11 +111,10 @@ export const cardCenter = async ({
   board: Board;
 }) => center({ of: boardCard({ page, board }) });
 
-/** The middle of the view that shows the board, below the header. */
+/** The center of the view that shows the board, below the header. */
 export const viewCenter = async ({ page }: { page: Page }) =>
   center({ of: page.getByRole('main') });
 
-/** Checks the board's card is in the middle of the view. */
 export const expectCardCentered = async ({
   page,
   board,
@@ -150,7 +149,11 @@ export const scrollBoard = async ({
   await page.mouse.wheel(x, y);
 };
 
-const center = async ({ of: element }: { of: Locator }): Promise<Point> => {
+export const center = async ({
+  of: element,
+}: {
+  of: Locator;
+}): Promise<Point> => {
   const box = await boundingBox({ of: element });
 
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };

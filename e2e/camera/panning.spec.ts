@@ -1,10 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { haskell, ocaml, ocamlNotes } from '../shared/boards';
+import { functional, haskell, ocaml, ocamlNotes } from '../shared/boards';
 import {
   boardCard,
   boundingBox,
   cardCenter,
+  center,
+  linkedCardButton,
   scrollBoard,
 } from '../shared/helpers';
 import { drag } from './helpers';
@@ -47,6 +49,39 @@ test.describe('panning', () => {
     expect(after.x).toBeCloseTo(before.x + 150, 0);
     expect(after.y).toBeCloseTo(before.y + 80, 0);
     await expect(page).toHaveURL(ocaml.url);
+  });
+
+  test("dragging from a linked card's button leaves the board where it is", async ({
+    page,
+  }) => {
+    await page.goto(functional.url);
+    const before = await cardCenter({ page, board: haskell });
+    const button = await center({
+      of: linkedCardButton({ page, card: haskell }),
+    });
+
+    await drag({ page, from: button, by: { x: 150, y: 80 } });
+
+    expect(await cardCenter({ page, board: haskell })).toEqual(before);
+  });
+
+  test('a drag that comes back to where it started keeps panning', async ({
+    page,
+  }) => {
+    await page.goto(ocaml.url);
+    const before = await cardCenter({ page, board: ocamlNotes });
+    // Below OCaml's cards, on the right.
+    const start = { x: 1200, y: 600 };
+
+    await page.mouse.move(start.x, start.y);
+    await page.mouse.down();
+    await page.mouse.move(start.x - 100, start.y, { steps: 5 });
+    await page.mouse.move(start.x - 2, start.y, { steps: 5 });
+    await page.mouse.up();
+
+    const after = await cardCenter({ page, board: ocamlNotes });
+    expect(after.x).toBeCloseTo(before.x - 2, 0);
+    expect(after.y).toBeCloseTo(before.y, 0);
   });
 
   test('a mouse drag on a text card selects its text rather than panning', async ({
