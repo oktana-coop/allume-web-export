@@ -1,7 +1,7 @@
 // Built from viewer/ by `npm run build:viewer`. Edit it there.
 "use strict";
 (() => {
-  // viewer/main.js
+  // viewer/main.ts
   (() => {
     const viewport = document.querySelector(".viewport");
     const world = viewport?.querySelector(".world");
@@ -124,7 +124,9 @@
       return true;
     }
     function closeMenus() {
-      for (const menu of document.querySelectorAll(".linked-menu:popover-open")) {
+      for (const menu of document.querySelectorAll(
+        ".linked-menu:popover-open"
+      )) {
         menu.hidePopover();
       }
     }
@@ -289,7 +291,9 @@
       ["hour", DAY / 24],
       ["minute", DAY / 1440]
     ];
-    for (const time of document.querySelectorAll(".comment time")) {
+    for (const time of document.querySelectorAll(
+      ".comment time"
+    )) {
       const elapsed = Date.now() - Date.parse(time.dateTime);
       if (!Number.isFinite(elapsed)) continue;
       const [unit, length] = UNITS.find(([, length2]) => elapsed >= length2) ?? UNITS.at(-1);
@@ -349,7 +353,9 @@
         history.back();
         return true;
       }
-      const parent = crumbs?.querySelector(':scope > a[rel="up"]');
+      const parent = crumbs?.querySelector(
+        ':scope > a[rel="up"]'
+      );
       if (!parent) return false;
       recordArrival(parent.href, "up", crumbTrail().slice(0, -1));
       location.href = parent.href;
@@ -357,7 +363,9 @@
     }
     const crumbs = document.querySelector(".crumbs");
     function crumbLinks() {
-      return [...crumbs?.querySelectorAll(":scope > a") ?? []];
+      return [
+        ...crumbs?.querySelectorAll(":scope > a") ?? []
+      ];
     }
     function crumbTrail() {
       return crumbLinks().map((link) => ({
@@ -386,14 +394,18 @@
     function markParent(heading, parent) {
       if (!parent) return;
       const path = new URL(parent.href).pathname;
-      for (const link of heading.querySelectorAll(".linked-menu a")) {
+      for (const link of heading.querySelectorAll(
+        ".linked-menu a"
+      )) {
         if (link.pathname === path) link.setAttribute("aria-current", "true");
         else link.removeAttribute("aria-current");
       }
     }
     const ARRIVAL_KEY = "arrival";
     document.addEventListener("click", (event) => {
-      const link = event.target.closest("a[href]");
+      const link = event.target.closest(
+        "a[href]"
+      );
       const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
       if (!link || link.target || modified || event.defaultPrevented) return;
       const crumb = crumbLinks().indexOf(link);

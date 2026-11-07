@@ -1,9 +1,47 @@
 // Pan and zoom for a board page, menus for linked cards, and focusing the card
 // named in the URL hash (#card-<document id>). Loaded at the end of <body>,
 // so the first camera is in place before the page is shown.
+
+type Point = { x: number; y: number };
+
+/** The canvas's offset in the viewport, in pixels, and its scale. */
+type Camera = { x: number; y: number; scale: number };
+
+type Axis = 'x' | 'y';
+
+type Interval = [min: number, max: number];
+
+/** A drag or pinch, from where it started. */
+type Gesture = {
+  camera: Camera;
+  center: Point;
+  distance: number;
+  dragging: boolean;
+};
+
+/** A board in the breadcrumbs. */
+type Crumb = { href: string; label: string };
+
+/** How a page was reached. */
+type Arrival = 'down' | 'across' | 'up';
+
+// Safari's trackpad pinches, which TypeScript's DOM types leave out.
+interface GestureEvent extends UIEvent {
+  readonly scale: number;
+  readonly clientX: number;
+  readonly clientY: number;
+}
+
+interface HTMLElementEventMap {
+  gesturestart: GestureEvent;
+  gesturechange: GestureEvent;
+}
+
 (() => {
-  const viewport = document.querySelector('.viewport');
-  const world = viewport?.querySelector('.world');
+  // Asserted rather than narrowed by the check below, which TypeScript
+  // doesn't carry into the function declarations.
+  const viewport = document.querySelector<HTMLElement>('.viewport')!;
+  const world = viewport?.querySelector<HTMLElement>('.world')!;
   if (!viewport || !world) return;
   document.documentElement.classList.add('js');
 
@@ -29,17 +67,17 @@
   const FOCUS_PADDING = 80;
   const SELECTABLE_TEXT =
     '.world > .card--text > .body, .world > .comment > .text, .world > .chain';
-  const [minX, minY, maxX, maxY] = world.dataset.bounds.split(',').map(Number);
+  const [minX, minY, maxX, maxY] = world.dataset.bounds!.split(',').map(Number);
   const zoomLevel = document.querySelector('.zoom-level');
   const cameraKey = `camera:${location.pathname}`;
 
-  let camera = { x: 0, y: 0, scale: 1 };
+  let camera: Camera = { x: 0, y: 0, scale: 1 };
   let springFrame = 0;
   let lastWheel = 0;
   const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
 
   // The camera positions that keep PAN_MARGIN of the board in view.
-  function panLimits() {
+  function panLimits(): Record<Axis, Interval> {
     const { clientWidth: width, clientHeight: height } = viewport;
     const { scale } = camera;
     const marginX = Math.min(PAN_MARGIN, width / 2, (maxX - minX) * scale);
@@ -52,7 +90,7 @@
 
   // Places the board, keeping the camera within the panning limits. While
   // panning (elastic), the camera may go past them and the board stretches.
-  function apply({ elastic = false } = {}) {
+  function apply({ elastic = false }: { elastic?: boolean } = {}) {
     const limits = panLimits();
     const bound = elastic && ELASTIC ? rubberBand : clamp;
     const x = bound(camera.x, ...limits.x);
@@ -68,13 +106,13 @@
   function springBack() {
     if (springFrame) return;
     let last = performance.now();
-    const step = (now) => {
+    const step = (now: number) => {
       springFrame = 0;
       if (gesture) return; // A drag holds the stretch until it's let go.
       const keep = SPRING ** (Math.max(0, now - last) / 16);
       last = now;
       const limits = panLimits();
-      const pull = (value, [min, max]) => {
+      const pull = (value: number, [min, max]: Interval) => {
         const edge = clamp(value, min, max);
         return Math.abs(value - edge) < 0.5
           ? edge
@@ -91,19 +129,19 @@
     springFrame = requestAnimationFrame(step);
   }
 
-  function clamp(value, min, max) {
+  function clamp(value: number, min: number, max: number) {
     return Math.min(max, Math.max(min, value));
   }
 
   // Past a limit, the board gives less the further it's pulled.
-  function rubberBand(value, min, max) {
+  function rubberBand(value: number, min: number, max: number) {
     const over = value < min ? value - min : value > max ? value - max : 0;
     return (
       clamp(value, min, max) + (STRETCH * over) / (Math.abs(over) + STRETCH)
     );
   }
 
-  function clampScale(scale) {
+  function clampScale(scale: number) {
     return clamp(scale, Math.min(MIN_SCALE, fitScale()), MAX_SCALE);
   }
 
@@ -123,7 +161,7 @@
   }
 
   // Zooms to the scale, keeping the viewport point (x, y) in place.
-  function zoomAt(x, y, scale) {
+  function zoomAt(x: number, y: number, scale: number) {
     const target = clampScale(scale);
     const ratio = target / camera.scale;
     camera = {
@@ -134,11 +172,11 @@
     apply();
   }
 
-  function zoomAtCenter(scale) {
+  function zoomAtCenter(scale: number) {
     zoomAt(viewport.clientWidth / 2, viewport.clientHeight / 2, scale);
   }
 
-  function focusCard(id) {
+  function focusCard(id: string) {
     const card = id && document.getElementById(id);
     if (!card || !world.contains(card)) return false;
     const {
@@ -164,12 +202,14 @@
   }
 
   function closeMenus() {
-    for (const menu of document.querySelectorAll('.linked-menu:popover-open')) {
+    for (const menu of document.querySelectorAll<HTMLElement>(
+      '.linked-menu:popover-open'
+    )) {
       menu.hidePopover();
     }
   }
 
-  function viewportPoint(clientX, clientY) {
+  function viewportPoint(clientX: number, clientY: number) {
     const { left, top } = viewport.getBoundingClientRect();
     return { x: clientX - left, y: clientY - top };
   }
@@ -195,7 +235,7 @@
         const paused = now - lastWheel > SCROLL_PAUSE;
         lastWheel = now;
         const limits = panLimits();
-        const pan = (axis, delta) => {
+        const pan = (axis: Axis, delta: number) => {
           const [min, max] = limits[axis];
           const value = camera[axis];
           const next = value - delta;
@@ -243,17 +283,17 @@
   // Dragging with one pointer pans; pinching with two zooms. A press that
   // doesn't move is left alone, so links and buttons still work, and a mouse
   // drag that starts on text selects the text instead.
-  const pointers = new Map();
-  let gesture = null;
+  const pointers = new Map<number, Point>();
+  let gesture: Gesture | null = null;
   let suppressClick = false;
 
-  function midpoint(points) {
+  function midpoint(points: Point[]) {
     const x = points.reduce((sum, p) => sum + p.x, 0) / points.length;
     const y = points.reduce((sum, p) => sum + p.y, 0) / points.length;
     return { x, y };
   }
 
-  function spread(points) {
+  function spread(points: Point[]) {
     return points.length > 1
       ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
       : 0;
@@ -272,10 +312,10 @@
   viewport.addEventListener('pointerdown', (event) => {
     suppressClick = false;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    if (event.target.closest('button, [popover]')) return;
+    if ((event.target as Element).closest('button, [popover]')) return;
     if (
       event.pointerType === 'mouse' &&
-      event.target.closest(SELECTABLE_TEXT)
+      (event.target as Element).closest(SELECTABLE_TEXT)
     ) {
       return;
     }
@@ -316,7 +356,7 @@
     apply({ elastic: true });
   });
 
-  function endPointer(event) {
+  function endPointer(event: PointerEvent) {
     if (!pointers.delete(event.pointerId)) return;
     if (pointers.size > 0) {
       startGesture();
@@ -350,7 +390,8 @@
   });
 
   document.querySelector('.zoom')?.addEventListener('click', (event) => {
-    const action = event.target.closest('[data-zoom]')?.dataset.zoom;
+    const action = (event.target as Element).closest<HTMLElement>('[data-zoom]')
+      ?.dataset.zoom;
     if (action === 'in') zoomAtCenter(camera.scale * 1.25);
     else if (action === 'out') zoomAtCenter(camera.scale * 0.8);
     else if (action === 'home') home();
@@ -361,7 +402,7 @@
   // ago is "last year".
   const relativeTime = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
   const DAY = 24 * 60 * 60 * 1000;
-  const UNITS = [
+  const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
     ['year', 365 * DAY],
     ['month', 30 * DAY],
     ['week', 7 * DAY],
@@ -369,43 +410,45 @@
     ['hour', DAY / 24],
     ['minute', DAY / 1440],
   ];
-  for (const time of document.querySelectorAll('.comment time')) {
+  for (const time of document.querySelectorAll<HTMLTimeElement>(
+    '.comment time'
+  )) {
     const elapsed = Date.now() - Date.parse(time.dateTime);
     if (!Number.isFinite(elapsed)) continue;
     const [unit, length] =
-      UNITS.find(([, length]) => elapsed >= length) ?? UNITS.at(-1);
+      UNITS.find(([, length]) => elapsed >= length) ?? UNITS.at(-1)!;
     time.textContent = relativeTime.format(-Math.trunc(elapsed / length), unit);
   }
 
   // Copy buttons copy a text card's or comment's full text, including any
   // part the card's size cuts off, or all of a canvas text.
-  const copiedTimers = new WeakMap();
+  const copiedTimers = new WeakMap<HTMLElement, number>();
   world.addEventListener('click', async (event) => {
-    const button = event.target.closest('.copy');
+    const button = (event.target as Element).closest<HTMLElement>('.copy');
     const owner = button?.parentElement;
     const source = owner?.matches('.chain')
       ? owner
       : owner?.querySelector(':scope > .body, :scope > .text');
     if (!source || !(await copyText(source))) return;
-    button.dataset.copied = '';
-    button.setAttribute('aria-label', 'Copied');
-    clearTimeout(copiedTimers.get(button));
+    button!.dataset.copied = '';
+    button!.setAttribute('aria-label', 'Copied');
+    clearTimeout(copiedTimers.get(button!));
     copiedTimers.set(
-      button,
+      button!,
       setTimeout(() => {
-        delete button.dataset.copied;
-        button.setAttribute('aria-label', 'Copy text');
+        delete button!.dataset.copied;
+        button!.setAttribute('aria-label', 'Copy text');
       }, 1500)
     );
   });
 
-  async function copyText(element) {
+  async function copyText(element: Element) {
     try {
       await navigator.clipboard.writeText(textOf(element));
       return true;
     } catch {
       // The Clipboard API needs a secure context; copy a selection instead.
-      const selection = getSelection();
+      const selection = getSelection()!;
       const range = document.createRange();
       range.selectNodeContents(element);
       selection.removeAllRanges();
@@ -417,7 +460,7 @@
   }
 
   // A canvas text has a paragraph per line, which textContent runs together.
-  function textOf(element) {
+  function textOf(element: Element) {
     if (!element.matches('.chain')) return element.textContent;
     return [...element.querySelectorAll(':scope > p')]
       .map((paragraph) => paragraph.textContent)
@@ -448,7 +491,9 @@
       history.back();
       return true;
     }
-    const parent = crumbs?.querySelector(':scope > a[rel="up"]');
+    const parent = crumbs?.querySelector<HTMLAnchorElement>(
+      ':scope > a[rel="up"]'
+    );
     if (!parent) return false;
     recordArrival(parent.href, 'up', crumbTrail().slice(0, -1));
     location.href = parent.href;
@@ -461,21 +506,23 @@
   const crumbs = document.querySelector('.crumbs');
 
   function crumbLinks() {
-    return [...(crumbs?.querySelectorAll(':scope > a') ?? [])];
+    return [
+      ...(crumbs?.querySelectorAll<HTMLAnchorElement>(':scope > a') ?? []),
+    ];
   }
 
   /** The boards in the breadcrumbs, from the root to the parent. */
-  function crumbTrail() {
+  function crumbTrail(): Crumb[] {
     return crumbLinks().map((link) => ({
       href: link.href,
       label: link.textContent,
     }));
   }
 
-  function showTrail(trail) {
+  function showTrail(trail: Crumb[]) {
     const heading = crumbs?.querySelector(':scope > h1');
     if (!heading) return;
-    const shown = crumbs.querySelectorAll(':scope > a, :scope > .separator');
+    const shown = crumbs!.querySelectorAll(':scope > a, :scope > .separator');
     for (const element of shown) element.remove();
     trail.forEach(({ href, label }, index) => {
       const link = document.createElement('a');
@@ -493,10 +540,12 @@
 
   // The page marks the main path's parent in the heading's linked card menu,
   // so a different path moves the mark to its own parent.
-  function markParent(heading, parent) {
+  function markParent(heading: Element, parent: Crumb | undefined) {
     if (!parent) return;
     const path = new URL(parent.href).pathname;
-    for (const link of heading.querySelectorAll('.linked-menu a')) {
+    for (const link of heading.querySelectorAll<HTMLAnchorElement>(
+      '.linked-menu a'
+    )) {
       if (link.pathname === path) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
     }
@@ -509,7 +558,9 @@
   const ARRIVAL_KEY = 'arrival';
   document.addEventListener('click', (event) => {
     // Modified clicks open new tabs or windows, which have nowhere to go back to.
-    const link = event.target.closest('a[href]');
+    const link = (event.target as Element).closest<HTMLAnchorElement>(
+      'a[href]'
+    );
     const modified =
       event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
     if (!link || link.target || modified || event.defaultPrevented) return;
@@ -529,7 +580,7 @@
     }
   });
 
-  function recordArrival(url, how, trail) {
+  function recordArrival(url: string, how: Arrival, trail?: Crumb[]) {
     try {
       const path = new URL(url).pathname;
       sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify({ path, how, trail }));
@@ -537,7 +588,8 @@
   }
 
   try {
-    const arrival = JSON.parse(sessionStorage.getItem(ARRIVAL_KEY));
+    // A missing item is null, which parses as null.
+    const arrival = JSON.parse(sessionStorage.getItem(ARRIVAL_KEY)!);
     sessionStorage.removeItem(ARRIVAL_KEY);
     if (arrival?.path === location.pathname) {
       const { how, trail } = arrival;
@@ -547,7 +599,7 @@
   if (history.state?.trail) showTrail(history.state.trail);
 
   // Linked-card menus live in the top layer, so place them by their button.
-  for (const menu of document.querySelectorAll('.linked-menu')) {
+  for (const menu of document.querySelectorAll<HTMLElement>('.linked-menu')) {
     const button = document.querySelector(`[popovertarget="${menu.id}"]`);
     menu.addEventListener('beforetoggle', (event) => {
       if (event.newState !== 'open' || !button) return;
@@ -569,7 +621,7 @@
       menu.style.top = `${top}px`;
     });
     menu.addEventListener('click', (event) => {
-      const link = event.target.closest('a');
+      const link = (event.target as Element).closest('a');
       if (!link || link.pathname !== location.pathname) return;
       event.preventDefault();
       menu.hidePopover();
@@ -587,7 +639,8 @@
 
   function restoreCamera() {
     try {
-      const saved = JSON.parse(sessionStorage.getItem(cameraKey));
+      // A missing item is null, which parses as null.
+      const saved = JSON.parse(sessionStorage.getItem(cameraKey)!);
       if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
         return false;
       }
