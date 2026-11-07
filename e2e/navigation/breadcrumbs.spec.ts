@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import {
   families,
@@ -7,8 +7,10 @@ import {
   haskellNotes,
   languages,
   mlFamily,
+  monoids,
   paradigms,
 } from '../shared/boards';
+import { openLinkedCardMenu } from '../shared/helpers';
 import { enterBoardsInPath, expectBoard, jumpToLinkedCard } from './helpers';
 
 test.describe('breadcrumbs', () => {
@@ -67,6 +69,24 @@ test.describe('breadcrumbs', () => {
     });
 
     await page.goBack();
+
+    await expectBoard({
+      page,
+      board: haskell,
+      ancestors: [languages, families, mlFamily],
+    });
+  });
+
+  test('choosing the current board in a linked card menu keeps the breadcrumbs, after a reload too', async ({
+    page,
+  }) => {
+    await page.goto(languages.url);
+    await enterBoardsInPath({ page, path: [families, mlFamily, haskell] });
+    const menu = await openLinkedCardMenu({ page, card: monoids });
+    await menu.getByRole('link', { name: haskell.label, exact: true }).click();
+    await expect(page).toHaveURL(`${haskell.url}#card-${monoids.id}`);
+
+    await page.reload();
 
     await expectBoard({
       page,
