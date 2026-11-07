@@ -96,7 +96,7 @@ import Testing
     }
 
     guard case .text(let text) = board("b", in: documents)?.chains.first else {
-      Issue.record("Expected the canvas text")
+      Issue.record("Expected the text block")
       return
     }
     #expect(text.paragraphs == [TextBlock.Paragraph(text: "Title", highlight: nil)])
@@ -117,7 +117,7 @@ import Testing
     }
 
     guard case .text(let text) = board("b", in: documents)?.chains.first else {
-      Issue.record("Expected the canvas text")
+      Issue.record("Expected the text block")
       return
     }
     #expect(text.paragraphs == [TextBlock.Paragraph(text: "", highlight: nil)])

@@ -9,7 +9,7 @@ test.describe('copy buttons', () => {
     await page.evaluate(() => navigator.clipboard.writeText(''));
   });
 
-  test("a text card's button copies its text", async ({ page }) => {
+  test("a note's button copies its text", async ({ page }) => {
     await page.goto(haskell.url);
 
     await copyButton({ page, text: 'Haskell is lazy' }).click();
@@ -22,7 +22,7 @@ test.describe('copy buttons', () => {
     });
   });
 
-  test("a canvas text's button copies it with a line per paragraph", async ({
+  test("a text block's button copies it with a line per paragraph", async ({
     page,
   }) => {
     await page.goto(functional.url);
@@ -112,7 +112,7 @@ test.describe('copy buttons', () => {
 });
 
 /**
- * The card, canvas text or comment on the current page's board that shows the
+ * The card, text block or comment on the current page's board that shows the
  * text.
  */
 const boardItem = ({ page, text }: { page: Page; text: string }) =>

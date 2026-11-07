@@ -21,5 +21,6 @@ func drawBreadcrumbs(of board: Document.Board, contents: Contents) -> HTML {
   let heading = HTML.element(
     "h1", [:], menu + [.element("span", [:], [.text(board.displayLabel)])])
 
-  return .element("nav", ["class": "breadcrumbs", "aria-label": "Breadcrumbs"], ancestors + [heading])
+  return .element(
+    "nav", ["class": "breadcrumbs", "aria-label": "Breadcrumbs"], ancestors + [heading])
 }

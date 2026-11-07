@@ -84,7 +84,7 @@ test.describe('panning', () => {
     expect(after.y).toBeCloseTo(before.y, 0);
   });
 
-  test('a mouse drag on a text card selects its text rather than panning', async ({
+  test('a mouse drag on a note selects its text rather than panning', async ({
     page,
   }) => {
     await page.goto(haskell.url);

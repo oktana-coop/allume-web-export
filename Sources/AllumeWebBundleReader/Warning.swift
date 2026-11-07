@@ -12,7 +12,7 @@ package enum BundleWarning: Equatable, Sendable {
   case invalidCommentDate(Document.ID, String)
   case unknownCardColor(boardID: Document.ID, documentID: Document.ID, color: String)
   case unknownHighlightColor(Chain.ID, color: String)
-  /// Ink drawn on canvas text or a comment thread, which the models have no place for.
+  /// Ink drawn on a text block or a comment thread, which the models have no place for.
   case inkOnChain(Chain.ID)
   case unknownConnectionEnd(boardID: Document.ID, end: String)
   /// A connection that doesn't have exactly two ends.

@@ -15,7 +15,7 @@
 
   --green: #36884a;
 
-  /* Colors tint cards and highlight canvas text. Allume's purple highlight is
+  /* Colors tint cards and highlight text blocks. Allume's purple highlight is
      sampled from a screenshot; the others share its lightness and chroma. */
   --purple-tint: #e4defb;
   --purple-highlight: oklch(86.5% 0.056 300);

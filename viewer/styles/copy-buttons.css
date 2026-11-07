@@ -24,7 +24,7 @@
   right: 18px;
 }
 
-/* Canvas text has no box to hold the button, so it sits beside the first
+/* A text block has no box to hold the button, so it sits beside its first
    line, with an invisible bridge so it stays shown on the way to it. */
 .chain > .copy {
   top: -1px;

@@ -15,7 +15,7 @@
   border-radius: 8px;
   background: var(--card-muted);
   box-shadow: var(--card-shadow);
-  /* Allume sizes text cards to fit their text; with the system font, this
+  /* Allume sizes notes to fit their text; with the system font, this
      size reproduces its line breaks without clipping. */
   font-size: 13.5px;
   letter-spacing: -0.1px;

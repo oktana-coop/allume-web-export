@@ -148,7 +148,8 @@ extension Card {
 }
 
 extension Chain {
-  /// A chain with cards is a comment thread, and any other is canvas text. Ink on either is left out.
+  /// A chain with cards is a comment thread, and any other is a text block. Ink on either is left
+  /// out.
   static func read(_ json: BundleChain, boardID: Document.ID, in bundle: AllumeBundle)
     -> (chain: Chain, warnings: [BundleWarning])
   {

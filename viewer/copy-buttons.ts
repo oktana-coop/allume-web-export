@@ -1,7 +1,7 @@
 import { type Canvas } from './canvas';
 
-// Copy buttons copy a text card's or comment's full text, including any part
-// the card's size cuts off, or all of a canvas text.
+// Copy buttons copy a note's or comment's full text, including any part the
+// card's size cuts off, or all of a text block.
 
 const COPIED_FOR = 1500;
 
@@ -44,7 +44,7 @@ async function copyText(element: Element) {
   }
 }
 
-// A canvas text has a paragraph per line, which textContent runs together.
+// A text block has a paragraph per line, which textContent runs together.
 function textOf(element: Element) {
   if (!element.matches('.chain')) return element.textContent;
 
