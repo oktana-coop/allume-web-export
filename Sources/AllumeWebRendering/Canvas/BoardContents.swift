@@ -20,7 +20,7 @@ func drawBoardContents(
   }
   let ink = board.ink.map { ink in drawInk(ink) }
 
-  return [connectionLines].compactMap { $0 } + cards + chains + ink
+  return (connectionLines.map { lines in [lines] } ?? []) + cards + chains + ink
 }
 
 private func drawChain(_ chain: Chain, contents: Contents, interactive: Bool) -> [HTML] {

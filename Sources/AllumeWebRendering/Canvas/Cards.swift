@@ -91,12 +91,10 @@ private func drawBoardCard(
   _ card: Card, showing child: Document.Board, preview: HTML?, menu: [HTML], interactive: Bool,
   contents: Contents
 ) -> HTML {
-  let linkedIcon: [HTML] =
-    !isLinked(child.id, in: contents)
-    ? [] : menu.isEmpty ? [.element("span", ["class": "linked"], [Icon.linked.html()])] : menu
   let title = HTML.element(
     "div", ["class": "board-title"],
-    linkedIcon + [.element("span", [:], [.text(child.displayLabel)])])
+    linkedIcon(of: child, menu: menu, contents: contents)
+      + [.element("span", [:], [.text(child.displayLabel)])])
   let panelContents = preview.map { preview in [preview] } ?? []
   let panel: HTML =
     interactive
@@ -111,6 +109,19 @@ private func drawBoardCard(
   return cardElement(
     card, kind: "board", style: boxStyle(card.frame), interactive: interactive,
     children: [title, panel])
+}
+
+/// The menu of the boards a linked board is a card on, or only its icon in a preview, which has no
+/// menu.
+private func linkedIcon(of board: Document.Board, menu: [HTML], contents: Contents) -> [HTML] {
+  guard isLinked(board.id, in: contents) else {
+    return []
+  }
+
+  if menu.isEmpty {
+    return [.element("span", ["class": "linked"], [Icon.linked.html()])]
+  }
+  return menu
 }
 
 private func drawImage(_ image: Document.Image, contents: Contents) -> HTML {
