@@ -212,87 +212,87 @@
       bouncingBack: false
     };
   }
-  function measure(canvas) {
-    const { clientWidth: width, clientHeight: height } = canvas.viewport;
-    return { viewport: { width, height }, contentBounds: canvas.contentBounds };
+  function measure(canvas2) {
+    const { clientWidth: width, clientHeight: height } = canvas2.viewport;
+    return { viewport: { width, height }, contentBounds: canvas2.contentBounds };
   }
   function moveCamera({
-    canvas,
+    canvas: canvas2,
     camera,
     bouncing = false
   }) {
-    const showBounce = bouncing && !canvas.reducedMotion;
-    const shown = showBounce ? bounce({ camera, ...measure(canvas) }) : withinLimits({ camera, ...measure(canvas) });
-    canvas.camera = showBounce ? camera : shown;
-    canvas.element.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
-    if (canvas.zoomLevelLabel) {
-      canvas.zoomLevelLabel.textContent = `${Math.round(canvas.camera.scale * 100)}%`;
+    const showBounce = bouncing && !canvas2.reducedMotion;
+    const shown = showBounce ? bounce({ camera, ...measure(canvas2) }) : withinLimits({ camera, ...measure(canvas2) });
+    canvas2.camera = showBounce ? camera : shown;
+    canvas2.element.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
+    if (canvas2.zoomLevelLabel) {
+      canvas2.zoomLevelLabel.textContent = `${Math.round(canvas2.camera.scale * 100)}%`;
     }
   }
-  function startBounceBack(canvas) {
-    if (canvas.bouncingBack) return;
+  function startBounceBack(canvas2) {
+    if (canvas2.bouncingBack) return;
     let last = performance.now();
     const step = (now) => {
-      canvas.bouncingBack = false;
-      if (canvas.gesture) return;
+      canvas2.bouncingBack = false;
+      if (canvas2.gesture) return;
       const camera = bounceBack({
-        camera: canvas.camera,
+        camera: canvas2.camera,
         elapsed: now - last,
-        ...measure(canvas)
+        ...measure(canvas2)
       });
       last = now;
-      moveCamera({ canvas, camera, bouncing: true });
-      if (isBouncing({ camera: canvas.camera, ...measure(canvas) })) {
-        canvas.bouncingBack = true;
+      moveCamera({ canvas: canvas2, camera, bouncing: true });
+      if (isBouncing({ camera: canvas2.camera, ...measure(canvas2) })) {
+        canvas2.bouncingBack = true;
         requestAnimationFrame(step);
       }
     };
-    canvas.bouncingBack = true;
+    canvas2.bouncingBack = true;
     requestAnimationFrame(step);
   }
   function zoomAtPoint({
-    canvas,
+    canvas: canvas2,
     point,
     scale
   }) {
     const camera = zoomAt({
-      camera: canvas.camera,
+      camera: canvas2.camera,
       point,
       scale,
-      ...measure(canvas)
+      ...measure(canvas2)
     });
-    moveCamera({ canvas, camera });
+    moveCamera({ canvas: canvas2, camera });
   }
   function zoomAtCenter({
-    canvas,
+    canvas: canvas2,
     scale
   }) {
-    const { width, height } = measure(canvas).viewport;
-    zoomAtPoint({ canvas, point: { x: width / 2, y: height / 2 }, scale });
+    const { width, height } = measure(canvas2).viewport;
+    zoomAtPoint({ canvas: canvas2, point: { x: width / 2, y: height / 2 }, scale });
   }
-  function fitBoard(canvas) {
-    moveCamera({ canvas, camera: fit(measure(canvas)) });
+  function fitBoard(canvas2) {
+    moveCamera({ canvas: canvas2, camera: fit(measure(canvas2)) });
   }
-  function focusCard({ canvas, id }) {
+  function focusCard({ canvas: canvas2, id }) {
     const card = id && document.getElementById(id);
-    if (!card || !canvas.element.contains(card)) return false;
+    if (!card || !canvas2.element.contains(card)) return false;
     const frame = {
       x: card.offsetLeft,
       y: card.offsetTop,
       width: card.offsetWidth,
       height: card.offsetHeight
     };
-    moveCamera({ canvas, camera: focus({ frame, ...measure(canvas) }) });
+    moveCamera({ canvas: canvas2, camera: focus({ frame, ...measure(canvas2) }) });
     return true;
   }
   function windowPoint(event) {
     return { x: event.clientX, y: event.clientY };
   }
   function windowToViewport({
-    canvas,
+    canvas: canvas2,
     point
   }) {
-    const { left, top } = canvas.viewport.getBoundingClientRect();
+    const { left, top } = canvas2.viewport.getBoundingClientRect();
     return { x: point.x - left, y: point.y - top };
   }
 
@@ -329,8 +329,8 @@
 
   // viewer/copy-buttons.ts
   var COPIED_FOR = 1500;
-  function setUpCopyButtons(canvas) {
-    canvas.element.addEventListener("click", async (event) => {
+  function setUpCopyButtons(canvas2) {
+    canvas2.element.addEventListener("click", async (event) => {
       const button = event.target.closest(".copy");
       if (!button) return;
       const element = copyTargetElement(button);
@@ -377,39 +377,39 @@
   // viewer/gestures.ts
   var DRAG_THRESHOLD = 4;
   var SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
-  function setUpGestures(canvas) {
-    const { viewport } = canvas;
+  function setUpGestures(canvas2) {
+    const { viewport } = canvas2;
     let pointers = /* @__PURE__ */ new Map();
     let suppressClick = false;
     let safariPinchStart = 1;
     viewport.addEventListener("gesturestart", (event) => {
       event.preventDefault();
-      safariPinchStart = canvas.camera.scale;
+      safariPinchStart = canvas2.camera.scale;
     });
     viewport.addEventListener("gesturechange", (event) => {
       event.preventDefault();
       if (pointers.size > 1) return;
-      const point = windowToViewport({ canvas, point: windowPoint(event) });
-      zoomAtPoint({ canvas, point, scale: safariPinchStart * event.scale });
+      const point = windowToViewport({ canvas: canvas2, point: windowPoint(event) });
+      zoomAtPoint({ canvas: canvas2, point, scale: safariPinchStart * event.scale });
     });
     viewport.addEventListener("pointerdown", (event) => {
       suppressClick = false;
       if (!startsGesture(event)) return;
       pointers = new Map(pointers).set(event.pointerId, windowPoint(event));
-      canvas.gesture = gestureFrom({
-        camera: canvas.camera,
+      canvas2.gesture = gestureFrom({
+        camera: canvas2.camera,
         pointers,
-        dragging: Boolean(canvas.gesture?.dragging)
+        dragging: Boolean(canvas2.gesture?.dragging)
       });
     });
     viewport.addEventListener("pointermove", (event) => {
-      const { gesture } = canvas;
+      const { gesture } = canvas2;
       if (!gesture || !pointers.has(event.pointerId)) return;
       pointers = new Map(pointers).set(event.pointerId, windowPoint(event));
       const points = [...pointers.values()];
       if (!gesture.dragging && !isPastDragThreshold({ gesture, points })) return;
       if (!gesture.dragging) {
-        canvas.gesture = { ...gesture, dragging: true };
+        canvas2.gesture = { ...gesture, dragging: true };
         viewport.classList.add("is-dragging");
       }
       if (!viewport.hasPointerCapture(event.pointerId)) {
@@ -418,27 +418,27 @@
       const camera = gestureCamera({
         gesture,
         points,
-        from: windowToViewport({ canvas, point: gesture.center }),
-        to: windowToViewport({ canvas, point: midpoint(points) }),
-        ...measure(canvas)
+        from: windowToViewport({ canvas: canvas2, point: gesture.center }),
+        to: windowToViewport({ canvas: canvas2, point: midpoint(points) }),
+        ...measure(canvas2)
       });
-      moveCamera({ canvas, camera, bouncing: true });
+      moveCamera({ canvas: canvas2, camera, bouncing: true });
     });
     const endPointer = (event) => {
       if (!pointers.has(event.pointerId)) return;
       pointers = withoutPointer({ pointers, id: event.pointerId });
       if (pointers.size > 0) {
-        canvas.gesture = gestureFrom({
-          camera: canvas.camera,
+        canvas2.gesture = gestureFrom({
+          camera: canvas2.camera,
           pointers,
-          dragging: Boolean(canvas.gesture?.dragging)
+          dragging: Boolean(canvas2.gesture?.dragging)
         });
         return;
       }
-      suppressClick = Boolean(canvas.gesture?.dragging);
-      canvas.gesture = null;
+      suppressClick = Boolean(canvas2.gesture?.dragging);
+      canvas2.gesture = null;
       viewport.classList.remove("is-dragging");
-      startBounceBack(canvas);
+      startBounceBack(canvas2);
     };
     viewport.addEventListener("pointerup", endPointer);
     viewport.addEventListener("pointercancel", endPointer);
@@ -515,8 +515,8 @@
   // viewer/linked-card-menus.ts
   var GAP = 6;
   var WINDOW_MARGIN = 16;
-  function setUpLinkedCardMenus(canvas) {
-    canvas.viewport.addEventListener("wheel", closeOpenMenus, { passive: true });
+  function setUpLinkedCardMenus(canvas2) {
+    canvas2.viewport.addEventListener("wheel", closeOpenMenus, { passive: true });
     for (const menu of document.querySelectorAll(".linked-menu")) {
       const button = document.querySelector(`[popovertarget="${menu.id}"]`);
       menu.addEventListener("beforetoggle", (event) => {
@@ -541,7 +541,7 @@
         event.preventDefault();
         menu.hidePopover();
         history.replaceState(history.state, "", link.hash);
-        focusCard({ canvas, id: link.hash.slice(1) });
+        focusCard({ canvas: canvas2, id: link.hash.slice(1) });
       });
     }
   }
@@ -781,63 +781,63 @@
   var SCROLL_PAUSE = 300;
   var ZOOM_PER_PIXEL = 0.01;
   var MAX_ZOOM_SCROLL = 50;
-  function setUpScrolling(canvas) {
+  function setUpScrolling(canvas2) {
     const noPush = { start: 0, slowest: 0 };
     let state = { last: 0, pushes: { x: noPush, y: noPush } };
-    canvas.viewport.addEventListener(
+    canvas2.viewport.addEventListener(
       "wheel",
       (event) => {
         event.preventDefault();
-        const delta = scrollDelta({ canvas, event });
+        const delta = scrollDelta({ canvas: canvas2, event });
         if (event.ctrlKey || event.metaKey) {
-          zoomAtPointer({ canvas, event, delta: delta.y });
+          zoomAtPointer({ canvas: canvas2, event, delta: delta.y });
         } else {
-          state = pan({ canvas, delta, state });
+          state = pan({ canvas: canvas2, delta, state });
         }
       },
       { passive: false }
     );
   }
   function scrollDelta({
-    canvas,
+    canvas: canvas2,
     event
   }) {
-    const unit = pixelsPerUnit({ canvas, deltaMode: event.deltaMode });
+    const unit = pixelsPerUnit({ canvas: canvas2, deltaMode: event.deltaMode });
     return { x: event.deltaX * unit, y: event.deltaY * unit };
   }
   function pixelsPerUnit({
-    canvas,
+    canvas: canvas2,
     deltaMode
   }) {
     switch (deltaMode) {
       case WheelEvent.DOM_DELTA_LINE:
         return 16;
       case WheelEvent.DOM_DELTA_PAGE:
-        return canvas.viewport.clientHeight;
+        return canvas2.viewport.clientHeight;
       default:
         return 1;
     }
   }
   function zoomAtPointer({
-    canvas,
+    canvas: canvas2,
     event,
     delta
   }) {
-    const point = windowToViewport({ canvas, point: windowPoint(event) });
+    const point = windowToViewport({ canvas: canvas2, point: windowPoint(event) });
     const counted = clamp(delta, -MAX_ZOOM_SCROLL, MAX_ZOOM_SCROLL);
-    const scale = canvas.camera.scale * Math.exp(-counted * ZOOM_PER_PIXEL);
-    zoomAtPoint({ canvas, point, scale });
+    const scale = canvas2.camera.scale * Math.exp(-counted * ZOOM_PER_PIXEL);
+    zoomAtPoint({ canvas: canvas2, point, scale });
   }
   function pan({
-    canvas,
+    canvas: canvas2,
     delta,
     state
   }) {
     const now = performance.now();
     const paused = now - state.last > SCROLL_PAUSE;
-    const limits = panLimits({ scale: canvas.camera.scale, ...measure(canvas) });
+    const limits = panLimits({ scale: canvas2.camera.scale, ...measure(canvas2) });
     const panned = (axis) => axisAfterScroll({
-      position: canvas.camera[axis],
+      position: canvas2.camera[axis],
       delta: delta[axis],
       limits: limits[axis],
       push: state.pushes[axis],
@@ -847,11 +847,11 @@
     const x = panned("x");
     const y = panned("y");
     moveCamera({
-      canvas,
-      camera: { ...canvas.camera, x: x.position, y: y.position },
+      canvas: canvas2,
+      camera: { ...canvas2.camera, x: x.position, y: y.position },
       bouncing: true
     });
-    startBounceBack(canvas);
+    startBounceBack(canvas2);
     return { last: now, pushes: { x: x.push, y: y.push } };
   }
   function axisAfterScroll({
@@ -876,52 +876,52 @@
   }
 
   // viewer/starting-view.ts
-  function setUpStartingView(canvas) {
+  function setUpStartingView(canvas2) {
     const key = `camera:${location.pathname}`;
     addEventListener(
       "hashchange",
-      () => focusCard({ canvas, id: location.hash.slice(1) })
+      () => focusCard({ canvas: canvas2, id: location.hash.slice(1) })
     );
     addEventListener(
       "pagehide",
-      () => writeSession({ key, value: canvas.camera })
+      () => writeSession({ key, value: canvas2.camera })
     );
-    if (focusCard({ canvas, id: location.hash.slice(1) })) return;
+    if (focusCard({ canvas: canvas2, id: location.hash.slice(1) })) return;
     const saved = readSession({ key, parse: parseCamera });
     if (!saved) {
-      fitBoard(canvas);
+      fitBoard(canvas2);
       return;
     }
-    const scale = clampScale({ scale: saved.scale, ...measure(canvas) });
-    moveCamera({ canvas, camera: { ...saved, scale } });
+    const scale = clampScale({ scale: saved.scale, ...measure(canvas2) });
+    moveCamera({ canvas: canvas2, camera: { ...saved, scale } });
   }
 
   // viewer/zoom-controls.ts
   var ZOOM_IN = 1.25;
   var ZOOM_OUT = 0.8;
-  function setUpZoomControls(canvas) {
+  function setUpZoomControls(canvas2) {
     document.querySelector(".zoom")?.addEventListener("click", (event) => {
       const action = event.target.closest("[data-zoom]")?.dataset.zoom;
-      const { scale } = canvas.camera;
+      const { scale } = canvas2.camera;
       if (action === "in") {
-        zoomAtCenter({ canvas, scale: scale * ZOOM_IN });
+        zoomAtCenter({ canvas: canvas2, scale: scale * ZOOM_IN });
       } else if (action === "out") {
-        zoomAtCenter({ canvas, scale: scale * ZOOM_OUT });
+        zoomAtCenter({ canvas: canvas2, scale: scale * ZOOM_OUT });
       } else if (action === "home") {
-        fitBoard(canvas);
+        fitBoard(canvas2);
       }
     });
     addEventListener("keydown", (event) => {
       if (event.altKey) return;
-      const { scale } = canvas.camera;
+      const { scale } = canvas2.camera;
       if (event.key === "+" || event.key === "=") {
-        zoomAtCenter({ canvas, scale: scale * ZOOM_IN });
+        zoomAtCenter({ canvas: canvas2, scale: scale * ZOOM_IN });
       } else if (event.key === "-") {
-        zoomAtCenter({ canvas, scale: scale * ZOOM_OUT });
+        zoomAtCenter({ canvas: canvas2, scale: scale * ZOOM_OUT });
       } else if (event.key === "0") {
-        zoomAtCenter({ canvas, scale: 1 });
+        zoomAtCenter({ canvas: canvas2, scale: 1 });
       } else if (event.shiftKey && event.code === "Digit1") {
-        fitBoard(canvas);
+        fitBoard(canvas2);
       } else {
         return;
       }
@@ -930,17 +930,17 @@
   }
 
   // viewer/main.ts
-  (() => {
-    const canvas = setUpCanvas(document);
-    if (!canvas) return;
-    document.documentElement.classList.add("js");
-    setUpScrolling(canvas);
-    setUpGestures(canvas);
-    setUpZoomControls(canvas);
-    makeCommentDatesRelative(document);
-    setUpCopyButtons(canvas);
-    setUpLinkedCardMenus(canvas);
-    setUpNavigation();
-    setUpStartingView(canvas);
-  })();
+  var canvas = setUpCanvas(document);
+  if (!canvas) {
+    throw new Error("The page has no board: no .viewport with a .world in it.");
+  }
+  document.documentElement.classList.add("js");
+  setUpScrolling(canvas);
+  setUpGestures(canvas);
+  setUpZoomControls(canvas);
+  makeCommentDatesRelative(document);
+  setUpCopyButtons(canvas);
+  setUpLinkedCardMenus(canvas);
+  setUpNavigation();
+  setUpStartingView(canvas);
 })();

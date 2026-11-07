@@ -41,6 +41,7 @@ export function setUpLinkedCardMenus(canvas: Canvas) {
       const link = (event.target as Element).closest('a');
       if (!link || link.pathname !== location.pathname) return;
 
+      // Not followed, so navigation records no arrival for a page not left.
       event.preventDefault();
       menu.hidePopover();
       history.replaceState(history.state, '', link.hash);
