@@ -9,6 +9,7 @@ import {
   focus,
   isBouncing,
   panLimits,
+  parseCamera,
   pinch,
   withinLimits,
   zoomAt,
@@ -292,6 +293,36 @@ describe('bounceBack', () => {
     expect(
       bounceBack({ camera: atOrigin, elapsed: 16, viewport, contentBounds })
     ).toEqual(atOrigin);
+  });
+});
+
+describe('parseCamera', () => {
+  it('reads a camera', () => {
+    const camera = { x: 10, y: -20, scale: 0.5 };
+
+    expect(parseCamera(camera)).toEqual(camera);
+  });
+
+  it('leaves out anything else', () => {
+    const value = { x: 10, y: -20, scale: 0.5, zoom: 2 };
+
+    expect(parseCamera(value)).toEqual({ x: 10, y: -20, scale: 0.5 });
+  });
+
+  it.each([
+    { kind: 'null', value: null },
+    { kind: 'a number', value: 1 },
+    { kind: 'a camera without a scale', value: { x: 10, y: -20 } },
+    {
+      kind: 'a camera whose scale is text',
+      value: { x: 10, y: -20, scale: '0.5' },
+    },
+    {
+      kind: 'a camera at an infinite x',
+      value: { x: Infinity, y: -20, scale: 0.5 },
+    },
+  ])('rejects $kind', ({ value }) => {
+    expect(parseCamera(value)).toBeNull();
   });
 });
 

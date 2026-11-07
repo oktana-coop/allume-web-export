@@ -23,6 +23,16 @@ const MAX_BOUNCE = 80;
 const SPRING = 0.8;
 const FOCUS_PADDING = 80;
 
+/** The camera in the value, if it has a finite x, y and scale. */
+export function parseCamera(value: unknown): Camera | null {
+  if (typeof value !== 'object' || value === null) return null;
+
+  const { x, y, scale } = value as Partial<Record<keyof Camera, unknown>>;
+  return isFiniteNumber(x) && isFiniteNumber(y) && isFiniteNumber(scale)
+    ? { x, y, scale }
+    : null;
+}
+
 /**
  * The scale that frames the board the way its card previews it: from the
  * canvas's origin, with everything in view, at most 100%.
@@ -261,4 +271,8 @@ export function bounceBack({
     y: pulled(camera.y, limits.y),
     scale: camera.scale,
   };
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
 }

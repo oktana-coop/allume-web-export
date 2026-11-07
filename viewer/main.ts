@@ -2,16 +2,10 @@
 // named in the URL hash (#card-<document id>). Loaded at the end of <body>,
 // so the first camera is in place before the page is shown.
 
-import { clampScale } from './camera';
-import {
-  fitBoard,
-  focusCard,
-  measure,
-  moveCamera,
-  setUpCanvas,
-} from './canvas';
+import { focusCard, setUpCanvas } from './canvas';
 import { setUpGestures } from './gestures';
 import { setUpScrolling } from './scrolling';
+import { setUpStartingView } from './starting-view';
 import { setUpZoomControls } from './zoom-controls';
 
 /** A board in the breadcrumbs. */
@@ -26,7 +20,6 @@ type Arrival = 'down' | 'across' | 'up';
   const canvas = setUpCanvas(document)!;
   if (!canvas) return;
   document.documentElement.classList.add('js');
-  const cameraKey = `camera:${location.pathname}`;
 
   setUpScrolling(canvas);
   setUpGestures(canvas);
@@ -294,38 +287,5 @@ type Arrival = 'down' | 'across' | 'up';
     });
   }
 
-  addEventListener('hashchange', () =>
-    focusCard({ canvas, id: location.hash.slice(1) })
-  );
-  addEventListener('pagehide', () => {
-    try {
-      sessionStorage.setItem(cameraKey, JSON.stringify(canvas.camera));
-    } catch {}
-  });
-
-  function restoreCamera() {
-    try {
-      // A missing item is null, which parses as null.
-      const saved = JSON.parse(sessionStorage.getItem(cameraKey)!);
-      if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
-        return false;
-      }
-
-      moveCamera({
-        canvas,
-        camera: {
-          ...saved,
-          scale: clampScale({ scale: saved.scale, ...measure(canvas) }),
-        },
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // A link to a card centres it. Otherwise a board opens where it was last
-  // left in this session, like in Muse, or framed whole on a first visit.
-  const card = location.hash.slice(1);
-  if (!focusCard({ canvas, id: card }) && !restoreCamera()) fitBoard(canvas);
+  setUpStartingView(canvas);
 })();

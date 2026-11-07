@@ -19,6 +19,11 @@
   var MAX_BOUNCE = 80;
   var SPRING = 0.8;
   var FOCUS_PADDING = 80;
+  function parseCamera(value) {
+    if (typeof value !== "object" || value === null) return null;
+    const { x, y, scale } = value;
+    return isFiniteNumber(x) && isFiniteNumber(y) && isFiniteNumber(scale) ? { x, y, scale } : null;
+  }
   function fitScale({
     viewport,
     contentBounds
@@ -171,6 +176,9 @@
       y: pulled(camera.y, limits.y),
       scale: camera.scale
     };
+  }
+  function isFiniteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
   }
 
   // viewer/canvas.ts
@@ -520,6 +528,46 @@
     return { position: outward && pushEnded ? position : next, push: pushed };
   }
 
+  // viewer/session.ts
+  function readSession({
+    key,
+    parse
+  }) {
+    try {
+      const item = sessionStorage.getItem(key);
+      return item === null ? null : parse(JSON.parse(item));
+    } catch {
+      return null;
+    }
+  }
+  function writeSession({ key, value }) {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch {
+    }
+  }
+
+  // viewer/starting-view.ts
+  function setUpStartingView(canvas) {
+    const key = `camera:${location.pathname}`;
+    addEventListener(
+      "hashchange",
+      () => focusCard({ canvas, id: location.hash.slice(1) })
+    );
+    addEventListener(
+      "pagehide",
+      () => writeSession({ key, value: canvas.camera })
+    );
+    if (focusCard({ canvas, id: location.hash.slice(1) })) return;
+    const saved = readSession({ key, parse: parseCamera });
+    if (!saved) {
+      fitBoard(canvas);
+      return;
+    }
+    const scale = clampScale({ scale: saved.scale, ...measure(canvas) });
+    moveCamera({ canvas, camera: { ...saved, scale } });
+  }
+
   // viewer/zoom-controls.ts
   var ZOOM_IN = 1.25;
   var ZOOM_OUT = 0.8;
@@ -558,7 +606,6 @@
     const canvas = setUpCanvas(document);
     if (!canvas) return;
     document.documentElement.classList.add("js");
-    const cameraKey = `camera:${location.pathname}`;
     setUpScrolling(canvas);
     setUpGestures(canvas);
     setUpZoomControls(canvas);
@@ -752,35 +799,6 @@
         focusCard({ canvas, id: link.hash.slice(1) });
       });
     }
-    addEventListener(
-      "hashchange",
-      () => focusCard({ canvas, id: location.hash.slice(1) })
-    );
-    addEventListener("pagehide", () => {
-      try {
-        sessionStorage.setItem(cameraKey, JSON.stringify(canvas.camera));
-      } catch {
-      }
-    });
-    function restoreCamera() {
-      try {
-        const saved = JSON.parse(sessionStorage.getItem(cameraKey));
-        if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
-          return false;
-        }
-        moveCamera({
-          canvas,
-          camera: {
-            ...saved,
-            scale: clampScale({ scale: saved.scale, ...measure(canvas) })
-          }
-        });
-        return true;
-      } catch {
-        return false;
-      }
-    }
-    const card = location.hash.slice(1);
-    if (!focusCard({ canvas, id: card }) && !restoreCamera()) fitBoard(canvas);
+    setUpStartingView(canvas);
   })();
 })();
