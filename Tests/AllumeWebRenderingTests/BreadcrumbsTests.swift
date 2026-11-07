@@ -17,7 +17,7 @@ import Testing
       html
         == markup(
           #"""
-          <nav class="crumbs" aria-label="Breadcrumbs">
+          <nav class="breadcrumbs" aria-label="Breadcrumbs">
             <h1><span>Languages</span></h1>
           </nav>
           """#))
@@ -41,7 +41,7 @@ import Testing
       html
         == markup(
           #"""
-          <nav class="crumbs" aria-label="Breadcrumbs">
+          <nav class="breadcrumbs" aria-label="Breadcrumbs">
             <a href="board:root">Languages</a>
             <span class="separator" aria-hidden="true">/</span>
             <a href="board:paradigms" rel="up">Paradigms</a>

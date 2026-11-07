@@ -46,7 +46,7 @@ const ARRIVAL_KEY = 'arrival';
  * up to the last breadcrumb.
  */
 export function setUpNavigation() {
-  const breadcrumbsElement = document.querySelector('.crumbs');
+  const breadcrumbsElement = document.querySelector('.breadcrumbs');
 
   // Following a link records how the next page is reached. That page keeps it
   // in its history entry, so the breadcrumbs survive going back to it.
@@ -192,7 +192,7 @@ function followedLink({
 }): FollowedLink | null {
   const index = breadcrumbLinks(breadcrumbsElement).indexOf(link);
   if (index >= 0) return { kind: 'breadcrumb', index };
-  if (link.closest('.crumbs')) return { kind: 'heading menu' };
+  if (link.closest('.breadcrumbs')) return { kind: 'heading menu' };
   if (link.closest('.linked-menu')) return { kind: 'linked card menu' };
   if (link.matches('.panel')) return { kind: 'board card' };
   return null;

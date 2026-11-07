@@ -28,7 +28,7 @@ import Testing
     #expect(
       html == #"""
         <header class="bar">
-        <nav class="crumbs" aria-label="Breadcrumbs"><h1><span>Languages</span></h1></nav>
+        <nav class="breadcrumbs" aria-label="Breadcrumbs"><h1><span>Languages</span></h1></nav>
         <div class="zoom" role="toolbar" aria-label="Zoom">
         <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
         <output class="zoom-level">100%</output>

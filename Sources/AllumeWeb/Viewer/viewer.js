@@ -677,7 +677,7 @@
   // viewer/navigation.ts
   var ARRIVAL_KEY = "arrival";
   function setUpNavigation() {
-    const breadcrumbsElement = document.querySelector(".crumbs");
+    const breadcrumbsElement = document.querySelector(".breadcrumbs");
     const recorded = takeSession({ key: ARRIVAL_KEY, parse: parseArrivalRecord });
     if (recorded?.path === location.pathname) {
       const { how, breadcrumbs: breadcrumbs2 } = recorded;
@@ -767,7 +767,7 @@
   }) {
     const index = breadcrumbLinks(breadcrumbsElement).indexOf(link);
     if (index >= 0) return { kind: "breadcrumb", index };
-    if (link.closest(".crumbs")) return { kind: "heading menu" };
+    if (link.closest(".breadcrumbs")) return { kind: "heading menu" };
     if (link.closest(".linked-menu")) return { kind: "linked card menu" };
     if (link.matches(".panel")) return { kind: "board card" };
     return null;
