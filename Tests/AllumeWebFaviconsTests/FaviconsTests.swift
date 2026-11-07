@@ -140,4 +140,20 @@ import UniformTypeIdentifiers
       StubSites.requests(to: "cached.example").count
         + StubSites.requests(to: "iconless.example").count == requestsBefore)
   }
+
+  @Test func fetchAgainAnIconGoneFromTheCache() async throws {
+    let cache = try makeTemporaryFolder()
+    defer { try? FileManager.default.removeItem(at: cache) }
+    StubSites.serve([
+      "https://deleted.example/favicon.ico": .body(try makeImage(sizes: [32], type: .png))
+    ])
+    _ = await fetchFavicons(for: ["deleted.example"], cache: cache, session: makeStubSession())
+    let icon = cache.appending(path: "deleted.example.png")
+    try FileManager.default.removeItem(at: icon)
+
+    let (favicons, _) = await fetchFavicons(
+      for: ["deleted.example"], cache: cache, session: makeStubSession())
+
+    #expect(favicons["deleted.example"] == icon)
+  }
 }
