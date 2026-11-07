@@ -96,6 +96,10 @@ so before committing a change to `viewer/`, run the type check, the
 [unit tests](docs/Testing.md#viewer) and the end-to-end tests, and commit the rebuilt
 files with it. All of these need Node and `npm install`, as for the end-to-end tests.
 
+The renderer in `Sources/AllumeWebRendering/`, the stylesheets and the script share the page's
+classes and `data-*` attributes, so renaming one means renaming it in all three. The integration
+tests' expected pages and the end-to-end tests catch one that's missed.
+
 ### Formatting
 
 The code is formatted with swift-format's defaults, which keep lines within 100 columns, and
