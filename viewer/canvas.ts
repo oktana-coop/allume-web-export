@@ -137,7 +137,10 @@ export function startBounceBack(canvas: Canvas) {
   requestAnimationFrame(step);
 }
 
-/** Zooms to the scale, keeping the canvas point under the viewport point there. */
+/**
+ * Zooms to the scale, keeping the canvas point under the viewport point
+ * there.
+ */
 export function zoomAtPoint({
   canvas,
   point,

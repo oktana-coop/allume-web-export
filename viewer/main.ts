@@ -4,15 +4,10 @@
 
 import { focusCard, setUpCanvas } from './canvas';
 import { setUpGestures } from './gestures';
+import { setUpNavigation } from './navigation';
 import { setUpScrolling } from './scrolling';
 import { setUpStartingView } from './starting-view';
 import { setUpZoomControls } from './zoom-controls';
-
-/** A board in the breadcrumbs. */
-type Breadcrumb = { href: string; label: string };
-
-/** How a page was reached. */
-type Arrival = 'down' | 'across' | 'up';
 
 (() => {
   // Asserted rather than narrowed by the check below, which TypeScript
@@ -36,8 +31,8 @@ type Arrival = 'down' | 'across' | 'up';
     }
   }
 
-  // Comment dates read like Muse's ("last year", "5 months ago"), counted
-  // when the page is viewed. Like Muse, only whole units count: 23 months
+  // Comment dates read like Allume's ("last year", "5 months ago"), counted
+  // when the page is viewed. Like Allume, only whole units count: 23 months
   // ago is "last year".
   const relativeTime = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
   const DAY = 24 * 60 * 60 * 1000;
@@ -112,141 +107,7 @@ type Arrival = 'down' | 'across' | 'up';
       .join('\n');
   }
 
-  // Escape goes back the way we came after entering a board or jumping to a
-  // linked card. Otherwise, after going up or arriving from elsewhere, it goes
-  // up to the last breadcrumb. An open menu takes Escape for itself.
-  addEventListener('keydown', (event) => {
-    const modified = event.altKey || event.ctrlKey || event.metaKey;
-    if (event.key !== 'Escape' || modified || !goToParent()) return;
-    event.preventDefault();
-  });
-
-  function goToParent() {
-    if (document.querySelector(':popover-open')) return false;
-
-    const { arrival } = history.state ?? {};
-    if (arrival === 'down' || arrival === 'across') {
-      history.back();
-      return true;
-    }
-
-    const parent = breadcrumbs?.querySelector<HTMLAnchorElement>(
-      ':scope > a[rel="up"]'
-    );
-    if (!parent) return false;
-
-    recordArrival(parent.href, 'up', breadcrumbTrail().slice(0, -1));
-    location.href = parent.href;
-    return true;
-  }
-
-  // Breadcrumbs follow the path taken, like in Muse: entering a board extends
-  // the breadcrumbs it was entered from, and going up a breadcrumb keeps the
-  // ones before it. Arriving any other way shows the board's main path.
-  const breadcrumbs = document.querySelector('.crumbs');
-
-  function breadcrumbLinks() {
-    return [
-      ...(breadcrumbs?.querySelectorAll<HTMLAnchorElement>(':scope > a') ?? []),
-    ];
-  }
-
-  /** The boards in the breadcrumbs, from the root to the parent. */
-  function breadcrumbTrail(): Breadcrumb[] {
-    return breadcrumbLinks().map((link) => ({
-      href: link.href,
-      label: link.textContent,
-    }));
-  }
-
-  function showTrail(trail: Breadcrumb[]) {
-    const heading = breadcrumbs?.querySelector(':scope > h1');
-    if (!heading) return;
-
-    const shown = breadcrumbs!.querySelectorAll(
-      ':scope > a, :scope > .separator'
-    );
-    for (const element of shown) element.remove();
-
-    trail.forEach(({ href, label }, index) => {
-      const link = document.createElement('a');
-      link.href = href;
-      link.textContent = label;
-      if (index === trail.length - 1) link.rel = 'up';
-
-      const separator = document.createElement('span');
-      separator.className = 'separator';
-      separator.setAttribute('aria-hidden', 'true');
-      separator.textContent = '/';
-      heading.before(link, separator);
-    });
-
-    markParent(heading, trail.at(-1));
-  }
-
-  // The page marks the main path's parent in the heading's linked card menu,
-  // so a different path moves the mark to its own parent.
-  function markParent(heading: Element, parent: Breadcrumb | undefined) {
-    if (!parent) return;
-
-    const path = new URL(parent.href).pathname;
-    for (const link of heading.querySelectorAll<HTMLAnchorElement>(
-      '.linked-menu a'
-    )) {
-      if (link.pathname === path) link.setAttribute('aria-current', 'true');
-      else link.removeAttribute('aria-current');
-    }
-  }
-
-  // Following a link records how the next page is reached: down into a
-  // board, across to a linked card, or up through the breadcrumbs, with the
-  // breadcrumbs it should show. That page keeps both in its history entry,
-  // so they survive going back to it.
-  const ARRIVAL_KEY = 'arrival';
-  document.addEventListener('click', (event) => {
-    // Modified clicks open new tabs or windows, which have nowhere to go back to.
-    const link = (event.target as Element).closest<HTMLAnchorElement>(
-      'a[href]'
-    );
-    const modified =
-      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-    if (!link || link.target || modified || event.defaultPrevented) return;
-
-    const breadcrumb = breadcrumbLinks().indexOf(link);
-    if (breadcrumb >= 0) {
-      recordArrival(link.href, 'up', breadcrumbTrail().slice(0, breadcrumb));
-    } else if (link.closest('.crumbs')) {
-      recordArrival(link.href, 'up');
-    } else if (link.closest('.linked-menu')) {
-      recordArrival(link.href, 'across');
-    } else if (link.matches('.panel')) {
-      const here = {
-        href: location.href.split('#')[0],
-        label:
-          breadcrumbs?.querySelector(':scope > h1 > span')?.textContent ?? '',
-      };
-      recordArrival(link.href, 'down', [...breadcrumbTrail(), here]);
-    }
-  });
-
-  function recordArrival(url: string, how: Arrival, trail?: Breadcrumb[]) {
-    try {
-      const path = new URL(url).pathname;
-      sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify({ path, how, trail }));
-    } catch {}
-  }
-
-  try {
-    // A missing item is null, which parses as null.
-    const arrival = JSON.parse(sessionStorage.getItem(ARRIVAL_KEY)!);
-    sessionStorage.removeItem(ARRIVAL_KEY);
-
-    if (arrival?.path === location.pathname) {
-      const { how, trail } = arrival;
-      history.replaceState({ ...history.state, arrival: how, trail }, '');
-    }
-  } catch {}
-  if (history.state?.trail) showTrail(history.state.trail);
+  setUpNavigation();
 
   // Linked-card menus live in the top layer, so place them by their button.
   for (const menu of document.querySelectorAll<HTMLElement>('.linked-menu')) {

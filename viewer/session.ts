@@ -18,6 +18,21 @@ export function readSession<T>({
   }
 }
 
+/** Reads the item under the key, as `readSession` does, and removes it. */
+export function takeSession<T>({
+  key,
+  parse,
+}: {
+  key: string;
+  parse: (value: unknown) => T | null;
+}): T | null {
+  const value = readSession({ key, parse });
+  try {
+    sessionStorage.removeItem(key);
+  } catch {}
+  return value;
+}
+
 export function writeSession({ key, value }: { key: string; value: unknown }) {
   try {
     sessionStorage.setItem(key, JSON.stringify(value));

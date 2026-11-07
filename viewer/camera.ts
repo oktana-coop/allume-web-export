@@ -6,6 +6,7 @@ import {
   type Rect,
   type Size,
 } from './geometry';
+import { isFiniteNumber, isRecord } from './guards';
 
 /** The canvas's offset in the viewport, in pixels, and its scale. */
 export type Camera = { x: number; y: number; scale: number };
@@ -25,9 +26,9 @@ const FOCUS_PADDING = 80;
 
 /** The camera in the value, if it has a finite x, y and scale. */
 export function parseCamera(value: unknown): Camera | null {
-  if (typeof value !== 'object' || value === null) return null;
+  if (!isRecord(value)) return null;
 
-  const { x, y, scale } = value as Partial<Record<keyof Camera, unknown>>;
+  const { x, y, scale } = value;
   return isFiniteNumber(x) && isFiniteNumber(y) && isFiniteNumber(scale)
     ? { x, y, scale }
     : null;
@@ -154,7 +155,10 @@ export function pinch({
   };
 }
 
-/** The camera positions, at the scale, that keep PAN_MARGIN of the board in view. */
+/**
+ * The camera positions, at the scale, that keep PAN_MARGIN of the board in
+ * view.
+ */
 export function panLimits({
   scale,
   viewport,
@@ -271,8 +275,4 @@ export function bounceBack({
     y: pulled(camera.y, limits.y),
     scale: camera.scale,
   };
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
 }

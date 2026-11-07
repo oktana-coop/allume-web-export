@@ -7,7 +7,7 @@
   --text: #1d1d1c;
   --muted: #7b7b78;
   --connection: #c2c0c0;
-  /* Cards and comments barely lift off the canvas, as in Muse. */
+  /* Cards and comments barely lift off the canvas, as in Allume. */
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   /* Boards float a little higher than the cards on them. */
   --board-shadow: 0 2px 4px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
@@ -15,7 +15,7 @@
 
   --green: #36884a;
 
-  /* Colors tint cards and highlight canvas text. Muse's purple highlight is
+  /* Colors tint cards and highlight canvas text. Allume's purple highlight is
      sampled from a screenshot; the others share its lightness and chroma. */
   --purple-tint: #e4defb;
   --purple-highlight: oklch(86.5% 0.056 300);
@@ -27,7 +27,7 @@
   --yellow-highlight: oklch(86.5% 0.056 95);
   --blue-tint: #dbe7fb;
   --blue-highlight: oklch(86.5% 0.056 255);
-  /* Muse's gray is its plain card color. */
+  /* Allume's gray is its plain card color. */
   --gray-tint: var(--card-muted);
   --gray-highlight: oklch(86.5% 0 0);
 
@@ -204,7 +204,7 @@ html:not(.js) .zoom {
   border-radius: 8px;
   background: var(--card-muted);
   box-shadow: var(--card-shadow);
-  /* Muse sizes text cards to fit their text; with the system font, this
+  /* Allume sizes text cards to fit their text; with the system font, this
      size reproduces its line breaks without clipping. */
   font-size: 13.5px;
   letter-spacing: -0.1px;
@@ -223,7 +223,7 @@ html:not(.js) .zoom {
 }
 
 /* Link and PDF cards: the icon sits on the title's line, the host at the
-   bottom, at Muse's sizes. */
+   bottom, at Allume's sizes. */
 .card--url > .body,
 .card--pdf > .body {
   display: grid;
@@ -388,7 +388,7 @@ html:not(.js) .zoom {
   --highlight: var(--gray-highlight);
 }
 
-/* Comments are tinted with their author's color, like in Muse. */
+/* Comments are tinted with their author's color, like in Allume. */
 .comment {
   position: absolute;
   padding: 12px 14px 12px 56px;
@@ -396,7 +396,7 @@ html:not(.js) .zoom {
   border-radius: 16px;
   background: color-mix(in srgb, var(--author, #d8b682) 38%, white);
   box-shadow: var(--card-shadow);
-  /* Calibrated like text cards to fit the size Muse gave each comment. */
+  /* Calibrated like text cards to fit the size Allume gave each comment. */
   font-size: 13.5px;
   letter-spacing: -0.1px;
   line-height: 20px;

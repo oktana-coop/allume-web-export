@@ -12,6 +12,14 @@
     return Math.min(max, Math.max(min, value));
   }
 
+  // viewer/guards.ts
+  function isRecord(value) {
+    return typeof value === "object" && value !== null;
+  }
+  function isFiniteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
+  }
+
   // viewer/camera.ts
   var MIN_SCALE = 0.5;
   var MAX_SCALE = 4;
@@ -20,7 +28,7 @@
   var SPRING = 0.8;
   var FOCUS_PADDING = 80;
   function parseCamera(value) {
-    if (typeof value !== "object" || value === null) return null;
+    if (!isRecord(value)) return null;
     const { x, y, scale } = value;
     return isFiniteNumber(x) && isFiniteNumber(y) && isFiniteNumber(scale) ? { x, y, scale } : null;
   }
@@ -176,9 +184,6 @@
       y: pulled(camera.y, limits.y),
       scale: camera.scale
     };
-  }
-  function isFiniteNumber(value) {
-    return typeof value === "number" && Number.isFinite(value);
   }
 
   // viewer/canvas.ts
@@ -429,6 +434,208 @@
     return points.length > 1 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : 0;
   }
 
+  // viewer/breadcrumbs.ts
+  function parseBreadcrumbs(value) {
+    if (!Array.isArray(value)) return null;
+    const breadcrumbs = value.map(parseBreadcrumb);
+    return breadcrumbs.every((breadcrumb) => breadcrumb !== null) ? breadcrumbs : null;
+  }
+  function parseBreadcrumb(value) {
+    if (!isRecord(value)) return null;
+    const { href, label } = value;
+    return typeof href === "string" && typeof label === "string" ? { href, label } : null;
+  }
+  function breadcrumbLinks(breadcrumbsElement) {
+    return [
+      ...breadcrumbsElement?.querySelectorAll(":scope > a") ?? []
+    ];
+  }
+  function parentLink(breadcrumbsElement) {
+    return breadcrumbsElement?.querySelector(
+      ':scope > a[rel="up"]'
+    ) ?? null;
+  }
+  function readBreadcrumbs(breadcrumbsElement) {
+    return breadcrumbLinks(breadcrumbsElement).map((link) => ({
+      href: link.href,
+      label: link.textContent
+    }));
+  }
+  function currentBoard(breadcrumbsElement) {
+    return {
+      href: location.href.split("#")[0],
+      label: breadcrumbsElement?.querySelector(":scope > h1 > span")?.textContent ?? ""
+    };
+  }
+  function showBreadcrumbs({
+    breadcrumbsElement,
+    breadcrumbs
+  }) {
+    const heading = breadcrumbsElement?.querySelector(":scope > h1");
+    if (!heading) return;
+    const shown = breadcrumbsElement.querySelectorAll(
+      ":scope > a, :scope > .separator"
+    );
+    for (const element of shown) element.remove();
+    breadcrumbs.forEach(({ href, label }, index) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      if (index === breadcrumbs.length - 1) link.rel = "up";
+      const separator = document.createElement("span");
+      separator.className = "separator";
+      separator.setAttribute("aria-hidden", "true");
+      separator.textContent = "/";
+      heading.before(link, separator);
+    });
+    markParent({ heading, parent: breadcrumbs.at(-1) });
+  }
+  function markParent({
+    heading,
+    parent
+  }) {
+    if (!parent) return;
+    const path = new URL(parent.href).pathname;
+    for (const link of heading.querySelectorAll(
+      ".linked-menu a"
+    )) {
+      if (link.pathname === path) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    }
+  }
+
+  // viewer/session.ts
+  function readSession({
+    key,
+    parse
+  }) {
+    try {
+      const item = sessionStorage.getItem(key);
+      return item === null ? null : parse(JSON.parse(item));
+    } catch {
+      return null;
+    }
+  }
+  function takeSession({
+    key,
+    parse
+  }) {
+    const value = readSession({ key, parse });
+    try {
+      sessionStorage.removeItem(key);
+    } catch {
+    }
+    return value;
+  }
+  function writeSession({ key, value }) {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch {
+    }
+  }
+
+  // viewer/navigation.ts
+  var ARRIVAL_KEY = "arrival";
+  function setUpNavigation() {
+    const breadcrumbsElement = document.querySelector(".crumbs");
+    const recorded = takeSession({ key: ARRIVAL_KEY, parse: parseArrivalRecord });
+    if (recorded?.path === location.pathname) {
+      const { how, breadcrumbs: breadcrumbs2 } = recorded;
+      history.replaceState({ ...history.state, arrival: how, breadcrumbs: breadcrumbs2 }, "");
+    }
+    const { breadcrumbs } = parseHistoryState(history.state);
+    if (breadcrumbs) showBreadcrumbs({ breadcrumbsElement, breadcrumbs });
+    const recordFollowing = (link) => {
+      const followed = followedLink({ breadcrumbsElement, link });
+      if (!followed) return;
+      const arrival = arrivalFor({
+        link: followed,
+        breadcrumbs: readBreadcrumbs(breadcrumbsElement),
+        current: currentBoard(breadcrumbsElement)
+      });
+      const path = new URL(link.href).pathname;
+      writeSession({ key: ARRIVAL_KEY, value: { path, ...arrival } });
+    };
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest(
+        "a[href]"
+      );
+      const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+      if (!link || link.target || modified || event.defaultPrevented) return;
+      recordFollowing(link);
+    });
+    addEventListener("keydown", (event) => {
+      const modified = event.altKey || event.ctrlKey || event.metaKey;
+      if (event.key !== "Escape" || modified) return;
+      if (document.querySelector(":popover-open")) return;
+      const parent = parentLink(breadcrumbsElement);
+      const target = escapeTarget({
+        arrival: parseHistoryState(history.state).arrival,
+        hasParent: parent !== null
+      });
+      if (target === "back") {
+        history.back();
+      } else if (target === "up" && parent) {
+        recordFollowing(parent);
+        location.href = parent.href;
+      } else {
+        return;
+      }
+      event.preventDefault();
+    });
+  }
+  function arrivalFor({
+    link,
+    breadcrumbs,
+    current
+  }) {
+    switch (link.kind) {
+      case "breadcrumb":
+        return { how: "up", breadcrumbs: breadcrumbs.slice(0, link.index) };
+      case "heading menu":
+        return { how: "up" };
+      case "linked card menu":
+        return { how: "across" };
+      case "board card":
+        return { how: "down", breadcrumbs: [...breadcrumbs, current] };
+    }
+  }
+  function escapeTarget({
+    arrival,
+    hasParent
+  }) {
+    if (arrival === "down" || arrival === "across") return "back";
+    return hasParent ? "up" : null;
+  }
+  function parseArrivalRecord(value) {
+    if (!isRecord(value)) return null;
+    const { path, how, breadcrumbs } = value;
+    if (typeof path !== "string" || !isArrival(how)) return null;
+    if (breadcrumbs === void 0) return { path, how };
+    const parsed = parseBreadcrumbs(breadcrumbs);
+    return parsed && { path, how, breadcrumbs: parsed };
+  }
+  function parseHistoryState(value) {
+    if (!isRecord(value)) return {};
+    const arrival = isArrival(value.arrival) ? value.arrival : void 0;
+    const breadcrumbs = parseBreadcrumbs(value.breadcrumbs) ?? void 0;
+    return { arrival, breadcrumbs };
+  }
+  function followedLink({
+    breadcrumbsElement,
+    link
+  }) {
+    const index = breadcrumbLinks(breadcrumbsElement).indexOf(link);
+    if (index >= 0) return { kind: "breadcrumb", index };
+    if (link.closest(".crumbs")) return { kind: "heading menu" };
+    if (link.closest(".linked-menu")) return { kind: "linked card menu" };
+    if (link.matches(".panel")) return { kind: "board card" };
+    return null;
+  }
+  function isArrival(value) {
+    return value === "down" || value === "across" || value === "up";
+  }
+
   // viewer/scrolling.ts
   var PUSH_TIME = 100;
   var SCROLL_PAUSE = 300;
@@ -526,25 +733,6 @@
     const outward = Math.abs(next - clamp(next, min, max)) > Math.abs(position - clamp(position, min, max));
     const pushEnded = now - pushed.start > PUSH_TIME;
     return { position: outward && pushEnded ? position : next, push: pushed };
-  }
-
-  // viewer/session.ts
-  function readSession({
-    key,
-    parse
-  }) {
-    try {
-      const item = sessionStorage.getItem(key);
-      return item === null ? null : parse(JSON.parse(item));
-    } catch {
-      return null;
-    }
-  }
-  function writeSession({ key, value }) {
-    try {
-      sessionStorage.setItem(key, JSON.stringify(value));
-    } catch {
-    }
   }
 
   // viewer/starting-view.ts
@@ -671,107 +859,7 @@
       if (!element.matches(".chain")) return element.textContent;
       return [...element.querySelectorAll(":scope > p")].map((paragraph) => paragraph.textContent).join("\n");
     }
-    addEventListener("keydown", (event) => {
-      const modified = event.altKey || event.ctrlKey || event.metaKey;
-      if (event.key !== "Escape" || modified || !goToParent()) return;
-      event.preventDefault();
-    });
-    function goToParent() {
-      if (document.querySelector(":popover-open")) return false;
-      const { arrival } = history.state ?? {};
-      if (arrival === "down" || arrival === "across") {
-        history.back();
-        return true;
-      }
-      const parent = breadcrumbs?.querySelector(
-        ':scope > a[rel="up"]'
-      );
-      if (!parent) return false;
-      recordArrival(parent.href, "up", breadcrumbTrail().slice(0, -1));
-      location.href = parent.href;
-      return true;
-    }
-    const breadcrumbs = document.querySelector(".crumbs");
-    function breadcrumbLinks() {
-      return [
-        ...breadcrumbs?.querySelectorAll(":scope > a") ?? []
-      ];
-    }
-    function breadcrumbTrail() {
-      return breadcrumbLinks().map((link) => ({
-        href: link.href,
-        label: link.textContent
-      }));
-    }
-    function showTrail(trail) {
-      const heading = breadcrumbs?.querySelector(":scope > h1");
-      if (!heading) return;
-      const shown = breadcrumbs.querySelectorAll(
-        ":scope > a, :scope > .separator"
-      );
-      for (const element of shown) element.remove();
-      trail.forEach(({ href, label }, index) => {
-        const link = document.createElement("a");
-        link.href = href;
-        link.textContent = label;
-        if (index === trail.length - 1) link.rel = "up";
-        const separator = document.createElement("span");
-        separator.className = "separator";
-        separator.setAttribute("aria-hidden", "true");
-        separator.textContent = "/";
-        heading.before(link, separator);
-      });
-      markParent(heading, trail.at(-1));
-    }
-    function markParent(heading, parent) {
-      if (!parent) return;
-      const path = new URL(parent.href).pathname;
-      for (const link of heading.querySelectorAll(
-        ".linked-menu a"
-      )) {
-        if (link.pathname === path) link.setAttribute("aria-current", "true");
-        else link.removeAttribute("aria-current");
-      }
-    }
-    const ARRIVAL_KEY = "arrival";
-    document.addEventListener("click", (event) => {
-      const link = event.target.closest(
-        "a[href]"
-      );
-      const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-      if (!link || link.target || modified || event.defaultPrevented) return;
-      const breadcrumb = breadcrumbLinks().indexOf(link);
-      if (breadcrumb >= 0) {
-        recordArrival(link.href, "up", breadcrumbTrail().slice(0, breadcrumb));
-      } else if (link.closest(".crumbs")) {
-        recordArrival(link.href, "up");
-      } else if (link.closest(".linked-menu")) {
-        recordArrival(link.href, "across");
-      } else if (link.matches(".panel")) {
-        const here = {
-          href: location.href.split("#")[0],
-          label: breadcrumbs?.querySelector(":scope > h1 > span")?.textContent ?? ""
-        };
-        recordArrival(link.href, "down", [...breadcrumbTrail(), here]);
-      }
-    });
-    function recordArrival(url, how, trail) {
-      try {
-        const path = new URL(url).pathname;
-        sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify({ path, how, trail }));
-      } catch {
-      }
-    }
-    try {
-      const arrival = JSON.parse(sessionStorage.getItem(ARRIVAL_KEY));
-      sessionStorage.removeItem(ARRIVAL_KEY);
-      if (arrival?.path === location.pathname) {
-        const { how, trail } = arrival;
-        history.replaceState({ ...history.state, arrival: how, trail }, "");
-      }
-    } catch {
-    }
-    if (history.state?.trail) showTrail(history.state.trail);
+    setUpNavigation();
     for (const menu of document.querySelectorAll(".linked-menu")) {
       const button = document.querySelector(`[popovertarget="${menu.id}"]`);
       menu.addEventListener("beforetoggle", (event) => {

@@ -138,6 +138,7 @@ export function setUpGestures(canvas: Canvas) {
 function startsGesture(event: PointerEvent) {
   const target = event.target as Element;
   const mouse = event.pointerType === 'mouse';
+
   if (mouse && event.button !== 0) return false;
   if (target.closest('button, [popover]')) return false;
   return !(mouse && target.closest(SELECTABLE_TEXT));

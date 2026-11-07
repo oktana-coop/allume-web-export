@@ -10,7 +10,7 @@ import { readSession, writeSession } from './session';
 
 /**
  * A link to a card centers it. Otherwise a board opens where it was last left
- * in this session, like in Muse, or framed whole on a first visit.
+ * in this session, like in Allume, or framed whole on a first visit.
  */
 export function setUpStartingView(canvas: Canvas) {
   const key = `camera:${location.pathname}`;
