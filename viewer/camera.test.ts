@@ -84,7 +84,7 @@ describe('focus', () => {
 
     const camera = focus({ frame, viewport, contentBounds });
 
-    expect(viewportPoint({ camera, of: { x: 200, y: 150 } })).toEqual({
+    expect(canvasToViewport({ camera, point: { x: 200, y: 150 } })).toEqual({
       x: 500,
       y: 300,
     });
@@ -96,7 +96,7 @@ describe('focus', () => {
     const camera = focus({ frame, viewport, contentBounds });
 
     expect(camera.scale).toBe(0.5);
-    expect(viewportPoint({ camera, of: { x: 0, y: 0 } }).x).toBe(80);
+    expect(canvasToViewport({ camera, point: { x: 0, y: 0 } }).x).toBe(80);
   });
 
   it("doesn't zoom in past 100%", () => {
@@ -114,8 +114,8 @@ describe('zoomAt', () => {
     const zoomed = zoomAt({ camera, point, scale: 2, viewport, contentBounds });
 
     expect(zoomed.scale).toBe(2);
-    expect(canvasPoint({ camera: zoomed, under: point })).toEqual(
-      canvasPoint({ camera, under: point })
+    expect(viewportToCanvas({ camera: zoomed, point })).toEqual(
+      viewportToCanvas({ camera, point })
     );
   });
 
@@ -141,8 +141,8 @@ describe('pinch', () => {
 
     const pinched = pinch({ camera: atOrigin, from, to, scale: 2 });
 
-    expect(canvasPoint({ camera: pinched, under: to })).toEqual(
-      canvasPoint({ camera: atOrigin, under: from })
+    expect(viewportToCanvas({ camera: pinched, point: to })).toEqual(
+      viewportToCanvas({ camera: atOrigin, point: from })
     );
   });
 
@@ -295,26 +295,26 @@ describe('bounceBack', () => {
   });
 });
 
-/** The canvas point under the viewport point. */
-const canvasPoint = ({
+/** The point in the viewport, on the canvas. */
+const viewportToCanvas = ({
   camera,
-  under,
+  point,
 }: {
   camera: Camera;
-  under: Point;
+  point: Point;
 }): Point => ({
-  x: (under.x - camera.x) / camera.scale,
-  y: (under.y - camera.y) / camera.scale,
+  x: (point.x - camera.x) / camera.scale,
+  y: (point.y - camera.y) / camera.scale,
 });
 
-/** The viewport point over the canvas point. */
-const viewportPoint = ({
+/** The point on the canvas, in the viewport. */
+const canvasToViewport = ({
   camera,
-  of,
+  point,
 }: {
   camera: Camera;
-  of: Point;
+  point: Point;
 }): Point => ({
-  x: camera.x + of.x * camera.scale,
-  y: camera.y + of.y * camera.scale,
+  x: camera.x + point.x * camera.scale,
+  y: camera.y + point.y * camera.scale,
 });

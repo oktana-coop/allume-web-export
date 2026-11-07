@@ -223,11 +223,9 @@ export function bounce({
 }): Camera {
   const limits = panLimits({ scale: camera.scale, viewport, contentBounds });
   const bounced = (value: number, [min, max]: Interval) => {
-    const over = value < min ? value - min : value > max ? value - max : 0;
-    return (
-      clamp(value, min, max) +
-      (MAX_BOUNCE * over) / (Math.abs(over) + MAX_BOUNCE)
-    );
+    const edge = clamp(value, min, max);
+    const over = value - edge;
+    return edge + (MAX_BOUNCE * over) / (Math.abs(over) + MAX_BOUNCE);
   };
   return {
     x: bounced(camera.x, limits.x),

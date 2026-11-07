@@ -1,8 +1,11 @@
 import {
   bounce,
   bounceBack,
+  fit,
+  focus,
   isBouncing,
   withinLimits,
+  zoomAt,
   type Camera,
 } from './camera';
 import { type Point, type Rect, type Size } from './geometry';
@@ -15,10 +18,14 @@ export type Gesture = {
   dragging: boolean;
 };
 
-/** A board's canvas, the viewport showing it, and where the camera is. */
+/**
+ * A board's canvas, the viewport showing it, where the camera is, and the zoom
+ * level that shows its scale.
+ */
 export type Canvas = {
   viewport: HTMLElement;
   element: HTMLElement;
+  zoomLevelLabel: HTMLElement | null;
   contentBounds: Rect;
   camera: Camera;
   gesture: Gesture | null;
@@ -50,6 +57,7 @@ export function setUpCanvas(root: ParentNode): Canvas | null {
   return {
     viewport,
     element,
+    zoomLevelLabel: root.querySelector<HTMLElement>('.zoom-level'),
     contentBounds: {
       x: minX,
       y: minY,
@@ -72,9 +80,9 @@ export function measure(canvas: Canvas): {
 }
 
 /**
- * Moves the camera, within the pan limits, and the canvas with it. While
- * bouncing, the camera may go past the limits, and the board bounces past the
- * edge.
+ * Moves the camera, within the pan limits, and the canvas with it, and shows
+ * the zoom level. While bouncing, the camera may go past the limits, and the
+ * board bounces past the edge.
  */
 export function moveCamera({
   canvas,
@@ -89,8 +97,13 @@ export function moveCamera({
   const shown = showBounce
     ? bounce({ camera, ...measure(canvas) })
     : withinLimits({ camera, ...measure(canvas) });
+
   canvas.camera = showBounce ? camera : shown;
+
   canvas.element.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
+  if (canvas.zoomLevelLabel) {
+    canvas.zoomLevelLabel.textContent = `${Math.round(canvas.camera.scale * 100)}%`;
+  }
 }
 
 /**
@@ -100,10 +113,12 @@ export function moveCamera({
  */
 export function startBounceBack(canvas: Canvas) {
   if (canvas.bouncingBack) return;
+
   let last = performance.now();
   const step = (now: number) => {
     canvas.bouncingBack = false;
     if (canvas.gesture) return; // Until it's let go.
+
     const camera = bounceBack({
       camera: canvas.camera,
       elapsed: now - last,
@@ -111,29 +126,88 @@ export function startBounceBack(canvas: Canvas) {
     });
     last = now;
     moveCamera({ canvas, camera, bouncing: true });
+
     if (isBouncing({ camera: canvas.camera, ...measure(canvas) })) {
       canvas.bouncingBack = true;
       requestAnimationFrame(step);
     }
   };
+
   canvas.bouncingBack = true;
   requestAnimationFrame(step);
 }
 
-/** The frame of the canvas's card with the element ID, or null without one. */
-export function cardFrame({
+/** Zooms to the scale, keeping the canvas point under the viewport point there. */
+export function zoomAtPoint({
   canvas,
-  id,
+  point,
+  scale,
 }: {
   canvas: Canvas;
-  id: string;
-}): Rect | null {
+  point: Point;
+  scale: number;
+}) {
+  const camera = zoomAt({
+    camera: canvas.camera,
+    point,
+    scale,
+    ...measure(canvas),
+  });
+  moveCamera({ canvas, camera });
+}
+
+/** Zooms to the scale, keeping the viewport's center where it is. */
+export function zoomAtCenter({
+  canvas,
+  scale,
+}: {
+  canvas: Canvas;
+  scale: number;
+}) {
+  const { width, height } = measure(canvas).viewport;
+  zoomAtPoint({ canvas, point: { x: width / 2, y: height / 2 }, scale });
+}
+
+/** Shows the whole board, from the canvas's origin. */
+export function fitBoard(canvas: Canvas) {
+  moveCamera({ canvas, camera: fit(measure(canvas)) });
+}
+
+/**
+ * Centers the canvas's card with the element ID, returning whether the canvas
+ * has one.
+ */
+export function focusCard({ canvas, id }: { canvas: Canvas; id: string }) {
   const card = id && document.getElementById(id);
-  if (!card || !canvas.element.contains(card)) return null;
-  return {
+  if (!card || !canvas.element.contains(card)) return false;
+
+  const frame = {
     x: card.offsetLeft,
     y: card.offsetTop,
     width: card.offsetWidth,
     height: card.offsetHeight,
   };
+
+  moveCamera({ canvas, camera: focus({ frame, ...measure(canvas) }) });
+  return true;
+}
+
+/** Where the event happened, in the window. */
+export function windowPoint(event: {
+  clientX: number;
+  clientY: number;
+}): Point {
+  return { x: event.clientX, y: event.clientY };
+}
+
+/** The point in the window, such as a pointer's, in the viewport. */
+export function windowToViewport({
+  canvas,
+  point,
+}: {
+  canvas: Canvas;
+  point: Point;
+}): Point {
+  const { left, top } = canvas.viewport.getBoundingClientRect();
+  return { x: point.x - left, y: point.y - top };
 }
