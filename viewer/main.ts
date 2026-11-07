@@ -2,14 +2,23 @@
 // named in the URL hash (#card-<document id>). Loaded at the end of <body>,
 // so the first camera is in place before the page is shown.
 
-type Point = { x: number; y: number };
-
-/** The canvas's offset in the viewport, in pixels, and its scale. */
-type Camera = { x: number; y: number; scale: number };
+import {
+  bounce,
+  bounceBack,
+  clampScale,
+  fit,
+  focus,
+  isBouncing,
+  panLimits,
+  pinch,
+  withinLimits,
+  zoomAt,
+  type Camera,
+  type Scene,
+} from './camera';
+import { clamp, type Point } from './geometry';
 
 type Axis = 'x' | 'y';
-
-type Interval = [min: number, max: number];
 
 /** A drag or pinch, from where it started. */
 type Gesture = {
@@ -25,16 +34,18 @@ type Breadcrumb = { href: string; label: string };
 /** How a page was reached. */
 type Arrival = 'down' | 'across' | 'up';
 
-// Safari's trackpad pinches, which TypeScript's DOM types leave out.
-interface GestureEvent extends UIEvent {
-  readonly scale: number;
-  readonly clientX: number;
-  readonly clientY: number;
-}
+declare global {
+  // Safari's trackpad pinches, which TypeScript's DOM types leave out.
+  interface GestureEvent extends UIEvent {
+    readonly scale: number;
+    readonly clientX: number;
+    readonly clientY: number;
+  }
 
-interface HTMLElementEventMap {
-  gesturestart: GestureEvent;
-  gesturechange: GestureEvent;
+  interface HTMLElementEventMap {
+    gesturestart: GestureEvent;
+    gesturechange: GestureEvent;
+  }
 }
 
 (() => {
@@ -45,16 +56,7 @@ interface HTMLElementEventMap {
   if (!viewport || !world) return;
   document.documentElement.classList.add('js');
 
-  // Zooming out stops at 50%, or lower when the whole board needs it to fit.
-  const MIN_SCALE = 0.5;
-  const MAX_SCALE = 4;
-  // Panning stops while this much of the board's contents is still in view.
-  // Pulling further bounces the board past the edge, by at most MAX_BOUNCE,
-  // and unless a drag holds it there it bounces back, keeping SPRING of the
-  // bounce each frame (at 60 fps). Reduced motion turns bouncing off.
-  const PAN_MARGIN = 120;
-  const MAX_BOUNCE = 80;
-  const SPRING = 0.8;
+  // Reduced motion turns bouncing off, so panning stops at the edges.
   const BOUNCES = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Past an edge, a scroll only pushes for PUSH_TIME. The rest of it, usually
   // trackpad momentum, is ignored, so the board bounces back like on a Mac.
@@ -64,10 +66,15 @@ interface HTMLElementEventMap {
   const PUSH_TIME = 100;
   const SCROLL_PAUSE = 300;
   const DRAG_THRESHOLD = 4;
-  const FOCUS_PADDING = 80;
   const SELECTABLE_TEXT =
     '.world > .card--text > .body, .world > .comment > .text, .world > .chain';
   const [minX, minY, maxX, maxY] = world.dataset.bounds!.split(',').map(Number);
+  const contentBounds = {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
   const zoomLevel = document.querySelector('.zoom-level');
   const cameraKey = `camera:${location.pathname}`;
 
@@ -76,27 +83,22 @@ interface HTMLElementEventMap {
   let lastWheel = 0;
   const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
 
-  // The camera positions that keep PAN_MARGIN of the board in view.
-  function panLimits(): Record<Axis, Interval> {
-    const { clientWidth: width, clientHeight: height } = viewport;
-    const { scale } = camera;
-    const marginX = Math.min(PAN_MARGIN, width / 2, (maxX - minX) * scale);
-    const marginY = Math.min(PAN_MARGIN, height / 2, (maxY - minY) * scale);
+  function scene(): Scene {
     return {
-      x: [marginX - maxX * scale, width - marginX - minX * scale],
-      y: [marginY - maxY * scale, height - marginY - minY * scale],
+      viewport: { width: viewport.clientWidth, height: viewport.clientHeight },
+      contentBounds,
     };
   }
 
   // Places the board, keeping the camera within the panning limits. While
   // panning (bouncing), the camera may go past them and the board bounces.
   function apply({ bouncing = false }: { bouncing?: boolean } = {}) {
-    const limits = panLimits();
-    const bound = bouncing && BOUNCES ? bounce : clamp;
-    const x = bound(camera.x, ...limits.x);
-    const y = bound(camera.y, ...limits.y);
-    if (bound === clamp) Object.assign(camera, { x, y });
-    world.style.transform = `translate(${x}px, ${y}px) scale(${camera.scale})`;
+    const showBounce = bouncing && BOUNCES;
+    const shown = showBounce
+      ? bounce({ camera, ...scene() })
+      : withinLimits({ camera, ...scene() });
+    if (!showBounce) camera = shown;
+    world.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
     if (zoomLevel) zoomLevel.textContent = `${Math.round(camera.scale * 100)}%`;
   }
 
@@ -109,95 +111,39 @@ interface HTMLElementEventMap {
     const step = (now: number) => {
       bounceFrame = 0;
       if (gesture) return; // A drag holds the bounce until it's let go.
-      const keep = SPRING ** (Math.max(0, now - last) / 16);
+      camera = bounceBack({ camera, elapsed: now - last, ...scene() });
       last = now;
-      const limits = panLimits();
-      const pull = (value: number, [min, max]: Interval) => {
-        const edge = clamp(value, min, max);
-        return Math.abs(value - edge) < 0.5
-          ? edge
-          : edge + (value - edge) * keep;
-      };
-      camera.x = pull(camera.x, limits.x);
-      camera.y = pull(camera.y, limits.y);
       apply({ bouncing: true });
-      const stillBouncing =
-        camera.x !== clamp(camera.x, ...limits.x) ||
-        camera.y !== clamp(camera.y, ...limits.y);
-      if (stillBouncing) bounceFrame = requestAnimationFrame(step);
+      if (isBouncing({ camera, ...scene() })) {
+        bounceFrame = requestAnimationFrame(step);
+      }
     };
     bounceFrame = requestAnimationFrame(step);
   }
 
-  function clamp(value: number, min: number, max: number) {
-    return Math.min(max, Math.max(min, value));
-  }
-
-  // Past a limit, the board gives less the further it's pulled.
-  function bounce(value: number, min: number, max: number) {
-    const over = value < min ? value - min : value > max ? value - max : 0;
-    return (
-      clamp(value, min, max) +
-      (MAX_BOUNCE * over) / (Math.abs(over) + MAX_BOUNCE)
-    );
-  }
-
-  function clampScale(scale: number) {
-    return clamp(scale, Math.min(MIN_SCALE, fitScale()), MAX_SCALE);
-  }
-
-  // The scale that frames the board the way its card previews it: origin at
-  // the top left, with everything in view.
-  function fitScale() {
-    return Math.min(
-      1,
-      viewport.clientWidth / (maxX + minX),
-      viewport.clientHeight / (maxY + minY)
-    );
-  }
-
   function home() {
-    camera = { x: 0, y: 0, scale: clampScale(fitScale()) };
-    apply();
-  }
-
-  // Zooms to the scale, keeping the viewport point (x, y) in place.
-  function zoomAt(x: number, y: number, scale: number) {
-    const target = clampScale(scale);
-    const ratio = target / camera.scale;
-    camera = {
-      x: x - (x - camera.x) * ratio,
-      y: y - (y - camera.y) * ratio,
-      scale: target,
-    };
+    camera = fit(scene());
     apply();
   }
 
   function zoomAtCenter(scale: number) {
-    zoomAt(viewport.clientWidth / 2, viewport.clientHeight / 2, scale);
+    const current = scene();
+    const { width, height } = current.viewport;
+    const point = { x: width / 2, y: height / 2 };
+    camera = zoomAt({ camera, point, scale, ...current });
+    apply();
   }
 
   function focusCard(id: string) {
     const card = id && document.getElementById(id);
     if (!card || !world.contains(card)) return false;
-    const {
-      offsetLeft: x,
-      offsetTop: y,
-      offsetWidth: w,
-      offsetHeight: h,
-    } = card;
-    const scale = clampScale(
-      Math.min(
-        1,
-        (viewport.clientWidth - FOCUS_PADDING * 2) / w,
-        (viewport.clientHeight - FOCUS_PADDING * 2) / h
-      )
-    );
-    camera = {
-      x: viewport.clientWidth / 2 - (x + w / 2) * scale,
-      y: viewport.clientHeight / 2 - (y + h / 2) * scale,
-      scale,
+    const frame = {
+      x: card.offsetLeft,
+      y: card.offsetTop,
+      width: card.offsetWidth,
+      height: card.offsetHeight,
     };
+    camera = focus({ frame, ...scene() });
     apply();
     return true;
   }
@@ -230,12 +176,14 @@ interface HTMLElementEventMap {
       if (event.ctrlKey || event.metaKey) {
         const delta = Math.max(-50, Math.min(50, event.deltaY * unit));
         const point = viewportPoint(event.clientX, event.clientY);
-        zoomAt(point.x, point.y, camera.scale * Math.exp(-delta * 0.01));
+        const scale = camera.scale * Math.exp(-delta * 0.01);
+        camera = zoomAt({ camera, point, scale, ...scene() });
+        apply();
       } else {
         const now = performance.now();
         const paused = now - lastWheel > SCROLL_PAUSE;
         lastWheel = now;
-        const limits = panLimits();
+        const limits = panLimits({ scale: camera.scale, ...scene() });
         const pan = (axis: Axis, delta: number) => {
           const [min, max] = limits[axis];
           const value = camera[axis];
@@ -278,7 +226,9 @@ interface HTMLElementEventMap {
     event.preventDefault();
     if (pointers.size > 1) return; // Touch pinches are handled below.
     const point = viewportPoint(event.clientX, event.clientY);
-    zoomAt(point.x, point.y, gestureStartScale * event.scale);
+    const scale = gestureStartScale * event.scale;
+    camera = zoomAt({ camera, point, scale, ...scene() });
+    apply();
   });
 
   // Dragging with one pointer pans; pinching with two zooms. A press that
@@ -343,17 +293,15 @@ interface HTMLElementEventMap {
     }
     const scale =
       points.length > 1 && gesture.distance > 0
-        ? clampScale((gesture.camera.scale * spread(points)) / gesture.distance)
+        ? clampScale({
+            scale: (gesture.camera.scale * spread(points)) / gesture.distance,
+            ...scene(),
+          })
         : gesture.camera.scale;
-    const ratio = scale / gesture.camera.scale;
-    const start = viewportPoint(gesture.center.x, gesture.center.y);
-    const now = viewportPoint(center.x, center.y);
+    const from = viewportPoint(gesture.center.x, gesture.center.y);
+    const to = viewportPoint(center.x, center.y);
     // Keeps the board point that started under the gesture under it.
-    camera = {
-      x: now.x - (start.x - gesture.camera.x) * ratio,
-      y: now.y - (start.y - gesture.camera.y) * ratio,
-      scale,
-    };
+    camera = pinch({ camera: gesture.camera, from, to, scale });
     apply({ bouncing: true });
   });
 
@@ -648,7 +596,10 @@ interface HTMLElementEventMap {
       if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
         return false;
       }
-      camera = { ...saved, scale: clampScale(saved.scale) };
+      camera = {
+        ...saved,
+        scale: clampScale({ scale: saved.scale, ...scene() }),
+      };
       apply();
       return true;
     } catch {

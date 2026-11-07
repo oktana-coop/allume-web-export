@@ -1,12 +1,13 @@
 # Testing
 
 The unit and integration tests use
-[Swift Testing](https://developer.apple.com/documentation/testing), and the end-to-end tests use
-[Playwright](https://playwright.dev/). None of them touches the network.
+[Swift Testing](https://developer.apple.com/documentation/testing), the viewer's unit tests use
+[Vitest](https://vitest.dev/), and the end-to-end tests use [Playwright](https://playwright.dev/).
+None of them touches the network.
 
 ## Running Tests
 
-Run every unit and integration test with:
+Run every Swift unit and integration test with:
 
 ```sh
 swift test
@@ -21,8 +22,22 @@ swift test --filter CardsTests
 
 ## Unit Tests
 
+### Swift Package
+
 Each module has a test target named after it in `Tests/`, e.g. `Tests/AllumeWebRenderingTests/`.
 They check the module on its own, with small inputs written in the tests.
+
+### Viewer
+
+The viewer's pure modules have unit tests next to them, named after them, e.g.
+`viewer/camera.test.ts` for `viewer/camera.ts`. They need Node and `npm install`, as for the
+end-to-end tests. Run them with:
+
+```sh
+npm run test:unit
+```
+
+`npm run test:unit:watch` runs them again whenever a file changes.
 
 ## Integration Tests
 

@@ -1,47 +1,188 @@
 // Built from viewer/ by `npm run build:viewer`. Edit it there.
 "use strict";
 (() => {
+  // viewer/geometry.ts
+  function maxX(rect) {
+    return rect.x + rect.width;
+  }
+  function maxY(rect) {
+    return rect.y + rect.height;
+  }
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  // viewer/camera.ts
+  var MIN_SCALE = 0.5;
+  var MAX_SCALE = 4;
+  var PAN_MARGIN = 120;
+  var MAX_BOUNCE = 80;
+  var SPRING = 0.8;
+  var FOCUS_PADDING = 80;
+  function fitScale({ viewport, contentBounds }) {
+    return Math.min(
+      1,
+      viewport.width / (maxX(contentBounds) + contentBounds.x),
+      viewport.height / (maxY(contentBounds) + contentBounds.y)
+    );
+  }
+  function clampScale({ scale, ...scene }) {
+    return clamp(scale, Math.min(MIN_SCALE, fitScale(scene)), MAX_SCALE);
+  }
+  function fit(scene) {
+    return { x: 0, y: 0, scale: fitScale(scene) };
+  }
+  function focus({ frame, ...scene }) {
+    const { width, height } = scene.viewport;
+    const scale = clampScale({
+      scale: Math.min(
+        1,
+        (width - FOCUS_PADDING * 2) / frame.width,
+        (height - FOCUS_PADDING * 2) / frame.height
+      ),
+      ...scene
+    });
+    return {
+      x: width / 2 - (frame.x + frame.width / 2) * scale,
+      y: height / 2 - (frame.y + frame.height / 2) * scale,
+      scale
+    };
+  }
+  function zoomAt({
+    camera,
+    point,
+    scale,
+    ...scene
+  }) {
+    return pinch({
+      camera,
+      from: point,
+      to: point,
+      scale: clampScale({ scale, ...scene })
+    });
+  }
+  function pinch({
+    camera,
+    from,
+    to,
+    scale
+  }) {
+    const ratio = scale / camera.scale;
+    return {
+      x: to.x - (from.x - camera.x) * ratio,
+      y: to.y - (from.y - camera.y) * ratio,
+      scale
+    };
+  }
+  function panLimits({
+    scale,
+    viewport,
+    contentBounds
+  }) {
+    const marginX = Math.min(
+      PAN_MARGIN,
+      viewport.width / 2,
+      contentBounds.width * scale
+    );
+    const marginY = Math.min(
+      PAN_MARGIN,
+      viewport.height / 2,
+      contentBounds.height * scale
+    );
+    return {
+      x: [
+        marginX - maxX(contentBounds) * scale,
+        viewport.width - marginX - contentBounds.x * scale
+      ],
+      y: [
+        marginY - maxY(contentBounds) * scale,
+        viewport.height - marginY - contentBounds.y * scale
+      ]
+    };
+  }
+  function withinLimits({
+    camera,
+    ...scene
+  }) {
+    const limits = panLimits({ scale: camera.scale, ...scene });
+    return {
+      x: clamp(camera.x, ...limits.x),
+      y: clamp(camera.y, ...limits.y),
+      scale: camera.scale
+    };
+  }
+  function isBouncing({ camera, ...scene }) {
+    const within = withinLimits({ camera, ...scene });
+    return camera.x !== within.x || camera.y !== within.y;
+  }
+  function bounce({
+    camera,
+    ...scene
+  }) {
+    const limits = panLimits({ scale: camera.scale, ...scene });
+    const bounced = (value, [min, max]) => {
+      const over = value < min ? value - min : value > max ? value - max : 0;
+      return clamp(value, min, max) + MAX_BOUNCE * over / (Math.abs(over) + MAX_BOUNCE);
+    };
+    return {
+      x: bounced(camera.x, limits.x),
+      y: bounced(camera.y, limits.y),
+      scale: camera.scale
+    };
+  }
+  function bounceBack({
+    camera,
+    elapsed,
+    ...scene
+  }) {
+    const keep = SPRING ** (Math.max(0, elapsed) / 16);
+    const limits = panLimits({ scale: camera.scale, ...scene });
+    const pulled = (value, [min, max]) => {
+      const edge = clamp(value, min, max);
+      return Math.abs(value - edge) < 0.5 ? edge : edge + (value - edge) * keep;
+    };
+    return {
+      x: pulled(camera.x, limits.x),
+      y: pulled(camera.y, limits.y),
+      scale: camera.scale
+    };
+  }
+
   // viewer/main.ts
   (() => {
     const viewport = document.querySelector(".viewport");
     const world = viewport?.querySelector(".world");
     if (!viewport || !world) return;
     document.documentElement.classList.add("js");
-    const MIN_SCALE = 0.5;
-    const MAX_SCALE = 4;
-    const PAN_MARGIN = 120;
-    const MAX_BOUNCE = 80;
-    const SPRING = 0.8;
     const BOUNCES = !matchMedia("(prefers-reduced-motion: reduce)").matches;
     const PUSH_TIME = 100;
     const SCROLL_PAUSE = 300;
     const DRAG_THRESHOLD = 4;
-    const FOCUS_PADDING = 80;
     const SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
-    const [minX, minY, maxX, maxY] = world.dataset.bounds.split(",").map(Number);
+    const [minX, minY, maxX2, maxY2] = world.dataset.bounds.split(",").map(Number);
+    const contentBounds = {
+      x: minX,
+      y: minY,
+      width: maxX2 - minX,
+      height: maxY2 - minY
+    };
     const zoomLevel = document.querySelector(".zoom-level");
     const cameraKey = `camera:${location.pathname}`;
     let camera = { x: 0, y: 0, scale: 1 };
     let bounceFrame = 0;
     let lastWheel = 0;
     const pushes = { x: { start: 0, slowest: 0 }, y: { start: 0, slowest: 0 } };
-    function panLimits() {
-      const { clientWidth: width, clientHeight: height } = viewport;
-      const { scale } = camera;
-      const marginX = Math.min(PAN_MARGIN, width / 2, (maxX - minX) * scale);
-      const marginY = Math.min(PAN_MARGIN, height / 2, (maxY - minY) * scale);
+    function scene() {
       return {
-        x: [marginX - maxX * scale, width - marginX - minX * scale],
-        y: [marginY - maxY * scale, height - marginY - minY * scale]
+        viewport: { width: viewport.clientWidth, height: viewport.clientHeight },
+        contentBounds
       };
     }
     function apply({ bouncing = false } = {}) {
-      const limits = panLimits();
-      const bound = bouncing && BOUNCES ? bounce : clamp;
-      const x = bound(camera.x, ...limits.x);
-      const y = bound(camera.y, ...limits.y);
-      if (bound === clamp) Object.assign(camera, { x, y });
-      world.style.transform = `translate(${x}px, ${y}px) scale(${camera.scale})`;
+      const showBounce = bouncing && BOUNCES;
+      const shown = showBounce ? bounce({ camera, ...scene() }) : withinLimits({ camera, ...scene() });
+      if (!showBounce) camera = shown;
+      world.style.transform = `translate(${shown.x}px, ${shown.y}px) scale(${shown.scale})`;
       if (zoomLevel) zoomLevel.textContent = `${Math.round(camera.scale * 100)}%`;
     }
     function startBounceBack() {
@@ -50,76 +191,36 @@
       const step = (now) => {
         bounceFrame = 0;
         if (gesture) return;
-        const keep = SPRING ** (Math.max(0, now - last) / 16);
+        camera = bounceBack({ camera, elapsed: now - last, ...scene() });
         last = now;
-        const limits = panLimits();
-        const pull = (value, [min, max]) => {
-          const edge = clamp(value, min, max);
-          return Math.abs(value - edge) < 0.5 ? edge : edge + (value - edge) * keep;
-        };
-        camera.x = pull(camera.x, limits.x);
-        camera.y = pull(camera.y, limits.y);
         apply({ bouncing: true });
-        const stillBouncing = camera.x !== clamp(camera.x, ...limits.x) || camera.y !== clamp(camera.y, ...limits.y);
-        if (stillBouncing) bounceFrame = requestAnimationFrame(step);
+        if (isBouncing({ camera, ...scene() })) {
+          bounceFrame = requestAnimationFrame(step);
+        }
       };
       bounceFrame = requestAnimationFrame(step);
     }
-    function clamp(value, min, max) {
-      return Math.min(max, Math.max(min, value));
-    }
-    function bounce(value, min, max) {
-      const over = value < min ? value - min : value > max ? value - max : 0;
-      return clamp(value, min, max) + MAX_BOUNCE * over / (Math.abs(over) + MAX_BOUNCE);
-    }
-    function clampScale(scale) {
-      return clamp(scale, Math.min(MIN_SCALE, fitScale()), MAX_SCALE);
-    }
-    function fitScale() {
-      return Math.min(
-        1,
-        viewport.clientWidth / (maxX + minX),
-        viewport.clientHeight / (maxY + minY)
-      );
-    }
     function home() {
-      camera = { x: 0, y: 0, scale: clampScale(fitScale()) };
-      apply();
-    }
-    function zoomAt(x, y, scale) {
-      const target = clampScale(scale);
-      const ratio = target / camera.scale;
-      camera = {
-        x: x - (x - camera.x) * ratio,
-        y: y - (y - camera.y) * ratio,
-        scale: target
-      };
+      camera = fit(scene());
       apply();
     }
     function zoomAtCenter(scale) {
-      zoomAt(viewport.clientWidth / 2, viewport.clientHeight / 2, scale);
+      const current = scene();
+      const { width, height } = current.viewport;
+      const point = { x: width / 2, y: height / 2 };
+      camera = zoomAt({ camera, point, scale, ...current });
+      apply();
     }
     function focusCard(id) {
       const card = id && document.getElementById(id);
       if (!card || !world.contains(card)) return false;
-      const {
-        offsetLeft: x,
-        offsetTop: y,
-        offsetWidth: w,
-        offsetHeight: h
-      } = card;
-      const scale = clampScale(
-        Math.min(
-          1,
-          (viewport.clientWidth - FOCUS_PADDING * 2) / w,
-          (viewport.clientHeight - FOCUS_PADDING * 2) / h
-        )
-      );
-      camera = {
-        x: viewport.clientWidth / 2 - (x + w / 2) * scale,
-        y: viewport.clientHeight / 2 - (y + h / 2) * scale,
-        scale
+      const frame = {
+        x: card.offsetLeft,
+        y: card.offsetTop,
+        width: card.offsetWidth,
+        height: card.offsetHeight
       };
+      camera = focus({ frame, ...scene() });
       apply();
       return true;
     }
@@ -143,12 +244,14 @@
         if (event.ctrlKey || event.metaKey) {
           const delta = Math.max(-50, Math.min(50, event.deltaY * unit));
           const point = viewportPoint(event.clientX, event.clientY);
-          zoomAt(point.x, point.y, camera.scale * Math.exp(-delta * 0.01));
+          const scale = camera.scale * Math.exp(-delta * 0.01);
+          camera = zoomAt({ camera, point, scale, ...scene() });
+          apply();
         } else {
           const now = performance.now();
           const paused = now - lastWheel > SCROLL_PAUSE;
           lastWheel = now;
-          const limits = panLimits();
+          const limits = panLimits({ scale: camera.scale, ...scene() });
           const pan = (axis, delta) => {
             const [min, max] = limits[axis];
             const value = camera[axis];
@@ -187,7 +290,9 @@
       event.preventDefault();
       if (pointers.size > 1) return;
       const point = viewportPoint(event.clientX, event.clientY);
-      zoomAt(point.x, point.y, gestureStartScale * event.scale);
+      const scale = gestureStartScale * event.scale;
+      camera = zoomAt({ camera, point, scale, ...scene() });
+      apply();
     });
     const pointers = /* @__PURE__ */ new Map();
     let gesture = null;
@@ -236,15 +341,13 @@
       if (!viewport.hasPointerCapture(event.pointerId)) {
         viewport.setPointerCapture(event.pointerId);
       }
-      const scale = points.length > 1 && gesture.distance > 0 ? clampScale(gesture.camera.scale * spread(points) / gesture.distance) : gesture.camera.scale;
-      const ratio = scale / gesture.camera.scale;
-      const start = viewportPoint(gesture.center.x, gesture.center.y);
-      const now = viewportPoint(center.x, center.y);
-      camera = {
-        x: now.x - (start.x - gesture.camera.x) * ratio,
-        y: now.y - (start.y - gesture.camera.y) * ratio,
-        scale
-      };
+      const scale = points.length > 1 && gesture.distance > 0 ? clampScale({
+        scale: gesture.camera.scale * spread(points) / gesture.distance,
+        ...scene()
+      }) : gesture.camera.scale;
+      const from = viewportPoint(gesture.center.x, gesture.center.y);
+      const to = viewportPoint(center.x, center.y);
+      camera = pinch({ camera: gesture.camera, from, to, scale });
       apply({ bouncing: true });
     });
     function endPointer(event) {
@@ -482,7 +585,10 @@
         if (![saved?.x, saved?.y, saved?.scale].every(Number.isFinite)) {
           return false;
         }
-        camera = { ...saved, scale: clampScale(saved.scale) };
+        camera = {
+          ...saved,
+          scale: clampScale({ scale: saved.scale, ...scene() })
+        };
         apply();
         return true;
       } catch {

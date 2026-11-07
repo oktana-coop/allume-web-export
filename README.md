@@ -92,9 +92,9 @@ Then reload the page, served as in [Run](#run). The
 
 `npm run typecheck` checks the TypeScript: the viewer against the browser's APIs, and the build
 script and the end-to-end tests against Node's. esbuild removes the types without checking them,
-so before committing a change to `viewer/`, run the type check and the end-to-end tests, and
-commit the rebuilt files with it. Both scripts need Node and `npm install`, as for the end-to-end
-tests.
+so before committing a change to `viewer/`, run the type check, the
+[unit tests](docs/Testing.md#viewer) and the end-to-end tests, and commit the rebuilt
+files with it. All of these need Node and `npm install`, as for the end-to-end tests.
 
 ### Formatting
 
