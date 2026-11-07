@@ -12,6 +12,8 @@ const canvas = setUpCanvas(document);
 if (!canvas) {
   throw new Error('The page has no board: no .viewport with a .world in it.');
 }
+
+// Switches the page's styles from a natively scrolling board to the camera's.
 document.documentElement.classList.add('js');
 
 setUpScrolling(canvas);
