@@ -68,6 +68,32 @@ test.describe('copy buttons', () => {
     await expect(button).toHaveAccessibleName('Copy text');
   });
 
+  test('copying again keeps "Copied" for a moment from the second copy', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(haskell.url);
+    const button = boardItem({ page, text: 'Haskell is lazy' }).getByRole(
+      'button'
+    );
+    // Each copy is waited for, since copying is asynchronous: the first by its
+    // label, and the second by its text arriving in the emptied clipboard.
+    await button.click();
+    await expect(button).toHaveAccessibleName('Copied');
+    await page.clock.runFor(1000);
+    await page.evaluate(() => navigator.clipboard.writeText(''));
+
+    await button.click();
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .not.toBe('');
+    await page.clock.runFor(1000);
+
+    await expect(button).toHaveAccessibleName('Copied');
+    await page.clock.runFor(500);
+    await expect(button).toHaveAccessibleName('Copy text');
+  });
+
   test('without the Clipboard API, copying still works', async ({ page }) => {
     // As on a site served over plain HTTP, where browsers refuse the API.
     await page.addInitScript(() => {
