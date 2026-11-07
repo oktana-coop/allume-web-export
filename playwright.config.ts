@@ -33,17 +33,19 @@ export default defineConfig({
       },
     },
   ],
-  // Builds the sample export's site, without favicons so that the tests stay
-  // offline, then serves it. The first run waits for `swift build`.
-  // `e2e/serve.json` keeps clean URLs to paths without an extension, so `/`
-  // serves `index.html` but pages keep their `.html`, which the viewer's
-  // camera memory is keyed by.
+  // Builds the viewer from `viewer/`, then the sample export's site with it,
+  // without favicons so that the tests stay offline, then serves the site. The
+  // first run waits for `swift build`. `e2e/serve.json` keeps clean URLs to
+  // paths without an extension, so `/` serves `index.html` but pages keep their
+  // `.html`, which the viewer's camera memory is keyed by.
   webServer: {
     command:
-      `swift run allume-web-export Fixtures/SampleExport --out ${SITE} --replace --no-favicons` +
+      `npm run build:viewer` +
+      ` && swift run allume-web-export Fixtures/SampleExport --out ${SITE} --replace --no-favicons` +
       ` && serve ${SITE} --listen ${PORT} --config ../../e2e/serve.json --no-clipboard`,
     url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
+    // Never a server already on the port, which would serve an older site.
+    reuseExistingServer: false,
     timeout: 300_000,
   },
 });

@@ -1,0 +1,12 @@
+// The viewer runs in browsers, so it's checked without Node's types.
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+
+    // Includes the script, unchecked, until the viewer has TypeScript to check.
+    "allowJs": true
+  },
+  "include": ["."],
+  "exclude": ["build.ts"]
+}

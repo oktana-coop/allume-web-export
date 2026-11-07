@@ -1,0 +1,16 @@
+// Checks the code that runs in Node. viewer/tsconfig.json checks the viewer.
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "types": ["node"],
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Node runs TypeScript by stripping the types, which needs only syntax
+    // that strips away and imports of types marked as such.
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["viewer/build.ts", "e2e", "playwright.config.ts"]
+}

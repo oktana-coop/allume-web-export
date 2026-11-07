@@ -71,6 +71,31 @@ python3 -m http.server --directory out
 Then open <http://localhost:8000>. Git ignores `out/`. `--replace` lets each run replace the last
 one's site, and `--no-favicons` keeps the run offline.
 
+### Viewer
+
+The viewer is the script and stylesheet that let visitors pan, zoom and move between boards. Its
+sources are in `viewer/`, but the tool doesn't build them: it copies a built `viewer.js` and
+`viewer.css` from its resources, in `Sources/AllumeWeb/Viewer/`, into every site it writes.
+esbuild builds those two files from `viewer/`, and they're committed, so building the tool needs
+only Swift.
+
+A change to the viewer therefore takes two steps: rebuilding it into the tool's resources, then
+writing the site again with them:
+
+```sh
+npm run build:viewer
+swift run allume-web-export Fixtures/SampleExport --out out --replace
+```
+
+Then reload the page, served as in [Run](#run). The
+[end-to-end tests](docs/Testing.md#end-to-end-tests) rebuild the viewer before each run.
+
+`npm run typecheck` checks the TypeScript: the viewer against the browser's APIs, and the build
+script and the end-to-end tests against Node's. esbuild removes the types without checking them,
+so before committing a change to `viewer/`, run the type check and the end-to-end tests, and
+commit the rebuilt files with it. Both scripts need Node and `npm install`, as for the end-to-end
+tests.
+
 ### Formatting
 
 The code is formatted with swift-format's defaults, which keep lines within 100 columns, and
@@ -81,6 +106,9 @@ swift format --in-place --recursive Package.swift Sources Tests
 ```
 
 `swift format lint --recursive Sources Tests` lists what's left.
+
+The viewer and the end-to-end tests are formatted with Prettier, which keeps lines within 80
+columns: `npm run format`.
 
 ### Commits
 

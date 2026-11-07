@@ -45,8 +45,9 @@ commit the expected files together with the change that caused it.
 ## End-to-End Tests
 
 The end-to-end tests in `e2e/` open the sample export's site in Chromium, and check what visitors
-see and do there. Before each run, Playwright builds the site into `e2e-results/site/` and serves
-it on <http://localhost:4400>, so the first run also waits for `swift build`.
+see and do there. Before each run, Playwright builds the viewer from `viewer/`, then the site into
+`e2e-results/site/`, and serves it on <http://localhost:4400>, so the first run also waits for
+`swift build`. If something is already serving on that port, the run fails rather than test it.
 
 They need Node, at the version in `.nvmrc`. Install the tools and Playwright's Chromium once:
 
@@ -61,7 +62,8 @@ Then run them with:
 npm run test:e2e
 ```
 
-`npm run test:e2e:ui` opens Playwright's UI, `npm run test:e2e:debug` steps through a test in a
+`npm run test:e2e:ui` opens Playwright's UI, which builds the site only when it opens, so restart
+it after changing the viewer or the tool. `npm run test:e2e:debug` steps through a test in a
 browser window, and `npm run test:e2e:report` shows the report of the last run. Results, including
 screenshots, videos and traces of failed tests, are written to `e2e-results/`.
 
