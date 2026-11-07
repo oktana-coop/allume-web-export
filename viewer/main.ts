@@ -4,6 +4,7 @@
 
 import { focusCard, setUpCanvas } from './canvas';
 import { makeCommentDatesRelative } from './comment-dates';
+import { setUpCopyButtons } from './copy-buttons';
 import { setUpGestures } from './gestures';
 import { setUpNavigation } from './navigation';
 import { setUpScrolling } from './scrolling';
@@ -34,57 +35,7 @@ import { setUpZoomControls } from './zoom-controls';
 
   makeCommentDatesRelative(document);
 
-  // Copy buttons copy a text card's or comment's full text, including any
-  // part the card's size cuts off, or all of a canvas text.
-  const copiedTimers = new WeakMap<HTMLElement, number>();
-  canvas.element.addEventListener('click', async (event) => {
-    const button = (event.target as Element).closest<HTMLElement>('.copy');
-    const owner = button?.parentElement;
-    const source = owner?.matches('.chain')
-      ? owner
-      : owner?.querySelector(':scope > .body, :scope > .text');
-    if (!source || !(await copyText(source))) return;
-
-    button!.dataset.copied = '';
-    button!.setAttribute('aria-label', 'Copied');
-
-    clearTimeout(copiedTimers.get(button!));
-    copiedTimers.set(
-      button!,
-      setTimeout(() => {
-        delete button!.dataset.copied;
-        button!.setAttribute('aria-label', 'Copy text');
-      }, 1500)
-    );
-  });
-
-  async function copyText(element: Element) {
-    try {
-      await navigator.clipboard.writeText(textOf(element));
-      return true;
-    } catch {
-      // The Clipboard API needs a secure context; copy a selection instead.
-      const selection = getSelection()!;
-      const range = document.createRange();
-
-      range.selectNodeContents(element);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      const copied = document.execCommand('copy');
-      selection.removeAllRanges();
-      return copied;
-    }
-  }
-
-  // A canvas text has a paragraph per line, which textContent runs together.
-  function textOf(element: Element) {
-    if (!element.matches('.chain')) return element.textContent;
-    return [...element.querySelectorAll(':scope > p')]
-      .map((paragraph) => paragraph.textContent)
-      .join('\n');
-  }
-
+  setUpCopyButtons(canvas);
   setUpNavigation();
 
   // Linked-card menus live in the top layer, so place them by their button.

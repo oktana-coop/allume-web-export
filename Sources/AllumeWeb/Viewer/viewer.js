@@ -327,6 +327,53 @@
     return relativeTime.format(-Math.trunc(elapsed / length), unit);
   }
 
+  // viewer/copy-buttons.ts
+  var COPIED_FOR = 1500;
+  function setUpCopyButtons(canvas) {
+    canvas.element.addEventListener("click", async (event) => {
+      const button = event.target.closest(".copy");
+      if (!button) return;
+      const element = copyTargetElement(button);
+      if (!element || !await copyText(element)) return;
+      showCopied(button);
+    });
+  }
+  function copyTargetElement(button) {
+    const owner = button.parentElement;
+    if (owner?.matches(".chain")) return owner;
+    return owner?.querySelector(":scope > .body, :scope > .text") ?? null;
+  }
+  async function copyText(element) {
+    try {
+      await navigator.clipboard.writeText(textOf(element));
+      return true;
+    } catch {
+      const selection = getSelection();
+      if (!selection) return false;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const copied = document.execCommand("copy");
+      selection.removeAllRanges();
+      return copied;
+    }
+  }
+  function textOf(element) {
+    if (!element.matches(".chain")) return element.textContent;
+    return [...element.querySelectorAll(":scope > p")].map((paragraph) => paragraph.textContent).join("\n");
+  }
+  function showCopied(button) {
+    const mark = String(performance.now());
+    button.dataset.copied = mark;
+    button.setAttribute("aria-label", "Copied");
+    setTimeout(() => {
+      if (button.dataset.copied !== mark) return;
+      delete button.dataset.copied;
+      button.setAttribute("aria-label", "Copy text");
+    }, COPIED_FOR);
+  }
+
   // viewer/gestures.ts
   var DRAG_THRESHOLD = 4;
   var SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
@@ -837,42 +884,7 @@
       }
     }
     makeCommentDatesRelative(document);
-    const copiedTimers = /* @__PURE__ */ new WeakMap();
-    canvas.element.addEventListener("click", async (event) => {
-      const button = event.target.closest(".copy");
-      const owner = button?.parentElement;
-      const source = owner?.matches(".chain") ? owner : owner?.querySelector(":scope > .body, :scope > .text");
-      if (!source || !await copyText(source)) return;
-      button.dataset.copied = "";
-      button.setAttribute("aria-label", "Copied");
-      clearTimeout(copiedTimers.get(button));
-      copiedTimers.set(
-        button,
-        setTimeout(() => {
-          delete button.dataset.copied;
-          button.setAttribute("aria-label", "Copy text");
-        }, 1500)
-      );
-    });
-    async function copyText(element) {
-      try {
-        await navigator.clipboard.writeText(textOf(element));
-        return true;
-      } catch {
-        const selection = getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(element);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        const copied = document.execCommand("copy");
-        selection.removeAllRanges();
-        return copied;
-      }
-    }
-    function textOf(element) {
-      if (!element.matches(".chain")) return element.textContent;
-      return [...element.querySelectorAll(":scope > p")].map((paragraph) => paragraph.textContent).join("\n");
-    }
+    setUpCopyButtons(canvas);
     setUpNavigation();
     for (const menu of document.querySelectorAll(".linked-menu")) {
       const button = document.querySelector(`[popovertarget="${menu.id}"]`);
