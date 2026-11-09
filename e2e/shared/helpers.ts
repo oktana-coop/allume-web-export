@@ -114,7 +114,7 @@ export const cardCenter = async ({
 }) => center({ of: boardCard({ page, board }) });
 
 /** The center of the viewport. */
-export const viewCenter = async ({ page }: { page: Page }) =>
+export const viewportCenter = async ({ page }: { page: Page }) =>
   center({ of: viewport({ page }) });
 
 export const expectCardCentered = async ({
@@ -125,14 +125,14 @@ export const expectCardCentered = async ({
   board: Board;
 }) => {
   const card = await cardCenter({ page, board });
-  const view = await viewCenter({ page });
+  const center = await viewportCenter({ page });
 
-  expect(card.x).toBeCloseTo(view.x, 0);
-  expect(card.y).toBeCloseTo(view.y, 0);
+  expect(card.x).toBeCloseTo(center.x, 0);
+  expect(card.y).toBeCloseTo(center.y, 0);
 };
 
 /**
- * Scrolls by the amounts, with the mouse over the middle of the view. The mouse
+ * Scrolls by the amounts, with the mouse over the viewport's center. The mouse
  * starts at the top left, over the header, where scrolling doesn't reach the
  * board.
  */
@@ -145,7 +145,7 @@ export const scrollBoard = async ({
   x: number;
   y: number;
 }) => {
-  const middle = await viewCenter({ page });
+  const middle = await viewportCenter({ page });
 
   await page.mouse.move(middle.x, middle.y);
   await page.mouse.wheel(x, y);

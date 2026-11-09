@@ -5,7 +5,7 @@ import {
   boardCard,
   cardCenter,
   scrollBoard,
-  viewCenter,
+  viewportCenter,
 } from '../shared/helpers';
 import { expectZoomLevel } from './helpers';
 
@@ -82,17 +82,17 @@ test.describe('zoom', () => {
     expect(await card.boundingBox()).toEqual(firstVisit);
   });
 
-  test('zooming keeps the middle of the view in place', async ({ page }) => {
+  test("zooming keeps the viewport's center in place", async ({ page }) => {
     await page.goto(ocaml.url);
-    const view = await viewCenter({ page });
+    const center = await viewportCenter({ page });
     const before = await cardCenter({ page, board: ocamlNotes });
 
     await page.keyboard.press('+');
 
     // The card moves away from the middle as much as it grows.
     const after = await cardCenter({ page, board: ocamlNotes });
-    expect(after.x - view.x).toBeCloseTo((before.x - view.x) * 1.25, 0);
-    expect(after.y - view.y).toBeCloseTo((before.y - view.y) * 1.25, 0);
+    expect(after.x - center.x).toBeCloseTo((before.x - center.x) * 1.25, 0);
+    expect(after.y - center.y).toBeCloseTo((before.y - center.y) * 1.25, 0);
   });
 
   test('zooming in stops at 400%', async ({ page }) => {

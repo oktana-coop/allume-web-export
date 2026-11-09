@@ -74,14 +74,14 @@ test.describe('linked card menus', () => {
   test('a menu without room below opens above its button', async ({ page }) => {
     await page.goto(functional.url);
     // Pans the button down to 60 pixels above the bottom of the window.
-    const view = await boundingBox({ of: viewport({ page }) });
+    const viewportBox = await boundingBox({ of: viewport({ page }) });
     const before = await boundingBox({
       of: linkedCardButton({ page, card: haskell }),
     });
     await scrollBoard({
       page,
       x: 0,
-      y: before.y - (view.y + view.height - 60),
+      y: before.y - (viewportBox.y + viewportBox.height - 60),
     });
     const button = await boundingBox({
       of: linkedCardButton({ page, card: haskell }),
