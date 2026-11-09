@@ -20,7 +20,7 @@ and the zoom level only come in later, in the browser.
 ## Text blocks
 
 The export doesn't record how wide a text block is, so its width is _estimated_: about 10 pixels per
-character, an average for the 18-pixel font the pages draw text blocks in. Its height follows from
+character, an average for the 18-pixel font the views draw text blocks in. Its height follows from
 the estimate, since the text wraps at its width and each line is 24 pixels high. A paragraph of 100
 characters is estimated at about 1,000 pixels wide, so if it wraps at 400 it takes three lines, 72
 pixels high.
@@ -66,4 +66,4 @@ to (290, 50):
 
 A card that shows another board draws it scaled down to fit the card, the way the viewer fits it to
 the window. A board with little on it would then be scaled up, and look bigger in the preview than
-on its own page. A preview shouldn't exceed the board's actual size, so its scale is capped at 80%.
+in its own view. A preview shouldn't exceed the board's actual size, so its scale is capped at 80%.

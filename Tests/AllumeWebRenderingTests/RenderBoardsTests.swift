@@ -4,7 +4,7 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct RenderBoardsTests {
-  @Test func renderEachBoardAsAPageInBreadthFirstOrder() throws {
+  @Test func renderEachBoardsViewInBreadthFirstOrder() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -14,10 +14,10 @@ import Testing
       users: [:]
     )
 
-    let (pages, _) = renderBoards(contents, favicons: [:])
+    let (views, _) = renderBoards(contents, favicons: [:])
 
-    #expect(pages.map(\.boardID.rawValue) == ["root", "functional"])
-    #expect(pages.allSatisfy { page in page.html.hasSuffix("</html>\n") })
+    #expect(views.map(\.boardID.rawValue) == ["root", "functional"])
+    #expect(views.allSatisfy { view in view.html.hasPrefix(#"<div class="allume""#) })
   }
 
   @Test func linkBoardsAndCardsWithReferences() throws {
@@ -30,13 +30,13 @@ import Testing
       users: [:]
     )
 
-    let (pages, _) = renderBoards(contents, favicons: [:])
+    let (views, _) = renderBoards(contents, favicons: [:])
 
-    let root = try #require(pages.first)
+    let root = try #require(views.first)
     #expect(
       root.html.contains(#"<a class="allume-body allume-panel" href="allume:board/functional""#))
     #expect(root.html.contains(#"<a href="allume:board/functional#card-note">Functional</a>"#))
-    let functional = try #require(pages.last)
+    let functional = try #require(views.last)
     #expect(functional.html.contains(#"<a href="allume:board/root" rel="up">Languages</a>"#))
   }
 
@@ -50,9 +50,9 @@ import Testing
       users: [:]
     )
 
-    let (pages, _) = renderBoards(contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")])
+    let (views, _) = renderBoards(contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")])
 
-    let html = try #require(pages.first?.html)
+    let html = try #require(views.first?.html)
     #expect(html.contains(#"src="allume:file/Tom%20%26%20Jerry.png""#))
     #expect(html.contains(#"src="allume:file/favicons/ocaml.org.png""#))
   }

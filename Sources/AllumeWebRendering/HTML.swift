@@ -104,7 +104,9 @@ private func attribute(
   }
 }
 
-func escaped(_ text: String) -> String {
+/// The text, with the characters that would read as markup escaped, for text or an attribute's
+/// value.
+package func escaped(_ text: String) -> String {
   text.unicodeScalars.map { scalar in
     switch scalar {
     case "&": "&amp;"

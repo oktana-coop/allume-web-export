@@ -18,13 +18,13 @@ public struct SiteFile: Equatable, Sendable {
 /// Every file of the site: a page for each board, the files the pages refer to, under
 /// `files/`, and the viewer's style sheet and script. The favicons are each link host's icon.
 public func siteFiles(for contents: Contents, favicons: [String: Asset]) -> [SiteFile] {
-  let (pages, files) = renderBoards(contents, favicons: favicons)
+  let (views, files) = renderBoards(contents, favicons: favicons)
   let urls = siteURLs(for: contents)
 
   // The site's URLs list every published board, which are all a page can refer to.
   guard
-    let sitePages = try? pages.map({ page throws(UnknownBoardError) in
-      try sitePage(page, urls: urls)
+    let sitePages = try? views.map({ view throws(UnknownBoardError) in
+      try sitePage(of: view, contents: contents, urls: urls)
     })
   else {
     preconditionFailure("A page refers to a board the site doesn't publish.")
@@ -37,14 +37,17 @@ public func siteFiles(for contents: Contents, favicons: [String: Asset]) -> [Sit
     }
 }
 
-/// The page at its board's URL, with each reference filled with the site's URL.
-private func sitePage(_ page: Page, urls: ReferenceURLs) throws(UnknownBoardError) -> SiteFile {
-  let html = try resolvingReferences(in: page.html) { reference throws(UnknownBoardError) in
+/// The view's standalone page, at its board's URL, with each reference filled with the site's URL.
+private func sitePage(
+  of view: BoardView, contents: Contents, urls: ReferenceURLs
+) throws(UnknownBoardError) -> SiteFile {
+  let page = standalonePage(title: pageTitle(of: view.boardID, in: contents), view: view.html)
+  let html = try resolvingReferences(in: page) { reference throws(UnknownBoardError) in
     try reference.url(in: urls)
   }
 
   return SiteFile(
-    path: try BoardReference(boardID: page.boardID).url(in: urls), source: .text(html))
+    path: try BoardReference(boardID: view.boardID).url(in: urls), source: .text(html))
 }
 
 private func viewerFile(_ name: String) -> URL {

@@ -1,7 +1,7 @@
 import AllumeWebModels
 
 extension Document.Board {
-  var displayLabel: String {
+  package var displayLabel: String {
     label ?? "Untitled board"
   }
 }
