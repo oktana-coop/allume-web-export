@@ -4,11 +4,12 @@ import { expectZoomLevel } from '../camera/helpers';
 import { functional, languages, paradigms } from '../shared/boards';
 import {
   boardCard,
+  boundingBox,
   enterBoard,
   expectHeading,
   viewport,
 } from '../shared/helpers';
-import { embedBoard } from './helpers';
+import { embedBoard, siteBox } from './helpers';
 
 test.describe("a board's view in a site's page", () => {
   test('sets itself up', async ({ page }) => {
@@ -28,6 +29,42 @@ test.describe("a board's view in a site's page", () => {
     await enterBoard({ page, board: paradigms });
 
     await expectHeading({ page, board: paradigms });
+  });
+
+  test('fills its box, its bar above its viewport', async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+
+    await page.goto(sitePage);
+
+    const box = await boundingBox({ of: siteBox({ page }) });
+    const bar = await boundingBox({ of: page.locator('.allume-bar') });
+    expect(bar).toMatchObject({ x: box.x, y: box.y, width: box.width });
+    expect(await boundingBox({ of: viewport({ page }) })).toEqual({
+      x: box.x,
+      y: bar.y + bar.height,
+      width: box.width,
+      height: box.height - bar.height,
+    });
+  });
+
+  test('frames the whole board in its box on a first visit', async ({
+    page,
+  }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+
+    await page.goto(sitePage);
+
+    const box = await boundingBox({ of: siteBox({ page }) });
+    for (const card of await viewport({ page })
+      .locator('[id^="card-"]')
+      .all()) {
+      const frame = await boundingBox({ of: card });
+      // Scaling leaves rounding errors of less than a pixel.
+      expect(frame.x).toBeGreaterThan(box.x - 1);
+      expect(frame.y).toBeGreaterThan(box.y - 1);
+      expect(frame.x + frame.width).toBeLessThan(box.x + box.width + 1);
+      expect(frame.y + frame.height).toBeLessThan(box.y + box.height + 1);
+    }
   });
 
   test("keeps its styles off the site's page", async ({ page }) => {

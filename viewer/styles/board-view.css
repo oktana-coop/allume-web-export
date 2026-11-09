@@ -1,0 +1,11 @@
+/* The view fills the box the page gives it, its bar above its viewport. */
+
+/* Without specificity, so that a site can size the view itself instead. */
+:where(.allume) {
+  height: 100%;
+}
+
+.allume {
+  display: flex;
+  flex-direction: column;
+}

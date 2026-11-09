@@ -28,6 +28,9 @@ export const embedBoard = async ({
 
 const SITE_PAGE = '/site.html';
 
+/** The box the site's page gives the board's view. */
+export const siteBox = ({ page }: { page: Page }) => page.locator('.board-box');
+
 /** The board's view, which its own page has as its main content. */
 const mainContent = (html: string) => {
   const content = /<main>\n(.*)\n<\/main>/s.exec(html)?.[1];

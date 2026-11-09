@@ -2,7 +2,7 @@ import AllumeWebModels
 import AllumeWebRendering
 
 /// The board's view as a page of its own, with the viewer's style sheet and script. The view takes
-/// the page's font.
+/// the page's font, and fills the window.
 func standalonePage(title: String, view: String) -> String {
   """
   <!doctype html>
@@ -12,7 +12,10 @@ func standalonePage(title: String, view: String) -> String {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>\(escaped(title))</title>
   <link rel="stylesheet" href="viewer.css">
-  <style>body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }</style>
+  <style>
+  body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  main { height: 100dvh; }
+  </style>
   </head>
   <body>
   <main>

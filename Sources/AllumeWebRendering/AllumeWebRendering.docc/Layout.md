@@ -65,5 +65,5 @@ to (290, 50):
 ## Previews
 
 A card that shows another board draws it scaled down to fit the card, the way the viewer fits it to
-the window. A board with little on it would then be scaled up, and look bigger in the preview than
+its view. A board with little on it would then be scaled up, and look bigger in the preview than
 in its own view. A preview shouldn't exceed the board's actual size, so its scale is capped at 80%.

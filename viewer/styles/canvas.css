@@ -1,8 +1,8 @@
 /* Without JS the board scrolls at its natural size. */
 
 .allume-viewport {
-  position: fixed;
-  inset: var(--allume-bar-height) 0 0;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   background: var(--allume-canvas);
 }

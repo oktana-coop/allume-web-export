@@ -52,6 +52,15 @@
   box-sizing: border-box;
 }
 
+/* viewer/styles/board-view.css */
+:where(.allume) {
+  height: 100%;
+}
+.allume {
+  display: flex;
+  flex-direction: column;
+}
+
 /* viewer/styles/icons.css */
 .allume-icon-sprite {
   position: absolute;
@@ -62,8 +71,7 @@
 
 /* viewer/styles/bar.css */
 .allume-bar {
-  position: fixed;
-  inset: 0 0 auto;
+  flex: none;
   height: var(--allume-bar-height);
   display: flex;
   align-items: center;
@@ -72,7 +80,6 @@
   padding: 0 16px;
   background: var(--allume-canvas);
   border-bottom: 1px solid var(--allume-hairline);
-  z-index: 1;
 }
 
 /* viewer/styles/breadcrumbs.css */
@@ -151,8 +158,8 @@
 
 /* viewer/styles/canvas.css */
 .allume-viewport {
-  position: fixed;
-  inset: var(--allume-bar-height) 0 0;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   background: var(--allume-canvas);
 }
