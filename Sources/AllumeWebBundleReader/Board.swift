@@ -4,7 +4,7 @@ import Foundation
 /// The export leaves out empty arrays, so every array here is optional.
 struct BundleBoard: Decodable {
   let label: String?
-  let cards: [BundleCard]?
+  let cards: [BundleCardEntry]?
   let chains: [BundleChain]?
   let connections: [[String]]?
   let inkModels: [String: BundleInkModel]?
@@ -15,6 +15,26 @@ struct BundleBoard: Decodable {
     case chains
     case connections
     case inkModels = "ink_models"
+  }
+}
+
+// TODO: Remove once Allume's exports leave out cards whose documents are gone, reading `cards` as
+// `[BundleCard]` again, without the `cardWithoutDocument` warning.
+/// Exports write a card whose document is gone as `{}`.
+enum BundleCardEntry: Decodable {
+  case card(BundleCard)
+  case withoutDocument
+
+  init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: BundleCard.CodingKeys.self)
+    self = keys.contains(.documentID) ? .card(try BundleCard(from: decoder)) : .withoutDocument
+  }
+
+  var card: BundleCard? {
+    guard case .card(let card) = self else {
+      return nil
+    }
+    return card
   }
 }
 
@@ -44,7 +64,7 @@ struct BundleChain: Decodable {
   let chainID: String
   let positionX: Double
   let positionY: Double
-  let cards: [BundleCard]?
+  let cards: [BundleCardEntry]?
   let textFile: String?
   let lineBreakWidth: Double?
   let format: [String: BundleFormat]?
@@ -68,7 +88,8 @@ struct BundleFormat: Decodable {
 
 struct BundleInkModel: Decodable {
   let inkSVG: String
-  let scale: Double
+  /// Exports leave it out for ink on a chain's cards, which is always at scale 1.
+  let scale: Double?
 
   enum CodingKeys: String, CodingKey {
     case inkSVG = "ink_svg"
@@ -80,7 +101,7 @@ extension Document.Board {
   static func read(_ json: BundleBoard, id: Document.ID, in bundle: AllumeBundle)
     -> (board: Document.Board, warnings: [BundleWarning])
   {
-    let cards = (json.cards ?? []).map { card in Card.read(card, boardID: id) }
+    let cards = readCards(json.cards ?? [], boardID: id)
     let chains = (json.chains ?? []).map { chain in Chain.read(chain, boardID: id, in: bundle) }
     let endpoints = connectionEndpoints(of: json)
     let connections = (json.connections ?? []).map { ends in
@@ -94,12 +115,12 @@ extension Document.Board {
 
     let board = Document.Board(
       id: id, label: json.label.nonEmpty,
-      cards: cards.map { result in result.card },
+      cards: cards.cards,
       chains: chains.map { result in result.chain },
       connections: connections.compactMap { result in result.connection },
       ink: ink.compactMap { result in result.ink })
     let warnings =
-      cards.flatMap { result in result.warnings } + chains.flatMap { result in result.warnings }
+      cards.warnings + chains.flatMap { result in result.warnings }
       + connections.flatMap { result in result.warnings }
       + ink.flatMap { result in result.warnings }
 
@@ -109,7 +130,8 @@ extension Document.Board {
   /// What a connection's ends can name: a card on the board or in one of its threads, by its
   /// `card_id`, or a chain.
   private static func connectionEndpoints(of json: BundleBoard) -> [String: Connection.Endpoint] {
-    let cards = (json.cards ?? []) + (json.chains ?? []).flatMap { chain in chain.cards ?? [] }
+    let cards = ((json.cards ?? []) + (json.chains ?? []).flatMap { chain in chain.cards ?? [] })
+      .compactMap(\.card)
     let cardEndpoints = cards.compactMap { card in
       card.cardID.map { cardID in
         (cardID, Connection.Endpoint.card(Document.ID(rawValue: card.documentID)))
@@ -161,10 +183,25 @@ extension Chain {
       return (.text(text), warnings + inkWarnings)
     }
 
-    let read = cards.map { card in Card.read(card, boardID: boardID) }
-    let thread = CommentThread(id: id, cards: read.map { result in result.card })
-    return (.comments(thread), read.flatMap { result in result.warnings } + inkWarnings)
+    let read = readCards(cards, boardID: boardID)
+    let thread = CommentThread(id: id, cards: read.cards)
+    return (.comments(thread), read.warnings + inkWarnings)
   }
+}
+
+/// The cards with a document, and a warning for each one without, which is left out.
+private func readCards(_ entries: [BundleCardEntry], boardID: Document.ID)
+  -> (cards: [Card], warnings: [BundleWarning])
+{
+  let read = entries.compactMap(\.card).map { card in Card.read(card, boardID: boardID) }
+  let withoutDocument = entries.filter { entry in entry.card == nil }.map { _ in
+    BundleWarning.cardWithoutDocument(boardID: boardID)
+  }
+
+  return (
+    read.map { result in result.card },
+    read.flatMap { result in result.warnings } + withoutDocument
+  )
 }
 
 extension TextBlock {
@@ -220,7 +257,6 @@ extension Connection {
 }
 
 extension Ink {
-  /// The size is the SVG's `width` and `height` times its scale, a missing attribute counting as 0.
   /// A missing SVG is left out, since its size can't be read.
   static func read(_ json: BundleInkModel, in bundle: AllumeBundle)
     -> (ink: Ink?, warnings: [BundleWarning])
@@ -235,7 +271,9 @@ extension Ink {
     let height = svg.firstMatch(of: #/<svg[^>]*\sheight="([\d.]+)"/#).flatMap { match in
       Double(match.1)
     }
-    let size = Size(width: (width ?? 0) * json.scale, height: (height ?? 0) * json.scale)
+    let scale = json.scale ?? 1
+    // The SVG's `width` and `height` times its scale.
+    let size = Size(width: (width ?? 0) * scale, height: (height ?? 0) * scale)
 
     return (Ink(file: bundle.asset(named: json.inkSVG), size: size), [])
   }

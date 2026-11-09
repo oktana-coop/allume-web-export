@@ -17,6 +17,8 @@ package enum BundleWarning: Equatable, Sendable {
   case unknownConnectionEnd(boardID: Document.ID, end: String)
   /// A connection that doesn't have exactly two ends.
   case malformedConnection(boardID: Document.ID)
+  /// A card whose document is gone, so it has no document ID.
+  case cardWithoutDocument(boardID: Document.ID)
 
   // What the contents left out to stay consistent, one warning for each.
   case cardForMissingDocument(boardID: Document.ID, documentID: Document.ID)

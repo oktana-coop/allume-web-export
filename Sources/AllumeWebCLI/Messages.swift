@@ -34,6 +34,8 @@ func warningMessage(for warning: BundleWarning, in contents: Contents) -> String
     "A connection on \(board(boardID, in: contents)) has an unknown end, \(end), so it's left out."
   case .malformedConnection(let boardID):
     "A connection on \(board(boardID, in: contents)) doesn't have two ends, so it's left out."
+  case .cardWithoutDocument(let boardID):
+    "A card on \(board(boardID, in: contents)) has no document, so it's left out."
   case .cardForMissingDocument(let boardID, let documentID):
     "A card on \(board(boardID, in: contents)) is for document \(documentID.rawValue), which "
       + "isn't in the export, so the card is left out."

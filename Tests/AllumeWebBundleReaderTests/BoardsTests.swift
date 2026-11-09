@@ -147,12 +147,17 @@ import Testing
     #expect(warnings.isEmpty)
   }
 
-  @Test func leavesOutInkOnAChain() throws {
+  @Test(arguments: [
+    #"{"ink_svg" : "t.svg", "scale" : 1}"#,
+    // As exports write it.
+    #"{"ink_svg" : "t.svg"}"#,
+  ])
+  func leavesOutInkOnAChain(inkModel: String) throws {
     let contents = makeContents(
       documents: #"""
         "b" : {"type" : "board", "chains" : [{
           "chain_id" : "t", "position_x" : 0, "position_y" : 0,
-          "ink_models" : {"0" : {"ink_svg" : "t.svg", "scale" : 1}}
+          "ink_models" : {"0" : \#(inkModel)}
         }]}
         """#)
 
@@ -187,6 +192,33 @@ import Testing
       ])
   }
 
+  @Test func leavesOutACardWithoutADocument() throws {
+    let contents = makeContents(
+      documents: #"""
+        "b" : {"type" : "board", "cards" : [\#(makeCardJSON("a")), {}]},
+        "a" : {"type" : "board"}
+        """#)
+
+    let (documents, warnings) = try withBundle(contents: contents) { bundle in
+      readDocuments(in: bundle)
+    }
+
+    #expect(board("b", in: documents)?.cards.map(\.documentID.rawValue) == ["a"])
+    #expect(warnings == [.cardWithoutDocument(boardID: Document.ID(rawValue: "b"))])
+  }
+
+  @Test func rejectsAnyOtherCardThatCantBeRead() throws {
+    let contents = makeContents(
+      documents: #"""
+        "b" : {"type" : "board", "cards" : [{"document_id" : "a"}]},
+        "a" : {"type" : "board"}
+        """#)
+
+    #expect(throws: UnreadableBundleError.self) {
+      try withBundle(contents: contents) { bundle in readDocuments(in: bundle) }
+    }
+  }
+
   @Test func readsInkSizesFromTheirSVGs() throws {
     let contents = makeContents(
       documents: #"""
@@ -208,6 +240,20 @@ import Testing
     #expect(ink?.map(\.file.name) == ["first.svg", "second.svg"])
     #expect(ink?.map(\.size) == [Size(width: 10, height: 20), Size(width: 14, height: 10)])
     #expect(warnings.isEmpty)
+  }
+
+  @Test func readsInkWithoutAScaleAtItsSVGsSize() throws {
+    let contents = makeContents(
+      documents: #"""
+        "b" : {"type" : "board", "ink_models" : {"0" : {"ink_svg" : "ink.svg"}}}
+        """#)
+    let files = ["ink.svg": #"<svg width="10" height="20"></svg>"#]
+
+    let (documents, _) = try withBundle(contents: contents, files: files) { bundle in
+      readDocuments(in: bundle)
+    }
+
+    #expect(board("b", in: documents)?.ink.map(\.size) == [Size(width: 10, height: 20)])
   }
 
   @Test func leavesOutInkWhoseSVGIsMissing() throws {

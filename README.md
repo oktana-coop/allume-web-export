@@ -94,6 +94,13 @@ python3 -m http.server --directory site
 
 and open <http://localhost:8000>.
 
+### Limitations
+
+- Ink drawn on a text block or a comment thread isn't shown yet, and the tool warns about it. It's
+  drawn over the text, positioned for how Allume wraps it, and the browser may wrap the text
+  differently. So the ink's position has to be worked out against the browser's own layout,
+  rather than copied.
+
 ## Development
 
 ### Run
