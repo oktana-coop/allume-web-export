@@ -21,6 +21,7 @@ let package = Package(
     .target(name: "AllumeWebBundleReader", dependencies: ["AllumeWebModels"]),
     .target(name: "AllumeWebRendering", dependencies: ["AllumeWebModels"]),
     .target(name: "AllumeWebFavicons"),
+    .target(name: "AllumeWebThumbnails"),
     .target(
       name: "AllumeWeb",
       dependencies: ["AllumeWebFavicons", "AllumeWebModels", "AllumeWebRendering"],
@@ -37,6 +38,7 @@ let package = Package(
     .testTarget(name: "AllumeWebBundleReaderTests", dependencies: ["AllumeWebBundleReader"]),
     .testTarget(name: "AllumeWebRenderingTests", dependencies: ["AllumeWebRendering"]),
     .testTarget(name: "AllumeWebFaviconsTests", dependencies: ["AllumeWebFavicons"]),
+    .testTarget(name: "AllumeWebThumbnailsTests", dependencies: ["AllumeWebThumbnails"]),
     .testTarget(name: "AllumeWebTests", dependencies: ["AllumeWeb", "AllumeWebModels"]),
     .testTarget(
       name: "AllumeWebIntegrationTests",
