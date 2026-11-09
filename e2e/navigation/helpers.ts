@@ -3,6 +3,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { type Board } from '../shared/boards';
 import {
   enterBoard,
+  expectArrivalAt,
   expectHeading,
   openLinkedCardMenu,
 } from '../shared/helpers';
@@ -38,7 +39,7 @@ export const jumpToLinkedCard = async ({
 }) => {
   const menu = await openLinkedCardMenu({ page, card });
   await menu.getByRole('link', { name: board.label, exact: true }).click();
-  await expect(page).toHaveURL(`${board.url}#card-${card.id}`);
+  await expectArrivalAt({ page, url: `${board.url}#card-${card.id}` });
 };
 
 /**

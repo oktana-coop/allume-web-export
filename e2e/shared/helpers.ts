@@ -16,6 +16,22 @@ export const boardCard = ({ page, board }: { page: Page; board: Board }) =>
   page.locator(`#card-${board.id}`);
 
 /**
+ * Waits for the page a link led to, until the viewer has set it up. The URL
+ * changes as the page starts loading, before the viewer's script at its end
+ * has run, so a key pressed then would go unheard.
+ */
+export const expectArrivalAt = async ({
+  page,
+  url,
+}: {
+  page: Page;
+  url: string;
+}) => {
+  await expect(page).toHaveURL(url);
+  await page.waitForLoadState('domcontentloaded');
+};
+
+/**
  * Enters a board through its card on the current board, and waits for its
  * page.
  */
@@ -29,7 +45,7 @@ export const enterBoard = async ({
   await viewport({ page })
     .getByRole('link', { name: board.label, exact: true })
     .click();
-  await expect(page).toHaveURL(board.url);
+  await expectArrivalAt({ page, url: board.url });
 };
 
 /** The "Appears in N boards" button of a board's card on the current board. */

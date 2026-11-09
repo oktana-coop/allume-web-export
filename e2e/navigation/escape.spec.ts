@@ -9,6 +9,7 @@ import {
   mlFamily,
   paradigms,
 } from '../shared/boards';
+import { expectArrivalAt } from '../shared/helpers';
 import { enterBoardsInPath, expectBoard, jumpToLinkedCard } from './helpers';
 
 test.describe('escape', () => {
@@ -77,6 +78,7 @@ test.describe('escape', () => {
       .getByRole('navigation', { name: 'Breadcrumbs' })
       .getByRole('link', { name: mlFamily.label, exact: true })
       .click();
+    await expectArrivalAt({ page, url: mlFamily.url });
 
     await page.keyboard.press('Escape');
 
