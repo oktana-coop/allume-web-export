@@ -26,8 +26,26 @@
   --allume-gray-tint: var(--allume-card-muted);
   --allume-gray-highlight: oklch(86.5% 0 0);
 }
+.allume :where(:not(svg, svg *)),
+.allume ::before,
+.allume ::after {
+  all: revert;
+}
+.allume :where(svg) {
+  display: inline;
+  max-width: none;
+  vertical-align: baseline;
+}
 .allume {
   color: var(--allume-text);
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: normal;
+  text-align: start;
+  text-indent: 0;
+  text-transform: none;
+  word-spacing: normal;
 }
 .allume,
 .allume * {

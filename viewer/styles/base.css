@@ -35,8 +35,35 @@
   --allume-gray-highlight: oklch(86.5% 0 0);
 }
 
+/* Each element of the view starts from the browser's defaults, which these
+   styles are written against, whatever a site's rules for its own elements
+   say: a site's rules made of element names alone lose to this one, which
+   loses to every rule after it. SVGs keep their attributes, such as an icon's
+   width, which reverting would drop. */
+.allume :where(:not(svg, svg *)),
+.allume ::before,
+.allume ::after {
+  all: revert;
+}
+
+/* Undoes resets that make SVGs blocks, such as Tailwind's. */
+.allume :where(svg) {
+  display: inline;
+  max-width: none;
+  vertical-align: baseline;
+}
+
+/* The page's font family is the only text property the view inherits. */
 .allume {
   color: var(--allume-text);
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: normal;
+  text-align: start;
+  text-indent: 0;
+  text-transform: none;
+  word-spacing: normal;
 }
 
 .allume,

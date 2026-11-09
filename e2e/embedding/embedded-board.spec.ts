@@ -1,8 +1,13 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { expectZoomLevel } from '../camera/helpers';
-import { languages, paradigms } from '../shared/boards';
-import { boardCard, enterBoard, expectHeading } from '../shared/helpers';
+import { functional, languages, paradigms } from '../shared/boards';
+import {
+  boardCard,
+  enterBoard,
+  expectHeading,
+  viewport,
+} from '../shared/helpers';
 import { embedBoard } from './helpers';
 
 test.describe("a board's view in a site's page", () => {
@@ -47,4 +52,87 @@ test.describe("a board's view in a site's page", () => {
       '0px'
     );
   });
+
+  test("keeps the site's element styles off its own", async ({ page }) => {
+    await page.goto(functional.url);
+    const own = await elementStyles({ page });
+    const sitePage = await embedBoard({ page, board: functional });
+
+    await page.goto(sitePage);
+
+    expect(await elementStyles({ page })).toEqual(own);
+  });
 });
+
+/**
+ * The computed styles of the view's elements that the site's rules for its own
+ * elements reach, for the properties those rules set. The font family is left
+ * out, since the view takes the page's.
+ */
+const elementStyles = ({ page }: { page: Page }) =>
+  Promise.all([
+    // body, which the view's text inherits from, p, and the reset's margins
+    computedStyles({
+      element: viewport({ page }).locator('.allume-text-block p').first(),
+      properties: [
+        'font-size',
+        'line-height',
+        'color',
+        'margin-top',
+        'margin-bottom',
+      ],
+    }),
+    // h1
+    computedStyles({
+      element: page.getByRole('heading', { level: 1 }),
+      properties: ['font-size', 'font-weight'],
+    }),
+    // a
+    computedStyles({
+      element: page
+        .getByRole('navigation', { name: 'Breadcrumbs' })
+        .getByRole('link')
+        .first(),
+      properties: ['color', 'text-decoration-line'],
+    }),
+    // img
+    computedStyles({
+      element: viewport({ page }).locator('img').first(),
+      properties: ['display', 'vertical-align', 'max-width', 'height'],
+    }),
+    // svg
+    computedStyles({
+      element: viewport({ page }).locator('svg').first(),
+      properties: ['display', 'vertical-align'],
+    }),
+    // button, and the reset's padding and border
+    computedStyles({
+      element: page.getByRole('button', { name: 'Zoom in' }),
+      properties: [
+        'background-color',
+        'color',
+        'font-size',
+        'line-height',
+        'padding-top',
+        'border-top-width',
+      ],
+    }),
+  ]);
+
+const computedStyles = ({
+  element,
+  properties,
+}: {
+  element: Locator;
+  properties: string[];
+}) =>
+  element.evaluate(
+    (element, properties) =>
+      Object.fromEntries(
+        properties.map((property) => [
+          property,
+          getComputedStyle(element).getPropertyValue(property),
+        ])
+      ),
+    properties
+  );

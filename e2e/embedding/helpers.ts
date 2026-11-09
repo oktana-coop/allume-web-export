@@ -63,7 +63,8 @@ body { font: 18px/1.6 Georgia, serif; color: #222; }
 h1 { font-size: 2.5rem; font-weight: 800; }
 p { margin-bottom: 1rem; }
 a { color: rebeccapurple; text-decoration: underline; }
-img { display: block; max-width: 100%; height: auto; }
+img, svg { display: block; vertical-align: middle; }
+img { max-width: 100%; height: auto; }
 button { background: transparent; font: inherit; color: inherit; }
 .card { border: 1px solid #ddd; border-radius: 0.5rem; padding: 1rem; }
 .title { font-size: 2rem; }
