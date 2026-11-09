@@ -141,7 +141,16 @@ import Testing
     @Test func fitsTheBoardAndItsMarginInTheCard() {
       let contentBounds = Rect(x: 100, y: 50, width: 900, height: 450)
 
-      let scale = previewScale(of: contentBounds, in: Rect(x: 0, y: 0, width: 220, height: 110))
+      let scale = previewScale(of: contentBounds, in: Rect(x: 0, y: 0, width: 220, height: 200))
+
+      #expect(scale == 0.2)
+    }
+
+    @Test func leavesRoomAboveTheBoardForTitles() {
+      // 32 px of room, then 418 of contents, below a margin of 50: 550 in all.
+      let contentBounds = Rect(x: 0, y: 50, width: 100, height: 418)
+
+      let scale = previewScale(of: contentBounds, in: Rect(x: 0, y: 0, width: 400, height: 110))
 
       #expect(scale == 0.2)
     }

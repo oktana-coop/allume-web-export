@@ -21,7 +21,7 @@ import Testing
     let child = try #require(contents.board(Document.ID(rawValue: "child")))
 
     let html = drawPreview(
-      of: child, in: Rect(x: 0, y: 0, width: 200, height: 100), depth: 1, contents: contents,
+      of: child, in: Rect(x: 0, y: 0, width: 200, height: 116), depth: 1, contents: contents,
       layouts: layouts(in: contents), favicons: [:], images: [:]
     )?
     .rendered(resolving: describe)
@@ -30,7 +30,8 @@ import Testing
       html
         == markup(
           #"""
-          <div class="allume-preview" style="width:400px;height:200px;transform:scale(0.5)">
+          <div class="allume-preview"
+            style="width:400px;height:232px;transform:scale(0.5) translateY(32px)">
             <div class="allume-card allume-note-card" data-allume-doc="note"
               style="left:100px;top:50px;width:200px;height:100px;z-index:0">
               <div class="allume-body">A note</div>

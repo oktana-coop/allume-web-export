@@ -18,7 +18,7 @@ func drawPreview(
   // Drawn larger than the frame by the scale, so that once scaled it fills the frame.
   let style =
     "width:\(number: frame.width / scale)px;height:\(number: frame.height / scale)px;"
-    + "transform:scale(\(number: scale))"
+    + "transform:scale(\(number: scale)) translateY(\(number: fitTopPadding)px)"
 
   return .element(
     "div", ["class": "allume-preview", "style": .text(style)],

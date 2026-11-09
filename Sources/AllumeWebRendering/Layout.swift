@@ -25,9 +25,13 @@ func layout(of board: Document.Board) -> BoardLayout {
     contentBounds: contentBounds(of: board), connectionLines: connectionLines(of: board))
 }
 
-/// A board's preview is scaled so that its contents, and the empty margin between the board's
-/// origin and its nearest card, fit the card. It's capped at 0.8, so that it never exceeds the
-/// board's actual size.
+/// A board card's title sits above the card, 25 px tall with its margin, so a board's preview
+/// leaves room for it above the board's origin, as the viewer does when it fits a board.
+let fitTopPadding = 32.0
+
+/// A board's preview is scaled so that its contents, the room above them for titles, and the empty
+/// margin between the board's origin and its nearest card, fit the card. It's capped at 0.8, so
+/// that it never exceeds the board's actual size.
 func previewScale(of contentBounds: Rect, in frame: Rect) -> Double {
   guard contentBounds.maxX > 0 && contentBounds.maxY > 0 else {
     return 0.8
@@ -35,7 +39,7 @@ func previewScale(of contentBounds: Rect, in frame: Rect) -> Double {
 
   return min(
     0.8, frame.width / (contentBounds.maxX + contentBounds.x),
-    frame.height / (contentBounds.maxY + contentBounds.y))
+    frame.height / (fitTopPadding + contentBounds.maxY + contentBounds.y))
 }
 
 extension TextBlock {

@@ -239,7 +239,8 @@ import Testing
               style="left:0px;top:0px;width:100px;height:100px;z-index:0">
               <div class="allume-board-title"><span>Untitled board</span></div>
               <a class="allume-body allume-panel" href="board:child" aria-label="Untitled board">
-                <div class="allume-preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+                <div class="allume-preview"
+                  style="width:125px;height:125px;transform:scale(0.8) translateY(32px)"></div>
               </a>
             </div>
             """#))
@@ -266,7 +267,8 @@ import Testing
               <span>Monoids</span>
             </div>
             <div class="allume-body allume-panel">
-              <div class="allume-preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+              <div class="allume-preview"
+                  style="width:125px;height:125px;transform:scale(0.8) translateY(32px)"></div>
             </div>
             """#)) == true)
     }
