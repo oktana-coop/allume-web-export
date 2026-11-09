@@ -16,6 +16,7 @@ test.describe("a board's view in a site's page", () => {
     const sitePage = await embedBoard({ page, board: languages });
     await page.goto(sitePage);
 
+    await viewport({ page }).click({ position: { x: 4, y: 4 } });
     await page.keyboard.press('0');
     await page.getByRole('button', { name: 'Zoom in' }).click();
 
@@ -65,6 +66,62 @@ test.describe("a board's view in a site's page", () => {
       expect(frame.x + frame.width).toBeLessThan(box.x + box.width + 1);
       expect(frame.y + frame.height).toBeLessThan(box.y + box.height + 1);
     }
+  });
+
+  test('takes the zoom keys only while it has focus', async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+    await page.goto(sitePage);
+    const zoomLevel = page
+      .getByRole('toolbar', { name: 'Zoom' })
+      .getByRole('status');
+    const before = await zoomLevel.textContent();
+
+    await page.keyboard.press('0');
+    await expect(zoomLevel).toHaveText(before ?? '');
+    await viewport({ page }).click({ position: { x: 4, y: 4 } });
+    await page.keyboard.press('0');
+
+    await expect(zoomLevel).toHaveText('100%');
+  });
+
+  test('goes up with Escape while nothing has focus', async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: functional });
+    await page.goto(sitePage);
+
+    await page.keyboard.press('Escape');
+
+    await expect(page).toHaveURL(paradigms.url);
+  });
+
+  test("leaves the zoom keys typed into the site's fields to them", async ({
+    page,
+  }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+    await page.goto(sitePage);
+    const zoomLevel = page
+      .getByRole('toolbar', { name: 'Zoom' })
+      .getByRole('status');
+    const before = await zoomLevel.textContent();
+    const search = page.getByRole('searchbox', { name: 'Search the site' });
+
+    await search.pressSequentially('+-0');
+
+    await expect(search).toHaveValue('+-0');
+    await expect(zoomLevel).toHaveText(before ?? '');
+  });
+
+  test("leaves Escape in the site's fields to them", async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: functional });
+    await page.goto(sitePage);
+    const search = page.getByRole('searchbox', { name: 'Search the site' });
+
+    await search.press('Escape');
+    await search.blur();
+    await page.keyboard.press('Escape');
+
+    // Had the first Escape gone up to Paradigms, this one would have gone up
+    // again, to Languages.
+    await expect(page).toHaveURL(paradigms.url);
   });
 
   test("keeps its styles off the site's page", async ({ page }) => {

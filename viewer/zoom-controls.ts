@@ -1,4 +1,5 @@
 import { fitBoard, zoomAtCenter, type Canvas } from './canvas';
+import { focusedArea, isMainContent } from './focus';
 
 // Each step zooms in by a quarter, and back out by as much.
 const ZOOM_IN = 1.25;
@@ -7,13 +8,15 @@ const ZOOM_OUT = 0.8;
 /**
  * The toolbar's buttons and the keys zoom at the viewport's center: + and −
  * zoom, 0 shows the board at 100%, and Shift+1 or Fit shows all of it. With
- * Ctrl/⌘ the keys work the same, instead of zooming the whole page.
+ * Ctrl/⌘ the keys work the same, instead of zooming the whole page. They work
+ * while the view has focus, and while nothing has on a page whose main content
+ * the view is; otherwise they're left to the page.
  */
 export function setUpZoomControls({
   root,
   canvas,
 }: {
-  root: ParentNode;
+  root: HTMLElement;
   canvas: Canvas;
 }) {
   root.querySelector('.allume-zoom')?.addEventListener('click', (event) => {
@@ -32,7 +35,7 @@ export function setUpZoomControls({
   });
 
   addEventListener('keydown', (event) => {
-    if (event.altKey) return;
+    if (event.altKey || !isForTheView({ root, event })) return;
 
     const { scale } = canvas.camera;
 
@@ -50,4 +53,21 @@ export function setUpZoomControls({
 
     event.preventDefault();
   });
+}
+
+function isForTheView({
+  root,
+  event,
+}: {
+  root: Element;
+  event: KeyboardEvent;
+}) {
+  switch (focusedArea({ root, event })) {
+    case 'view':
+      return true;
+    case 'page':
+      return isMainContent(root);
+    case 'other':
+      return false;
+  }
 }

@@ -39,7 +39,7 @@ import Testing
         <button type="button" data-allume-zoom="home">Fit</button>
         </div>
         </header>
-        <div class="allume-viewport">
+        <div class="allume-viewport" tabindex="0">
         <div class="allume-canvas" data-allume-bounds="0,0,200,100" style="width:600px;height:500px">
         \#(ink)
         </div>

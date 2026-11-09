@@ -9,6 +9,7 @@ import {
   type Breadcrumbs,
 } from './breadcrumbs';
 import { isRecord } from './guards';
+import { focusedArea } from './focus';
 import { takeSession, writeSession } from './session';
 
 /** How a page was reached. */
@@ -42,8 +43,10 @@ const ARRIVAL_KEY = 'arrival';
  * ones before it. Arriving any other way shows the board's main path.
  *
  * Escape goes back the way we came after entering a board or jumping to a
- * linked card. Otherwise, after going up or arriving from elsewhere, it goes
- * up to the last breadcrumb.
+ * linked card. Otherwise, after going up or arriving from elsewhere, it goes up
+ * to the last breadcrumb. It's the view's while the view has focus or nothing
+ * has, on any page, so that it works on arrival; Escape in a site's field or
+ * dialog is left to it.
  */
 export function setUpNavigation(root: HTMLElement) {
   const breadcrumbsElement = root.querySelector('.allume-breadcrumbs');
@@ -89,6 +92,7 @@ export function setUpNavigation(root: HTMLElement) {
   addEventListener('keydown', (event) => {
     const modified = event.altKey || event.ctrlKey || event.metaKey;
     if (event.key !== 'Escape' || modified) return;
+    if (focusedArea({ root, event }) === 'other') return;
 
     // An open menu takes Escape for itself.
     if (document.querySelector(':popover-open')) return;

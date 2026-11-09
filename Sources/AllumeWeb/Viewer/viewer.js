@@ -655,6 +655,23 @@
     }
   }
 
+  // viewer/focus.ts
+  function focusedArea({
+    root,
+    event
+  }) {
+    const { target } = event;
+    if (target instanceof Node && root.contains(target)) return "view";
+    if (target === document.body || target === document.documentElement) {
+      return "page";
+    }
+    return "other";
+  }
+  function isMainContent(root) {
+    const parent = root.parentElement;
+    return parent?.localName === "main" && parent.childElementCount === 1;
+  }
+
   // viewer/session.ts
   function readSession({
     key,
@@ -718,6 +735,7 @@
     addEventListener("keydown", (event) => {
       const modified = event.altKey || event.ctrlKey || event.metaKey;
       if (event.key !== "Escape" || modified) return;
+      if (focusedArea({ root, event }) === "other") return;
       if (document.querySelector(":popover-open")) return;
       const parent = parentLink(breadcrumbsElement);
       const target = escapeTarget({
@@ -928,7 +946,7 @@
       }
     });
     addEventListener("keydown", (event) => {
-      if (event.altKey) return;
+      if (event.altKey || !isForTheView({ root, event })) return;
       const { scale } = canvas.camera;
       if (event.key === "+" || event.key === "=") {
         zoomAtCenter({ canvas, scale: scale * ZOOM_IN });
@@ -943,6 +961,19 @@
       }
       event.preventDefault();
     });
+  }
+  function isForTheView({
+    root,
+    event
+  }) {
+    switch (focusedArea({ root, event })) {
+      case "view":
+        return true;
+      case "page":
+        return isMainContent(root);
+      case "other":
+        return false;
+    }
   }
 
   // viewer/board-view.ts

@@ -1,7 +1,7 @@
 import AllumeWebModels
 
 /// A board's view, as one element: the icons it draws, then its breadcrumbs and zoom controls
-/// above its canvas.
+/// above its canvas. Its viewport takes focus when clicked or tabbed to.
 func drawBoardView(
   _ board: Document.Board, contents: Contents, layouts: [Document.ID: BoardLayout],
   favicons: [String: Asset]
@@ -24,7 +24,8 @@ func drawBoardView(
   let bar = HTML.element(
     "header", ["class": "allume-bar"],
     onLinesOfTheirOwn([drawBreadcrumbs(of: board, contents: contents), zoomControls]))
-  let viewport = HTML.element("div", ["class": "allume-viewport"], onLinesOfTheirOwn([canvas]))
+  let viewport = HTML.element(
+    "div", ["class": "allume-viewport", "tabindex": "0"], onLinesOfTheirOwn([canvas]))
 
   return .element(
     "div", ["class": "allume", "data-allume-board": .text(board.id.rawValue)],
