@@ -16,10 +16,25 @@ import Testing
   @Test func rendersTheExpectedFolderToEmbed() throws {
     let (contents, _) = try readBundle(at: fixtureURL)
 
-    let embedFiles = embedFiles(from: renderedBoards(for: contents, favicons: [:]))
+    let embedFiles = embedFiles(
+      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: URLPatterns())
 
     try compareWithExpectedFiles(
       comparableOutput(of: embedFiles), in: expectedURL.appending(path: "SampleEmbed"))
+  }
+
+  @Test func resolvesEveryReferenceToEmbedFromThePatterns() throws {
+    let (contents, _) = try readBundle(at: fixtureURL)
+    let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
+
+    let embedFiles = embedFiles(
+      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: urlPatterns)
+
+    let withReferences = embedFiles.filter { file in
+      guard case .text(let text) = file.source else { return false }
+      return text.contains("allume:")
+    }
+    #expect(withReferences.map(\.path) == [])
   }
 
   @Test func publishesItsSiteIntoAFolder() async throws {

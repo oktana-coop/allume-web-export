@@ -5,8 +5,8 @@ those live is up to the site. The tool's own site has a page for each board, sid
 files under `files/`. A site built with a framework such as Astro has routes of its own, and may
 serve files through its own pipeline.
 
-So a board's view isn't drawn with URLs. It's drawn with references, and each output fills them
-with the URLs of the site it's for. A view is otherwise the same, whatever site shows it.
+So a board's view isn't drawn with URLs. It's drawn with references, and each output resolves them
+to the URLs of the site it's for. A view is otherwise the same, whatever site shows it.
 
 ## What a reference is
 
@@ -20,13 +20,14 @@ Every link between boards is a reference: board cards, breadcrumbs and linked ca
 every file a view shows, as an image, ink, an avatar or a favicon. The files published are the
 files the views refer to, so a site publishes exactly what its boards show.
 
-## Filling references
+## Resolving references
 
 Each output decides what the references become. The tool's own site, which the `site` command
 writes, names each board's page after its slug, with the root's as `index.html`, and puts the
-files under `files/`. The `embed` command writes board views for other sites, and keeps the
-references, for the site to replace with its own URLs. Filling them from patterns the site gives
-instead, such as `/boards/{slug}/` for boards and `/allume/` for files, comes next.
+files under `files/`. The `embed` command writes board views for other sites. It resolves the
+references from patterns the site gives, `--board-url` such as `/boards/{slug}/` for boards and
+`--files-url` such as `/allume/files` for files, or keeps them, for the site to replace with its
+own URLs.
 
 The link from Functional's card for Haskell to Haskell's board is, in each case:
 
@@ -34,7 +35,7 @@ The link from Functional's card for Haskell to Haskell's board is, in each case:
 <!-- On the tool's own site -->
 <a class="allume-body allume-panel" href="haskell-zkdb1w.html">…</a>
 
-<!-- From the patterns /boards/{slug}/ and /allume/ -->
+<!-- From the pattern /boards/{slug}/ -->
 <a class="allume-body allume-panel" href="/boards/haskell-zkdb1w/">…</a>
 
 <!-- With the reference kept -->

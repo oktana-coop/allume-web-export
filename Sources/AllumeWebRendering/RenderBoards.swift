@@ -1,6 +1,6 @@
 import AllumeWebModels
 
-/// A board's view, whose links and images are references, for its output to fill with URLs.
+/// A board's view, whose links and images are references, for its output to resolve to URLs.
 package struct BoardView: Equatable, Sendable {
   package let boardID: Document.ID
   package let html: String

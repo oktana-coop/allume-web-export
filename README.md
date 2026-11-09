@@ -57,6 +57,16 @@ Its folder holds:
 - `files/`, as for a site;
 - `allume.css` and `allume.js`, the viewer, for the site's pages to include.
 
+To have the views link to the site's URLs instead, give `embed` the site's patterns: each board's
+URL, with `{slug}` standing for its slug, and where the site serves the folder's `files/`:
+
+```sh
+allume-web-export embed path/to/export --out allume --board-url '/boards/{slug}/' \
+  --files-url /allume/files
+```
+
+Either can be given alone, leaving the other kind of reference in.
+
 #### Options
 
 For both commands, `--out` defaults to `out`. The folder must be missing or empty, so that a

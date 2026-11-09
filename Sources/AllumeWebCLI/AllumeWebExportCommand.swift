@@ -34,14 +34,43 @@ struct EmbedCommand: AsyncParsableCommand {
       The folder holds boards.json, which lists the boards; each board's view, under boards/; the \
       files the views show, under files/; and the viewer, allume.js and allume.css. The views \
       link to boards and files with allume: references, for the site to replace with its own \
-      URLs. Embedding here means putting a view's HTML in a page, not an <iframe>.
+      URLs, unless --board-url and --files-url give them. Embedding here means putting a view's \
+      HTML in a page, not an <iframe>.
       """
   )
 
   @OptionGroup var options: PublishingOptions
 
+  @Option(
+    help: ArgumentHelp(
+      "Each board's URL on the site, with {slug} standing for the board's slug, e.g. "
+        + "/boards/{slug}/. Without it, links to boards are kept as allume: references.",
+      valueName: "pattern")
+  )
+  var boardURL: String?
+
+  @Option(
+    help: ArgumentHelp(
+      "Where the site serves the folder's files/, e.g. /allume/files. Without it, images and "
+        + "other files are kept as allume: references.",
+      valueName: "url")
+  )
+  var filesURL: String?
+
+  func validate() throws {
+    if let boardURL, !boardURL.contains("{slug}") {
+      throw ValidationError(
+        "--board-url needs {slug}, which stands for each board's slug, e.g. /boards/{slug}/.")
+    }
+  }
+
   func run() async throws {
-    try await publish(with: options, publishEmbed(_:to:replacingContents:faviconCache:))
+    try await publish(with: options) {
+      contents, folder, replacing, cache async throws(UnwritableFolderError) in
+      try await publishEmbed(
+        contents, to: folder, replacingContents: replacing, faviconCache: cache,
+        boardURL: boardURL, filesURL: filesURL)
+    }
   }
 }
 

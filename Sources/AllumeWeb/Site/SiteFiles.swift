@@ -19,7 +19,7 @@ package func siteFiles(from boards: RenderedBoards) -> [OutputFile] {
   return sitePages + referredFiles(of: boards) + viewerFiles()
 }
 
-/// The view's standalone page, at its board's URL, with each reference filled with the site's URL.
+/// The view's standalone page, at its board's URL, with each reference resolved to the site's URL.
 private func sitePage(
   of view: BoardView, index: BoardsIndex, urls: ReferenceURLs
 ) throws(UnknownBoardError) -> OutputFile {
