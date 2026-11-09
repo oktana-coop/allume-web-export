@@ -3,11 +3,7 @@ import Foundation
 
 /// A root board with a card for each document.
 func makeContents(with documents: [Document]) throws -> Contents {
-  let cards = documents.map { document in
-    Card(
-      documentID: document.id, frame: Rect(x: 0, y: 0, width: 100, height: 100), zIndex: 0,
-      color: nil)
-  }
+  let cards = documents.map { document in makeCard(document.id.rawValue) }
 
   return try Contents(
     rootID: Document.ID(rawValue: "root"),
@@ -21,10 +17,17 @@ func makeContents(with documents: [Document]) throws -> Contents {
   )
 }
 
-func makeBoard(_ id: String, label: String) -> Document {
+func makeBoard(_ id: String, label: String, cards: [String] = []) -> Document {
   .board(
     Document.Board(
-      id: Document.ID(rawValue: id), label: label, cards: [], chains: [], connections: [], ink: []))
+      id: Document.ID(rawValue: id), label: label, cards: cards.map(makeCard), chains: [],
+      connections: [], ink: []))
+}
+
+func makeCard(_ documentID: String) -> Card {
+  Card(
+    documentID: Document.ID(rawValue: documentID), frame: Rect(x: 0, y: 0, width: 100, height: 100),
+    zIndex: 0, color: nil)
 }
 
 func makeImage(_ name: String) -> Document {
