@@ -703,13 +703,15 @@
   }
 
   // viewer/navigation.ts
-  var ARRIVAL_KEY = "arrival";
+  var ARRIVAL_KEY = "allume:arrival";
+  var HISTORY_KEY = "allume";
   function setUpNavigation(root) {
     const breadcrumbsElement = root.querySelector(".allume-breadcrumbs");
     const recorded = takeSession({ key: ARRIVAL_KEY, parse: parseArrivalRecord });
     if (recorded?.path === location.pathname) {
       const { how, breadcrumbs: breadcrumbs2 } = recorded;
-      history.replaceState({ ...history.state, arrival: how, breadcrumbs: breadcrumbs2 }, "");
+      const ours = { arrival: how, breadcrumbs: breadcrumbs2 };
+      history.replaceState(withViewerState({ state: history.state, ours }), "");
     }
     const { breadcrumbs } = parseHistoryState(history.state);
     if (breadcrumbs) showBreadcrumbs({ breadcrumbsElement, breadcrumbs });
@@ -784,11 +786,18 @@
     const parsed = parseBreadcrumbs(breadcrumbs);
     return parsed && { path, how, breadcrumbs: parsed };
   }
-  function parseHistoryState(value) {
-    if (!isRecord(value)) return {};
-    const arrival = isArrival(value.arrival) ? value.arrival : void 0;
-    const breadcrumbs = parseBreadcrumbs(value.breadcrumbs) ?? void 0;
+  function parseHistoryState(state) {
+    const ours = isRecord(state) ? state[HISTORY_KEY] : void 0;
+    if (!isRecord(ours)) return {};
+    const arrival = isArrival(ours.arrival) ? ours.arrival : void 0;
+    const breadcrumbs = parseBreadcrumbs(ours.breadcrumbs) ?? void 0;
     return { arrival, breadcrumbs };
+  }
+  function withViewerState({
+    state,
+    ours
+  }) {
+    return { ...isRecord(state) ? state : {}, [HISTORY_KEY]: ours };
   }
   function followedLink({
     breadcrumbsElement,
@@ -906,7 +915,7 @@
 
   // viewer/starting-view.ts
   function setUpStartingView(canvas) {
-    const key = `camera:${location.pathname}`;
+    const key = `allume:camera:${location.pathname}`;
     addEventListener(
       "hashchange",
       () => focusCard({ canvas, id: location.hash.slice(1) })

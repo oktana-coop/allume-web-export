@@ -13,7 +13,7 @@ import { readSession, writeSession } from './session';
  * in this session, like in Allume, or framed whole on a first visit.
  */
 export function setUpStartingView(canvas: Canvas) {
-  const key = `camera:${location.pathname}`;
+  const key = `allume:camera:${location.pathname}`;
 
   addEventListener('hashchange', () =>
     focusCard({ canvas, id: location.hash.slice(1) })

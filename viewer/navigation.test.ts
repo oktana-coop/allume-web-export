@@ -5,6 +5,7 @@ import {
   escapeTarget,
   parseArrivalRecord,
   parseHistoryState,
+  withViewerState,
 } from './navigation';
 
 // The breadcrumbs on Functional, inside Paradigms, inside Languages.
@@ -111,19 +112,41 @@ describe('parseArrivalRecord', () => {
 
 describe('parseHistoryState', () => {
   it('reads the arrival and the breadcrumbs', () => {
-    expect(parseHistoryState({ arrival: 'down', breadcrumbs })).toEqual({
-      arrival: 'down',
-      breadcrumbs,
-    });
+    const state = { allume: { arrival: 'down', breadcrumbs } };
+
+    expect(parseHistoryState(state)).toEqual({ arrival: 'down', breadcrumbs });
   });
 
   it("leaves out what isn't valid", () => {
-    const state = { arrival: 'sideways', breadcrumbs: 'Languages' };
+    const state = { allume: { arrival: 'sideways', breadcrumbs: 'Languages' } };
 
     expect(parseHistoryState(state)).toEqual({});
   });
 
+  it("reads nothing from the site's own state", () => {
+    expect(parseHistoryState({ arrival: 'down', breadcrumbs })).toEqual({});
+  });
+
   it('reads nothing from a page without a history entry of its own', () => {
     expect(parseHistoryState(null)).toEqual({});
+  });
+});
+
+describe('withViewerState', () => {
+  it("keeps the site's own state beside the viewer's", () => {
+    const state = { arrival: "the site's", allume: { arrival: 'up' } };
+
+    const updated = withViewerState({ state, ours: { arrival: 'down' } });
+
+    expect(updated).toEqual({
+      arrival: "the site's",
+      allume: { arrival: 'down' },
+    });
+  });
+
+  it('starts from nothing without a state to keep', () => {
+    expect(withViewerState({ state: null, ours: { arrival: 'down' } })).toEqual(
+      { allume: { arrival: 'down' } }
+    );
   });
 });

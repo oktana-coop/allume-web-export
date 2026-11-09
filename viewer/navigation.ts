@@ -35,7 +35,10 @@ export type FollowedLink =
   | { kind: 'linked card menu' }
   | { kind: 'board card' };
 
-const ARRIVAL_KEY = 'arrival';
+// Under keys of the viewer's own, since a site's scripts share the session
+// storage and the history entry's state.
+const ARRIVAL_KEY = 'allume:arrival';
+const HISTORY_KEY = 'allume';
 
 /**
  * Breadcrumbs follow the path taken, like in Allume: entering a board extends
@@ -56,7 +59,8 @@ export function setUpNavigation(root: HTMLElement) {
   const recorded = takeSession({ key: ARRIVAL_KEY, parse: parseArrivalRecord });
   if (recorded?.path === location.pathname) {
     const { how, breadcrumbs } = recorded;
-    history.replaceState({ ...history.state, arrival: how, breadcrumbs }, '');
+    const ours = { arrival: how, breadcrumbs };
+    history.replaceState(withViewerState({ state: history.state, ours }), '');
   }
 
   const { breadcrumbs } = parseHistoryState(history.state);
@@ -172,15 +176,27 @@ export function parseArrivalRecord(value: unknown): ArrivalRecord | null {
 }
 
 /**
- * The arrival and the breadcrumbs in the value, leaving out what isn't
- * valid.
+ * The viewer's arrival and breadcrumbs in a history entry's state, leaving out
+ * what isn't valid.
  */
-export function parseHistoryState(value: unknown): HistoryState {
-  if (!isRecord(value)) return {};
+export function parseHistoryState(state: unknown): HistoryState {
+  const ours = isRecord(state) ? state[HISTORY_KEY] : undefined;
+  if (!isRecord(ours)) return {};
 
-  const arrival = isArrival(value.arrival) ? value.arrival : undefined;
-  const breadcrumbs = parseBreadcrumbs(value.breadcrumbs) ?? undefined;
+  const arrival = isArrival(ours.arrival) ? ours.arrival : undefined;
+  const breadcrumbs = parseBreadcrumbs(ours.breadcrumbs) ?? undefined;
   return { arrival, breadcrumbs };
+}
+
+/** A history entry's state, with the viewer's own in it, beside the site's. */
+export function withViewerState({
+  state,
+  ours,
+}: {
+  state: unknown;
+  ours: HistoryState;
+}): Record<string, unknown> {
+  return { ...(isRecord(state) ? state : {}), [HISTORY_KEY]: ours };
 }
 
 /**
