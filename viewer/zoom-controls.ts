@@ -9,8 +9,14 @@ const ZOOM_OUT = 0.8;
  * zoom, 0 shows the board at 100%, and Shift+1 or Fit shows all of it. With
  * Ctrl/⌘ the keys work the same, instead of zooming the whole page.
  */
-export function setUpZoomControls(canvas: Canvas) {
-  document.querySelector('.zoom')?.addEventListener('click', (event) => {
+export function setUpZoomControls({
+  root,
+  canvas,
+}: {
+  root: ParentNode;
+  canvas: Canvas;
+}) {
+  root.querySelector('.zoom')?.addEventListener('click', (event) => {
     const action = (event.target as Element).closest<HTMLElement>('[data-zoom]')
       ?.dataset.zoom;
     const { scale } = canvas.camera;

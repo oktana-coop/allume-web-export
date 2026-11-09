@@ -25,6 +25,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-html:not(.js) .zoom {
+.allume:not(.js) .zoom {
   display: none;
 }

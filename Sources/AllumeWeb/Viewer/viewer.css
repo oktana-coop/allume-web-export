@@ -133,7 +133,7 @@ body {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-html:not(.js) .zoom {
+.allume:not(.js) .zoom {
   display: none;
 }
 
@@ -143,13 +143,13 @@ html:not(.js) .zoom {
   inset: var(--bar-height) 0 0;
   overflow: auto;
 }
-.js .viewport {
+.allume.js .viewport {
   overflow: hidden;
   touch-action: none;
   user-select: none;
   cursor: grab;
 }
-.js .viewport.is-dragging {
+.allume.js .viewport.is-dragging {
   cursor: grabbing;
 }
 .world {

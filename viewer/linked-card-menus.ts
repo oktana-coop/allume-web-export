@@ -11,11 +11,19 @@ const WINDOW_MARGIN = 16;
  * and close when the board scrolls. Choosing the board the menu is on centers
  * the card, without leaving the page.
  */
-export function setUpLinkedCardMenus(canvas: Canvas) {
-  canvas.viewport.addEventListener('wheel', closeOpenMenus, { passive: true });
+export function setUpLinkedCardMenus({
+  root,
+  canvas,
+}: {
+  root: ParentNode;
+  canvas: Canvas;
+}) {
+  canvas.viewport.addEventListener('wheel', () => closeOpenMenus(root), {
+    passive: true,
+  });
 
-  for (const menu of document.querySelectorAll<HTMLElement>('.linked-menu')) {
-    const button = document.querySelector(`[popovertarget="${menu.id}"]`);
+  for (const menu of root.querySelectorAll<HTMLElement>('.linked-menu')) {
+    const button = root.querySelector(`[popovertarget="${menu.id}"]`);
 
     menu.addEventListener('beforetoggle', (event) => {
       if (event.newState !== 'open' || !button) return;
@@ -82,8 +90,8 @@ export function menuPosition({
   return { x, y: fitsBelow ? below : above };
 }
 
-function closeOpenMenus() {
-  for (const menu of document.querySelectorAll<HTMLElement>(
+function closeOpenMenus(root: ParentNode) {
+  for (const menu of root.querySelectorAll<HTMLElement>(
     '.linked-menu:popover-open'
   )) {
     menu.hidePopover();

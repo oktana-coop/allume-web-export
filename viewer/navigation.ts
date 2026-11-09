@@ -45,8 +45,8 @@ const ARRIVAL_KEY = 'arrival';
  * linked card. Otherwise, after going up or arriving from elsewhere, it goes
  * up to the last breadcrumb.
  */
-export function setUpNavigation() {
-  const breadcrumbsElement = document.querySelector('.breadcrumbs');
+export function setUpNavigation(root: HTMLElement) {
+  const breadcrumbsElement = root.querySelector('.breadcrumbs');
 
   // Following a link records how the next page is reached. That page keeps it
   // in its history entry, so the breadcrumbs survive going back to it.
@@ -73,7 +73,7 @@ export function setUpNavigation() {
     writeSession({ key: ARRIVAL_KEY, value: { path, ...arrival } });
   };
 
-  document.addEventListener('click', (event) => {
+  root.addEventListener('click', (event) => {
     const link = (event.target as Element).closest<HTMLAnchorElement>(
       'a[href]'
     );

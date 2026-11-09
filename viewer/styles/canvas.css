@@ -6,14 +6,14 @@
   overflow: auto;
 }
 
-.js .viewport {
+.allume.js .viewport {
   overflow: hidden;
   touch-action: none;
   user-select: none;
   cursor: grab;
 }
 
-.js .viewport.is-dragging {
+.allume.js .viewport.is-dragging {
   cursor: grabbing;
 }
 

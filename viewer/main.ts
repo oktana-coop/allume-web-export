@@ -1,28 +1,5 @@
-import { setUpCanvas } from './canvas';
-import { makeCommentDatesRelative } from './comment-dates';
-import { setUpCopyButtons } from './copy-buttons';
-import { setUpGestures } from './gestures';
-import { setUpLinkedCardMenus } from './linked-card-menus';
-import { setUpNavigation } from './navigation';
-import { setUpScrolling } from './scrolling';
-import { setUpStartingView } from './starting-view';
-import { setUpZoomControls } from './zoom-controls';
+import { setUpBoardView } from './board-view';
 
-const canvas = setUpCanvas(document);
-if (!canvas) {
-  throw new Error('The page has no board: no .viewport with a .world in it.');
+for (const root of document.querySelectorAll<HTMLElement>('.allume')) {
+  setUpBoardView(root);
 }
-
-// Switches the page's styles from a natively scrolling board to the camera's.
-document.documentElement.classList.add('js');
-
-setUpScrolling(canvas);
-setUpGestures(canvas);
-setUpZoomControls(canvas);
-
-makeCommentDatesRelative(document);
-setUpCopyButtons(canvas);
-setUpLinkedCardMenus(canvas);
-
-setUpNavigation();
-setUpStartingView(canvas);
