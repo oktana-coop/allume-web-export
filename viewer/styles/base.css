@@ -1,50 +1,64 @@
 /* Without specificity, so that a site's own values for .allume win, whichever
    stylesheet comes first. */
 :where(.allume) {
-  /* Allume's own colors, from its color sets, converted to sRGB where they're
-     Display P3. The white, the hairline, the muted text and the green are
-     ours: the view's controls, which Allume draws its own way. */
-  --allume-canvas: #e0dfde;
-  --allume-panel: #f1f0ee;
-  --allume-card: #ffffff;
-  --allume-card-muted: #e9e8e7;
-  --allume-hairline: rgb(0 0 0 / 0.07);
-  --allume-text: #272624;
-  --allume-muted: #7b7b78;
-  --allume-connection: #c2c0c0;
-  /* Allume's shadows, whose radius CSS's blur doubles. */
-  --allume-board-shadow: 0 0 14px rgb(38 36 32 / 0.07);
-  --allume-image-shadow: 0 0 6px rgb(38 36 32 / 0.07);
-  --allume-card-shadow: 0 0 6px rgb(38 36 32 / 0.05);
-  --allume-comment-shadow: 0 1px 1px rgb(38 36 32 / 0.05);
+  /* Each color is a light and a dark value, which the page's color-scheme
+     picks between. They're Allume's own, from its color sets, converted to
+     sRGB where they're Display P3, but for the white, the hairline, the muted
+     text and the green: the view's controls, which Allume draws its own way,
+     whose dark values are ours. */
+  --allume-canvas: light-dark(#e0dfde, #191919);
+  --allume-panel: light-dark(#f1f0ee, #2b2b2a);
+  --allume-card: light-dark(#ffffff, #333333);
+  --allume-card-muted: light-dark(#e9e8e7, #262525);
+  --allume-hairline: light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.08));
+  --allume-text: light-dark(#272624, #d9d3c7);
+  --allume-muted: light-dark(#7b7b78, #8e8a84);
+  --allume-connection: light-dark(#c2c0c0, #403e3e);
+  /* Allume's shadows, whose radius CSS's blur doubles. In dark mode, cards
+     have a thin light border instead. */
+  --allume-board-shadow:
+    0 0 14px light-dark(rgb(38 36 32 / 0.07), transparent),
+    0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.16));
+  --allume-image-shadow:
+    0 0 6px light-dark(rgb(38 36 32 / 0.07), transparent),
+    0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.16));
+  --allume-card-shadow:
+    0 0 6px light-dark(rgb(38 36 32 / 0.05), transparent),
+    0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.12));
+  --allume-comment-shadow:
+    0 1px 1px light-dark(rgb(38 36 32 / 0.05), transparent),
+    0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.12));
+  /* Allume turns black ink white in dark mode, which an image can't, so a
+     light halo keeps it visible on the dark canvas. */
+  --allume-ink-halo: light-dark(transparent, #d9d3c7);
   --allume-bar-height: 48px;
 
-  --allume-green: #36884a;
+  --allume-green: light-dark(#36884a, #7bb285);
 
   /* A user's color is a note's background, a board's, the border of an image,
      link or PDF, or a text block's highlight. Gray is a note's or board's own
      color, and no highlight. */
-  --allume-purple-note: #ebe2fd;
-  --allume-purple-board: #f0e9ff;
-  --allume-purple-border: #b88df8;
-  --allume-purple-highlight: #d8cbf3;
-  --allume-red-note: #ffe4df;
-  --allume-red-board: #ffeeeb;
-  --allume-red-border: #f88d8d;
-  --allume-red-highlight: #f4c8bf;
-  --allume-green-note: #dff4da;
-  --allume-green-board: #e6f7e2;
-  --allume-green-border: #8fce80;
-  --allume-green-highlight: #bee7b4;
-  --allume-yellow-note: #faf0da;
-  --allume-yellow-board: #fff8e8;
-  --allume-yellow-border: #f8dd8d;
-  --allume-yellow-highlight: #fbeac0;
-  --allume-blue-note: #dce8f9;
-  --allume-blue-board: #e5f0ff;
-  --allume-blue-border: #8db8f8;
-  --allume-blue-highlight: #c1d3ef;
-  --allume-gray-border: #bebbb8;
+  --allume-purple-note: light-dark(#ebe2fd, #484157);
+  --allume-purple-board: light-dark(#f0e9ff, #3e374d);
+  --allume-purple-border: light-dark(#b88df8, #685177);
+  --allume-purple-highlight: light-dark(#d8cbf3, #524b61);
+  --allume-red-note: light-dark(#ffe4df, #57403d);
+  --allume-red-board: light-dark(#ffeeeb, #4d3633);
+  --allume-red-border: light-dark(#f88d8d, #775047);
+  --allume-red-highlight: light-dark(#f4c8bf, #614a47);
+  --allume-green-note: light-dark(#dff4da, #41523d);
+  --allume-green-board: light-dark(#e6f7e2, #374833);
+  --allume-green-border: light-dark(#8fce80, #517247);
+  --allume-green-highlight: light-dark(#bee7b4, #4b5c47);
+  --allume-yellow-note: light-dark(#faf0da, #544d3d);
+  --allume-yellow-board: light-dark(#fff8e8, #4a4333);
+  --allume-yellow-border: light-dark(#f8dd8d, #746747);
+  --allume-yellow-highlight: light-dark(#fbeac0, #5e5747);
+  --allume-blue-note: light-dark(#dce8f9, #3d4857);
+  --allume-blue-board: light-dark(#e5f0ff, #333e4d);
+  --allume-blue-border: light-dark(#8db8f8, #475877);
+  --allume-blue-highlight: light-dark(#c1d3ef, #475261);
+  --allume-gray-border: light-dark(#bebbb8, #4e4b48);
 }
 
 /* Each element of the view starts from the browser's defaults, which these

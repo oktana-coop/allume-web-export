@@ -4,7 +4,11 @@
   padding: 12px 14px 12px 56px;
   overflow: hidden;
   border-radius: 16px;
-  background: color-mix(in srgb, var(--allume-author, #d8b682) 38%, white);
+  background: color-mix(
+    in srgb,
+    var(--allume-author, #d8b682) 38%,
+    light-dark(white, #191919)
+  );
   box-shadow: var(--allume-comment-shadow);
   /* Calibrated like notes to fit the size Allume gave each comment. */
   font-size: 13.5px;
@@ -30,5 +34,5 @@
 
 .allume-comment time {
   display: block;
-  color: rgb(0 0 0 / 0.5);
+  color: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.5));
 }

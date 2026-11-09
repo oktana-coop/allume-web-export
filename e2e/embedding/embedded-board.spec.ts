@@ -124,6 +124,21 @@ test.describe("a board's view in a site's page", () => {
     await expect(page).toHaveURL(paradigms.url);
   });
 
+  test("follows the page's color scheme", async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+    await page.goto(sitePage);
+
+    await setColorScheme({ page, scheme: 'dark' });
+    const dark = await brightnesses({ page });
+    await setColorScheme({ page, scheme: 'light' });
+    const light = await brightnesses({ page });
+
+    expect(dark.canvas).toBeLessThan(0.2);
+    expect(dark.text).toBeGreaterThan(0.7);
+    expect(light.canvas).toBeGreaterThan(0.8);
+    expect(light.text).toBeLessThan(0.3);
+  });
+
   test("keeps its styles off the site's page", async ({ page }) => {
     const sitePage = await embedBoard({ page, board: languages });
 
@@ -230,3 +245,35 @@ const computedStyles = ({
       ),
     properties
   );
+
+/** Sets the color scheme of the site's page, which the view inherits. */
+const setColorScheme = ({
+  page,
+  scheme,
+}: {
+  page: Page;
+  scheme: 'light' | 'dark';
+}) =>
+  page.evaluate((scheme) => {
+    document.documentElement.style.colorScheme = scheme;
+  }, scheme);
+
+/** How bright the board's canvas and its heading's text are, from 0 to 1. */
+const brightnesses = async ({ page }: { page: Page }) => ({
+  canvas: brightness(
+    await viewport({ page }).evaluate(
+      (element) => getComputedStyle(element).backgroundColor
+    )
+  ),
+  text: brightness(
+    await page
+      .getByRole('heading', { level: 1 })
+      .evaluate((element) => getComputedStyle(element).color)
+  ),
+});
+
+/** The average of a computed `rgb(…)` color's channels, from 0 to 1. */
+const brightness = (color: string) => {
+  const channels = (color.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+  return channels.reduce((sum, channel) => sum + channel, 0) / 3 / 255;
+};
