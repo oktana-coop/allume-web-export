@@ -37,7 +37,7 @@ import Testing
       contents, to: folder, replacingContents: false, faviconCache: nil)
 
     #expect(warnings.isEmpty)
-    #expect(Set(try filePaths(in: folder)) == Set(pages + files + ["viewer.css", "viewer.js"]))
+    #expect(Set(try filePaths(in: folder)) == Set(pages + files + ["allume.css", "allume.js"]))
     #expect(
       try pages.allSatisfy { page in
         try Data(contentsOf: folder.appending(path: page))

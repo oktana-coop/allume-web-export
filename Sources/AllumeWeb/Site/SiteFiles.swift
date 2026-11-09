@@ -32,7 +32,7 @@ public func siteFiles(for contents: Contents, favicons: [String: Asset]) -> [Sit
 
   return sitePages
     + files.map { file in SiteFile(path: "files/\(file.path)", source: .copy(file.source)) }
-    + ["viewer.css", "viewer.js"].map { name in
+    + ["allume.css", "allume.js"].map { name in
       SiteFile(path: name, source: .copy(viewerFile(name)))
     }
 }

@@ -16,7 +16,7 @@ import Testing
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Functional | Languages</title>
-        <link rel="stylesheet" href="viewer.css">
+        <link rel="stylesheet" href="allume.css">
         <style>
         body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
         main { height: 100dvh; }
@@ -26,7 +26,7 @@ import Testing
         <main>
         <div class="allume"></div>
         </main>
-        <script src="viewer.js"></script>
+        <script src="allume.js"></script>
         </body>
         </html>
 

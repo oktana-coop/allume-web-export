@@ -43,7 +43,7 @@ const sitePageHTML = ({ view }: { view: string }) => `<!doctype html>
 <head>
 <meta charset="utf-8">
 <title>A site's page</title>
-<link rel="stylesheet" href="viewer.css">
+<link rel="stylesheet" href="allume.css">
 <style>
 ${siteStyles}
 </style>
@@ -53,7 +53,7 @@ ${siteStyles}
 <div class="board-box">
 ${view}
 </div>
-<script src="viewer.js"></script>
+<script src="allume.js"></script>
 </body>
 </html>
 `;

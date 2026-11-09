@@ -34,7 +34,7 @@ The site's folder then holds:
 - a page for every board inside it, named after its label with a short code, such as
   `functional-q5tbqj.html`;
 - `files/`, with the images, handwriting, avatars and favicons the pages show;
-- `viewer.css` and `viewer.js`, the viewer.
+- `allume.css` and `allume.js`, the viewer.
 
 PDFs are never published: their cards show only their title.
 
@@ -74,8 +74,8 @@ one's site, and `--no-favicons` keeps the run offline.
 ### Viewer
 
 The viewer is the script and stylesheet that let visitors pan, zoom and move between boards. Its
-sources are in `viewer/`, but the tool doesn't build them: it copies a built `viewer.js` and
-`viewer.css` from its resources, in `Sources/AllumeWeb/Viewer/`, into every site it writes.
+sources are in `viewer/`, but the tool doesn't build them: it copies a built `allume.js` and
+`allume.css` from its resources, in `Sources/AllumeWeb/Viewer/`, into every site it writes.
 esbuild builds those two files from `viewer/`, and they're committed, so building the tool needs
 only Swift.
 

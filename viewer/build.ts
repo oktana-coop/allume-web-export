@@ -10,8 +10,8 @@ const notice = 'Built from viewer/ by `npm run build:viewer`. Edit it there.';
 await build({
   absWorkingDir: fileURLToPath(new URL('..', import.meta.url)),
   entryPoints: [
-    { in: 'viewer/main.ts', out: 'viewer' },
-    { in: 'viewer/styles/main.css', out: 'viewer' },
+    { in: 'viewer/main.ts', out: 'allume' },
+    { in: 'viewer/styles/main.css', out: 'allume' },
   ],
   outdir: 'Sources/AllumeWeb/Viewer',
   bundle: true,

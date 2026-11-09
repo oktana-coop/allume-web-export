@@ -10,7 +10,7 @@ import Testing
 
     let files = siteFiles(for: contents, favicons: [:])
 
-    #expect(files.map(\.path) == ["index.html", "files/image.png", "viewer.css", "viewer.js"])
+    #expect(files.map(\.path) == ["index.html", "files/image.png", "allume.css", "allume.js"])
   }
 
   @Test func holdThePagesTextAndCopyEverythingElse() throws {
@@ -48,7 +48,7 @@ import Testing
       }
       return url
     }
-    #expect(viewerURLs.map(\.lastPathComponent) == ["viewer.css", "viewer.js"])
+    #expect(viewerURLs.map(\.lastPathComponent) == ["allume.css", "allume.js"])
     #expect(
       viewerURLs.allSatisfy { url in
         FileManager.default.fileExists(atPath: url.path(percentEncoded: false))
