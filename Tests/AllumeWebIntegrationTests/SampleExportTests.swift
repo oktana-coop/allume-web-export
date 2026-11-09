@@ -7,7 +7,7 @@ import Testing
   @Test func rendersTheExpectedPagesAndFiles() throws {
     let (contents, _) = try readBundle(at: fixtureURL)
 
-    let siteFiles = siteFiles(for: contents, favicons: [:])
+    let siteFiles = siteFiles(from: renderedBoards(for: contents, favicons: [:]))
 
     let pages = siteFiles.compactMap { file -> (String, String)? in
       guard case .text(let html) = file.source else { return nil }

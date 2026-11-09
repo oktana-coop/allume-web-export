@@ -11,7 +11,7 @@ public func publishSite(
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   let (favicons, faviconWarnings) = await favicons(of: contents, cache: faviconCache)
   let writingWarnings = try writeFolder(
-    siteFiles(for: contents, favicons: favicons), to: folder,
+    siteFiles(from: renderedBoards(for: contents, favicons: favicons)), to: folder,
     replacingContents: replacingContents)
 
   return (favicons.count, faviconWarnings + writingWarnings)

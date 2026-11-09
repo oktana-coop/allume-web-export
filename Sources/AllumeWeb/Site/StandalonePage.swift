@@ -29,10 +29,10 @@ func standalonePage(title: String, view: String) -> String {
 }
 
 /// The board's label, then the root's, except on the root's own page.
-func pageTitle(of boardID: Document.ID, in contents: Contents) -> String {
-  let label = { (boardID: Document.ID) in contents.board(boardID)?.displayLabel ?? "" }
+func pageTitle(of boardID: Document.ID, in index: BoardsIndex) -> String {
+  let label = { (boardID: Document.ID) in index.boards[boardID]?.label ?? "" }
 
-  return boardID == contents.rootID
+  return boardID == index.root
     ? label(boardID)
-    : "\(label(boardID)) | \(label(contents.rootID))"
+    : "\(label(boardID)) | \(label(index.root))"
 }

@@ -9,7 +9,7 @@ import Testing
     let contents = try makeContents(with: [makeBoard("functional", label: "Functional")])
     let slug = try #require(slugs(in: contents)[Document.ID(rawValue: "functional")])
 
-    let urls = boardURLs(pattern: "/boards/{slug}/", in: contents)
+    let urls = boardURLs(pattern: "/boards/{slug}/", in: boardsIndex(for: contents))
 
     #expect(urls[Document.ID(rawValue: "functional")] == "/boards/\(slug)/")
   }

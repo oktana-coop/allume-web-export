@@ -41,10 +41,11 @@ import Testing
 
   @Test func titlesThePageWithTheBoardsLabelThenTheRoots() throws {
     let contents = try makeContents(with: [makeBoard("functional", label: "Functional")])
+    let index = boardsIndex(for: contents)
 
     let titles = [
-      pageTitle(of: Document.ID(rawValue: "root"), in: contents),
-      pageTitle(of: Document.ID(rawValue: "functional"), in: contents),
+      pageTitle(of: Document.ID(rawValue: "root"), in: index),
+      pageTitle(of: Document.ID(rawValue: "functional"), in: index),
     ]
 
     #expect(titles == ["Languages", "Functional | Languages"])

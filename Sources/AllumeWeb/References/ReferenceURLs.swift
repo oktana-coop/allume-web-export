@@ -20,8 +20,8 @@ package struct UnknownBoardError: Error, Equatable, Sendable {
 }
 
 /// Each board's URL, from the pattern, with `{slug}` standing for the board's slug.
-func boardURLs(pattern: String, in contents: Contents) -> [Document.ID: String] {
-  slugs(in: contents).mapValues { slug in pattern.replacingOccurrences(of: "{slug}", with: slug) }
+func boardURLs(pattern: String, in index: BoardsIndex) -> [Document.ID: String] {
+  index.boards.mapValues { board in pattern.replacingOccurrences(of: "{slug}", with: board.slug) }
 }
 
 extension Reference {

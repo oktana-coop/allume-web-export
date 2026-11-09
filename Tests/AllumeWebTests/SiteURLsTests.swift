@@ -9,7 +9,7 @@ import Testing
     let contents = try makeContents(with: [makeBoard("functional", label: "Functional")])
     let slug = try #require(slugs(in: contents)[Document.ID(rawValue: "functional")])
 
-    let urls = siteURLs(for: contents)
+    let urls = siteURLs(for: boardsIndex(for: contents))
 
     #expect(
       urls.boards == [
