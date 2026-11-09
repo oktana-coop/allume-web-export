@@ -12,8 +12,8 @@ import Testing
 
     let warnings = try writeFolder(
       [
-        SiteFile(path: "index.html", source: .text("<p>Languages</p>")),
-        SiteFile(path: "files/image.png", source: .copy(image)),
+        OutputFile(path: "index.html", source: .text("<p>Languages</p>")),
+        OutputFile(path: "files/image.png", source: .copy(image)),
       ],
       to: folder, replacingContents: false)
 
@@ -27,7 +27,7 @@ import Testing
     defer { try? FileManager.default.removeItem(at: root) }
 
     _ = try writeFolder(
-      [SiteFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
+      [OutputFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
       replacingContents: false)
 
     #expect(try text(of: "index.html", in: root) == "<p>Languages</p>")
@@ -40,7 +40,7 @@ import Testing
 
     #expect(throws: UnwritableFolderError.notEmpty(root)) {
       try writeFolder(
-        [SiteFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
+        [OutputFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
         replacingContents: false)
     }
     #expect(try text(of: "notes.txt", in: root) == "Mine")
@@ -52,7 +52,7 @@ import Testing
     _ = try makeFile("old.html", text: "Old", in: root)
 
     _ = try writeFolder(
-      [SiteFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
+      [OutputFile(path: "index.html", source: .text("<p>Languages</p>"))], to: root,
       replacingContents: true)
 
     #expect(
@@ -68,7 +68,7 @@ import Testing
 
     #expect(throws: UnwritableFolderError.notAFolder(file)) {
       try writeFolder(
-        [SiteFile(path: "index.html", source: .text("<p>Languages</p>"))], to: file,
+        [OutputFile(path: "index.html", source: .text("<p>Languages</p>"))], to: file,
         replacingContents: true)
     }
   }
@@ -80,7 +80,7 @@ import Testing
 
     #expect(throws: UnwritableFolderError.pathOutsideFolder("files/../../escaped.txt")) {
       try writeFolder(
-        [SiteFile(path: "files/../../escaped.txt", source: .text("Out"))], to: folder,
+        [OutputFile(path: "files/../../escaped.txt", source: .text("Out"))], to: folder,
         replacingContents: false)
     }
     #expect(
@@ -95,8 +95,8 @@ import Testing
 
     let warnings = try writeFolder(
       [
-        SiteFile(path: "index.html", source: .text("<p>Languages</p>")),
-        SiteFile(path: "files/missing.png", source: .copy(missing)),
+        OutputFile(path: "index.html", source: .text("<p>Languages</p>")),
+        OutputFile(path: "files/missing.png", source: .copy(missing)),
       ],
       to: folder, replacingContents: false)
 
@@ -116,8 +116,8 @@ import Testing
     #expect(throws: UnwritableFolderError.self) {
       try writeFolder(
         [
-          SiteFile(path: "files", source: .text("A file")),
-          SiteFile(path: "files/image.png", source: .text("PNG")),
+          OutputFile(path: "files", source: .text("A file")),
+          OutputFile(path: "files/image.png", source: .text("PNG")),
         ],
         to: root, replacingContents: true)
     }

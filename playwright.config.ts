@@ -41,7 +41,7 @@ export default defineConfig({
   webServer: {
     command:
       `npm run build:viewer` +
-      ` && swift run allume-web-export Fixtures/SampleExport --out ${SITE} --replace --no-favicons` +
+      ` && swift run allume-web-export site Fixtures/SampleExport --out ${SITE} --replace --no-favicons` +
       ` && serve ${SITE} --listen ${PORT} --config ../../e2e/serve.json --no-clipboard`,
     url: `http://localhost:${PORT}`,
     // Never a server already on the port, which would serve an older site.

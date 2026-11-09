@@ -1,0 +1,114 @@
+{
+  "boards" : {
+    "0b92912e0774056fbb869596628560b7" : {
+      "label" : "Haskell",
+      "parents" : [
+        "a7f13ab235c23b16b85e0ca635564f5f",
+        "f76ff6d97ad777dac223434a205e0a59"
+      ],
+      "slug" : "haskell-zkdb1w",
+      "view" : "boards/0b92912e0774056fbb869596628560b7.html"
+    },
+    "1641aad5fb464422acb7eeb712ba221d" : {
+      "label" : "Notes",
+      "parents" : [
+        "0b92912e0774056fbb869596628560b7"
+      ],
+      "slug" : "notes-v3zv0o",
+      "view" : "boards/1641aad5fb464422acb7eeb712ba221d.html"
+    },
+    "382613a5ed1f936bfeda0551a70d1392" : {
+      "label" : "Monoids",
+      "parents" : [
+        "eba911c2265398fb98a70c672ad6bda8",
+        "a7f13ab235c23b16b85e0ca635564f5f",
+        "0b92912e0774056fbb869596628560b7"
+      ],
+      "slug" : "monoids-tij98o",
+      "view" : "boards/382613a5ed1f936bfeda0551a70d1392.html"
+    },
+    "4b313eb564890d916e583755ed03ddce" : {
+      "label" : "Untitled board",
+      "parents" : [
+        "c307f262eeed5b301fcb901822b18aee"
+      ],
+      "slug" : "untitled-board-zg1hul",
+      "view" : "boards/4b313eb564890d916e583755ed03ddce.html"
+    },
+    "4bd3545d00af80ac6a2a84c38a3b0108" : {
+      "label" : "Languages",
+      "parents" : [
+
+      ],
+      "slug" : "languages-8esk85",
+      "view" : "boards/4bd3545d00af80ac6a2a84c38a3b0108.html"
+    },
+    "a7f13ab235c23b16b85e0ca635564f5f" : {
+      "label" : "Functional",
+      "parents" : [
+        "d6e6adf7d783d443f01ed1db489ca420"
+      ],
+      "slug" : "functional-q5tbqj",
+      "view" : "boards/a7f13ab235c23b16b85e0ca635564f5f.html"
+    },
+    "af801f00f48770cd6a5d14329427565c" : {
+      "label" : "OCaml",
+      "parents" : [
+        "a7f13ab235c23b16b85e0ca635564f5f",
+        "f76ff6d97ad777dac223434a205e0a59"
+      ],
+      "slug" : "ocaml-bb1rze",
+      "view" : "boards/af801f00f48770cd6a5d14329427565c.html"
+    },
+    "c307f262eeed5b301fcb901822b18aee" : {
+      "label" : "Logic",
+      "parents" : [
+        "d6e6adf7d783d443f01ed1db489ca420"
+      ],
+      "slug" : "logic-rhkb6w",
+      "view" : "boards/c307f262eeed5b301fcb901822b18aee.html"
+    },
+    "d1e850ae3790672b35715cc5bc38222e" : {
+      "label" : "Families",
+      "parents" : [
+        "4bd3545d00af80ac6a2a84c38a3b0108"
+      ],
+      "slug" : "families-uywptl",
+      "view" : "boards/d1e850ae3790672b35715cc5bc38222e.html"
+    },
+    "d6e6adf7d783d443f01ed1db489ca420" : {
+      "label" : "Paradigms",
+      "parents" : [
+        "4bd3545d00af80ac6a2a84c38a3b0108"
+      ],
+      "slug" : "paradigms-grn33t",
+      "view" : "boards/d6e6adf7d783d443f01ed1db489ca420.html"
+    },
+    "dd7bf0decb9c7c423ead28d27949f48c" : {
+      "label" : "Notes",
+      "parents" : [
+        "af801f00f48770cd6a5d14329427565c"
+      ],
+      "slug" : "notes-adhjzq",
+      "view" : "boards/dd7bf0decb9c7c423ead28d27949f48c.html"
+    },
+    "eba911c2265398fb98a70c672ad6bda8" : {
+      "label" : "Reading",
+      "parents" : [
+        "4bd3545d00af80ac6a2a84c38a3b0108"
+      ],
+      "slug" : "reading-0ta80t",
+      "view" : "boards/eba911c2265398fb98a70c672ad6bda8.html"
+    },
+    "f76ff6d97ad777dac223434a205e0a59" : {
+      "label" : "ML family",
+      "parents" : [
+        "d1e850ae3790672b35715cc5bc38222e"
+      ],
+      "slug" : "ml-family-6bghrk",
+      "view" : "boards/f76ff6d97ad777dac223434a205e0a59.html"
+    }
+  },
+  "root" : "4bd3545d00af80ac6a2a84c38a3b0108",
+  "version" : 1
+}

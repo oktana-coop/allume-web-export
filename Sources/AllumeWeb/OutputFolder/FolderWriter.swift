@@ -3,7 +3,7 @@ import Foundation
 /// Writes the files into a new folder, and swaps it in for the given one once they're all written,
 /// so a failed run leaves the folder as it was. A folder with anything in it is only replaced when
 /// asked to, since replacing deletes what's there.
-func writeFolder(_ files: [SiteFile], to folder: URL, replacingContents: Bool)
+func writeFolder(_ files: [OutputFile], to folder: URL, replacingContents: Bool)
   throws(UnwritableFolderError) -> [PublishingWarning]
 {
   if let outside = files.first(where: { file in leavesFolder(file.path) }) {
@@ -64,7 +64,7 @@ private func leavesFolder(_ path: String) -> Bool {
 }
 
 /// Nil once the file is written, or a warning when its source is missing.
-private func write(_ file: SiteFile, into folder: URL)
+private func write(_ file: OutputFile, into folder: URL)
   throws(UnwritableFolderError) -> PublishingWarning?
 {
   let destination = folder.appending(path: file.path)

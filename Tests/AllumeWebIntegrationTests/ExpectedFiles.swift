@@ -11,20 +11,21 @@ let fixtureURL = URL(filePath: #filePath)
 /// The accepted output, next to the tests so that `ACCEPT=1` can write it.
 let expectedURL = URL(filePath: #filePath).deletingLastPathComponent().appending(path: "Expected")
 
-/// Compares each file's text with the expected file of the same name in the folder, which holds no
+/// Compares each file's text with the expected file at the same path in the folder, which holds no
 /// others. With `ACCEPT=1`, replaces the folder with the output instead.
 func compareWithExpectedFiles(_ output: [String: String], in folder: URL) throws {
   if ProcessInfo.processInfo.environment["ACCEPT"] == "1" {
     try? FileManager.default.removeItem(at: folder)
-    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
     for (name, text) in output {
-      try text.write(to: folder.appending(path: name), atomically: true, encoding: .utf8)
+      let file = folder.appending(path: name)
+      try FileManager.default.createDirectory(
+        at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+      try text.write(to: file, atomically: true, encoding: .utf8)
     }
     return
   }
 
-  let expectedNames = try FileManager.default.contentsOfDirectory(
-    atPath: folder.path(percentEncoded: false))
+  let expectedNames = try filePaths(in: folder)
   let differences = output.sorted { a, b in a.key < b.key }.compactMap { name, text in
     let expected = (try? String(contentsOf: folder.appending(path: name), encoding: .utf8)) ?? ""
     return firstDifference(between: text, and: expected).map { difference in
@@ -59,4 +60,13 @@ private func firstDifference(between actual: String, and expected: String) -> St
     lines.indices.contains(index) ? lines[index].prefix(200) : "(none)"
   }
   return "line \(index + 1)\n  expected: \(line(expectedLines))\n  actual:   \(line(actualLines))"
+}
+
+/// The paths of the files in the folder and the folders inside it.
+func filePaths(in folder: URL) throws -> [String] {
+  try (FileManager.default.subpathsOfDirectory(atPath: folder.path(percentEncoded: false))).filter {
+    path in
+    try folder.appending(path: path).resourceValues(forKeys: [.isDirectoryKey]).isDirectory
+      == false
+  }
 }

@@ -24,9 +24,9 @@ files the views refer to, so a site publishes exactly what its boards show.
 
 Each output decides what the references become. The tool's own site, which the `site` command
 writes, names each board's page after its slug, with the root's as `index.html`, and puts the
-files under `files/`. Writing board views for other sites, which comes next, will either fill the
-references from patterns the site gives, such as `/boards/{slug}/` for boards and `/allume/` for
-files, or keep them, for the site to replace with its own URLs.
+files under `files/`. The `embed` command writes board views for other sites, and keeps the
+references, for the site to replace with its own URLs. Filling them from patterns the site gives
+instead, such as `/boards/{slug}/` for boards and `/allume/` for files, comes next.
 
 The link from Functional's card for Haskell to Haskell's board is, in each case:
 

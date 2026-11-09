@@ -1,6 +1,6 @@
 import Foundation
 
-/// Why a site couldn't be written to its folder. A folder that was there is left as it was.
+/// Why an output couldn't be written to its folder. A folder that was there is left as it was.
 public enum UnwritableFolderError: Error, Equatable, Sendable {
   /// Something other than a folder is at its path.
   case notAFolder(URL)

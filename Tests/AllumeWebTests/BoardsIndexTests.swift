@@ -37,7 +37,7 @@ import Testing
           view: "boards/functional.html"),
       ])
 
-    let json = String(decoding: boardsJSON(index), as: UTF8.self)
+    let json = boardsJSON(index)
 
     #expect(
       json == """

@@ -22,10 +22,15 @@ The command is then `.build/release/allume-web-export`.
 
 ### Run
 
-Point it at an export folder, the one with `contents.json`, `metadata.json` and `files/` in it:
+Point it at an export folder, the one with `contents.json`, `metadata.json` and `files/` in it.
+Its two commands publish the boards in two ways: `site` as a website of their own, and `embed` for
+an existing site to show in its own pages. Either way, PDFs are never published: their cards show
+only their title.
+
+#### Site
 
 ```sh
-allume-web-export path/to/export --out site
+allume-web-export site path/to/export --out site
 ```
 
 The site's folder then holds:
@@ -36,11 +41,28 @@ The site's folder then holds:
 - `files/`, with the images, handwriting, avatars and favicons the pages show;
 - `allume.css` and `allume.js`, the viewer.
 
-PDFs are never published: their cards show only their title.
+#### Embed
 
-`--out` defaults to `out`. The folder must be missing or empty, so that a mistyped path can't wipe a
-folder. To publish again over an earlier site, pass `--replace`, which replaces the folder's
-contents. If anything fails while writing, the earlier site is left as it was.
+```sh
+allume-web-export embed path/to/export --out allume
+```
+
+Its folder holds:
+
+- `boards.json`, which lists the boards, each with its label, a suggested slug, the boards it's on
+  and its view's path;
+- `boards/`, each board's view, an element for a page to include, whose links and images are
+  `allume:` references for the site to replace with its own URLs, as
+  [References](docs/References.md) explains;
+- `files/`, as for a site;
+- `allume.css` and `allume.js`, the viewer, for the site's pages to include.
+
+#### Options
+
+For both commands, `--out` defaults to `out`. The folder must be missing or empty, so that a
+mistyped path can't wipe a folder. To publish again over an earlier run, pass `--replace`, which
+replaces the folder's contents. If anything fails while writing, the earlier run's files are left
+as they were.
 
 Link cards show their site's icon, fetched the first time a site is linked to and kept in
 `~/Library/Caches/allume-web-export/favicons/`; delete that folder to fetch them again.
@@ -64,7 +86,7 @@ and open <http://localhost:8000>.
 `Fixtures/SampleExport/`, and view the result:
 
 ```sh
-swift run allume-web-export Fixtures/SampleExport --out out --replace
+swift run allume-web-export site Fixtures/SampleExport --out out --replace
 python3 -m http.server --directory out
 ```
 
@@ -84,7 +106,7 @@ writing the site again with them:
 
 ```sh
 npm run build:viewer
-swift run allume-web-export Fixtures/SampleExport --out out --replace
+swift run allume-web-export site Fixtures/SampleExport --out out --replace
 ```
 
 Then reload the page, served as in [Run](#run). The

@@ -9,15 +9,17 @@ import Testing
 
     let siteFiles = siteFiles(from: renderedBoards(for: contents, favicons: [:]))
 
-    let pages = siteFiles.compactMap { file -> (String, String)? in
-      guard case .text(let html) = file.source else { return nil }
-      return (file.path, html)
-    }
-    let files = siteFiles.map(\.path).filter { path in path.hasPrefix("files/") }
-      .map { path in String(path.dropFirst("files/".count)) }
-    let output = [String: String](
-      uniqueKeysWithValues: pages + [("files.txt", files.joined(separator: "\n") + "\n")])
-    try compareWithExpectedFiles(output, in: expectedURL.appending(path: "SampleExport"))
+    try compareWithExpectedFiles(
+      comparableOutput(of: siteFiles), in: expectedURL.appending(path: "SampleExport"))
+  }
+
+  @Test func rendersTheExpectedFolderToEmbed() throws {
+    let (contents, _) = try readBundle(at: fixtureURL)
+
+    let embedFiles = embedFiles(from: renderedBoards(for: contents, favicons: [:]))
+
+    try compareWithExpectedFiles(
+      comparableOutput(of: embedFiles), in: expectedURL.appending(path: "SampleEmbed"))
   }
 
   @Test func publishesItsSiteIntoAFolder() async throws {
@@ -46,11 +48,16 @@ import Testing
   }
 }
 
-/// The paths of the files in the folder and the folders inside it.
-private func filePaths(in folder: URL) throws -> [String] {
-  try (FileManager.default.subpathsOfDirectory(atPath: folder.path(percentEncoded: false))).filter {
-    path in
-    try folder.appending(path: path).resourceValues(forKeys: [.isDirectoryKey]).isDirectory
-      == false
+/// The files written as text, by path, and `files.txt`, listing the paths of those copied under
+/// `files/`, whose bytes the test doesn't compare.
+private func comparableOutput(of files: [OutputFile]) -> [String: String] {
+  let texts = files.compactMap { file -> (String, String)? in
+    guard case .text(let text) = file.source else { return nil }
+    return (file.path, text)
   }
+  let copied = files.map(\.path).filter { path in path.hasPrefix("files/") }
+    .map { path in String(path.dropFirst("files/".count)) }
+
+  return [String: String](
+    uniqueKeysWithValues: texts + [("files.txt", copied.joined(separator: "\n") + "\n")])
 }

@@ -42,7 +42,7 @@ func viewPath(of boardID: Document.ID) -> String {
 }
 
 /// The index as `boards.json`, its keys sorted, so the same boards give the same file.
-package func boardsJSON(_ index: BoardsIndex) -> Data {
+package func boardsJSON(_ index: BoardsIndex) -> String {
   let encoder = JSONEncoder()
   encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 
@@ -50,7 +50,7 @@ package func boardsJSON(_ index: BoardsIndex) -> Data {
   guard let json = try? encoder.encode(index) else {
     preconditionFailure("The boards index didn't encode.")
   }
-  return json
+  return String(decoding: json, as: UTF8.self)
 }
 
 extension BoardsIndex: Encodable {

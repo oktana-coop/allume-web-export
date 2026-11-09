@@ -69,7 +69,7 @@ import Testing
       from: renderedBoards(
         for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)]))
 
-    #expect(files.contains(SiteFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
+    #expect(files.contains(OutputFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
   }
 
   @Test func copyThePackagesViewerFiles() throws {
