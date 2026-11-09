@@ -1,4 +1,4 @@
-/* A card's color, by what the card shows, as in Allume. */
+/* A card's color, by what the card shows. */
 .allume-card[data-allume-color='purple'] {
   --allume-note-color: var(--allume-purple-note);
   --allume-board-color: var(--allume-purple-board);

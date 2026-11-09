@@ -12,8 +12,7 @@
   margin: 0;
 }
 
-/* Colored paragraphs are highlighted like labels, and gray ones not at all, as
-   in Allume. */
+/* Colored paragraphs are highlighted like labels, and gray ones not at all. */
 .allume-text-block [data-allume-color] {
   width: fit-content;
   padding: 4px 9px;
