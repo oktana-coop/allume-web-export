@@ -69,6 +69,34 @@ import Testing
               loading="lazy" decoding="async" draggable="false">
             """#)) == true)
     }
+
+    @Test func showTheirThumbnailInPreviewsAndTheOriginalOnTheBoardsOwnPage() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["image"]), makeImage("image")],
+        users: [:]
+      )
+      let thumbnails = ["image.png": makeAsset("image.jpg")]
+
+      let sources = [0, 1].map { depth in
+        drawn("image", on: "root", in: contents, depth: depth, thumbnails: thumbnails)
+      }
+
+      #expect(sources[0]?.contains(#"src="file:image.png""#) == true)
+      #expect(sources[1]?.contains(#"src="file:thumbs/image.jpg""#) == true)
+    }
+
+    @Test func showTheOriginalInPreviewsWithoutAThumbnail() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["image"]), makeImage("image")],
+        users: [:]
+      )
+
+      let html = drawn("image", on: "root", in: contents, depth: 1)
+
+      #expect(html?.contains(#"src="file:image.png""#) == true)
+    }
   }
 
   @Suite struct Links {
@@ -155,7 +183,7 @@ import Testing
       let board = try #require(contents.board(Document.ID(rawValue: "root")))
 
       let html = drawCard(
-        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:]
+        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:], thumbnails: [:]
       )?
       .rendered(resolving: describe)
 

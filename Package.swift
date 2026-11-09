@@ -24,7 +24,9 @@ let package = Package(
     .target(name: "AllumeWebThumbnails"),
     .target(
       name: "AllumeWeb",
-      dependencies: ["AllumeWebFavicons", "AllumeWebModels", "AllumeWebRendering"],
+      dependencies: [
+        "AllumeWebFavicons", "AllumeWebModels", "AllumeWebRendering", "AllumeWebThumbnails",
+      ],
       resources: [.copy("Viewer")]
     ),
     .executableTarget(

@@ -42,7 +42,7 @@ import Testing
   @Test func areThePagesThenTheFilesTheyReferToThenTheViewer() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
 
-    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:]))
+    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]))
 
     #expect(files.map(\.path) == ["index.html", "files/image.png", "allume.css", "allume.js"])
   }
@@ -50,7 +50,7 @@ import Testing
   @Test func holdThePagesTextAndCopyEverythingElse() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
 
-    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:]))
+    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]))
 
     let sources = files.map(\.source)
     guard case .text(let page) = sources.first else {
@@ -67,7 +67,8 @@ import Testing
 
     let files = siteFiles(
       from: renderedBoards(
-        for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)]))
+        for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)],
+        thumbnails: [:]))
 
     #expect(files.contains(OutputFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
   }
@@ -75,7 +76,7 @@ import Testing
   @Test func copyThePackagesViewerFiles() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
 
-    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:]))
+    let files = siteFiles(from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]))
 
     let viewerURLs = files.suffix(2).compactMap { file -> URL? in
       guard case .copy(let url) = file.source else {

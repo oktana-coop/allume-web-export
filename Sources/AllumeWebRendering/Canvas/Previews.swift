@@ -6,7 +6,8 @@ let maxPreviewDepth = 3
 /// The board's contents at the depth, scaled to fit the frame, or nil past the deepest preview.
 func drawPreview(
   of board: Document.Board, in frame: Rect, depth: Int, contents: Contents,
-  layouts: [Document.ID: BoardLayout], favicons: [String: Asset]
+  layouts: [Document.ID: BoardLayout], favicons: [String: Asset],
+  thumbnails: [String: Asset]
 ) -> HTML? {
   guard depth <= maxPreviewDepth else {
     return nil
@@ -23,5 +24,6 @@ func drawPreview(
     "div", ["class": "allume-preview", "style": .text(style)],
     separatedByLineBreaks(
       drawBoardContents(
-        board, depth: depth, contents: contents, layouts: layouts, favicons: favicons)))
+        board, depth: depth, contents: contents, layouts: layouts, favicons: favicons,
+        thumbnails: thumbnails)))
 }

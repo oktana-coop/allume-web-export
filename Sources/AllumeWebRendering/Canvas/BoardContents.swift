@@ -4,7 +4,8 @@ import AllumeWebModels
 /// connection lines, the cards by z-index, the chains, the ink.
 func drawBoardContents(
   _ board: Document.Board, depth: Int, contents: Contents, layouts: [Document.ID: BoardLayout],
-  favicons: [String: Asset]
+  favicons: [String: Asset],
+  thumbnails: [String: Asset]
 ) -> [HTML] {
   let interactive = depth == 0
   let connectionLines = drawConnectionLines(layouts[board.id] ?? layout(of: board))
@@ -13,7 +14,8 @@ func drawBoardContents(
     .sorted { a, b in (a.element.zIndex, a.offset) < (b.element.zIndex, b.offset) }
     .compactMap { _, card in
       drawCard(
-        card, on: board, depth: depth, contents: contents, layouts: layouts, favicons: favicons)
+        card, on: board, depth: depth, contents: contents, layouts: layouts, favicons: favicons,
+        thumbnails: thumbnails)
     }
   let chains = board.chains.flatMap { chain in
     drawChain(chain, contents: contents, interactive: interactive)

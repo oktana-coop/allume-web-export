@@ -7,8 +7,12 @@ package struct BoardView: Equatable, Sendable {
 }
 
 /// Each board's view, in breadth-first order from the root, and the files the views refer to,
-/// once each, in the order they're first referred to.
-package func renderBoards(_ contents: Contents, favicons: [String: Asset])
+/// once each, in the order they're first referred to. Previews show an image's thumbnail, found by
+/// the image's file name, when it has one.
+package func renderBoards(
+  _ contents: Contents, favicons: [String: Asset],
+  thumbnails: [String: Asset]
+)
   -> (views: [BoardView], files: [PublishedFile])
 {
   let boardLayouts = layouts(in: contents)
@@ -16,7 +20,9 @@ package func renderBoards(_ contents: Contents, favicons: [String: Asset])
     contents.board(boardID).map { board in
       (
         boardID: boardID,
-        view: drawBoardView(board, contents: contents, layouts: boardLayouts, favicons: favicons)
+        view: drawBoardView(
+          board, contents: contents, layouts: boardLayouts, favicons: favicons,
+          thumbnails: thumbnails)
       )
     }
   }

@@ -14,7 +14,7 @@ import Testing
       users: [:]
     )
 
-    let (views, _) = renderBoards(contents, favicons: [:])
+    let (views, _) = renderBoards(contents, favicons: [:], thumbnails: [:])
 
     #expect(views.map(\.boardID.rawValue) == ["root", "functional"])
     #expect(views.allSatisfy { view in view.html.hasPrefix(#"<div class="allume""#) })
@@ -30,7 +30,7 @@ import Testing
       users: [:]
     )
 
-    let (views, _) = renderBoards(contents, favicons: [:])
+    let (views, _) = renderBoards(contents, favicons: [:], thumbnails: [:])
 
     let root = try #require(views.first)
     #expect(
@@ -50,7 +50,8 @@ import Testing
       users: [:]
     )
 
-    let (views, _) = renderBoards(contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")])
+    let (views, _) = renderBoards(
+      contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")], thumbnails: [:])
 
     let html = try #require(views.first?.html)
     #expect(html.contains(#"src="allume:file/Tom%20%26%20Jerry.png""#))
@@ -71,7 +72,7 @@ import Testing
       users: [:]
     )
 
-    let (_, files) = renderBoards(contents, favicons: [:])
+    let (_, files) = renderBoards(contents, favicons: [:], thumbnails: [:])
 
     #expect(files.map(\.path) == ["image.png", "root_ink.svg"])
   }

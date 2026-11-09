@@ -75,6 +75,8 @@ import Testing
 }
 
 private func drawnView(of board: Document.Board, in contents: Contents) -> String {
-  drawBoardView(board, contents: contents, layouts: layouts(in: contents), favicons: [:])
-    .rendered(resolving: describe)
+  drawBoardView(
+    board, contents: contents, layouts: layouts(in: contents), favicons: [:], thumbnails: [:]
+  )
+  .rendered(resolving: describe)
 }

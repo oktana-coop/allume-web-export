@@ -12,9 +12,12 @@ package struct RenderedBoards: Sendable {
   package let files: [PublishedFile]
 }
 
-/// The boards published from the export, rendered. The favicons are each link host's icon.
-package func renderedBoards(for contents: Contents, favicons: [String: Asset]) -> RenderedBoards {
-  let (views, files) = renderBoards(contents, favicons: favicons)
+/// The boards published from the export, rendered. The favicons are each link host's icon, and
+/// the thumbnails, which previews show, each image's by its file name.
+package func renderedBoards(
+  for contents: Contents, favicons: [String: Asset], thumbnails: [String: Asset]
+) -> RenderedBoards {
+  let (views, files) = renderBoards(contents, favicons: favicons, thumbnails: thumbnails)
 
   return RenderedBoards(index: boardsIndex(for: contents), views: views, files: files)
 }

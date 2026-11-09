@@ -10,7 +10,8 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: URLPatterns())
+      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]),
+      urlPatterns: URLPatterns())
 
     #expect(
       files.map(\.path) == [
@@ -22,7 +23,8 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: URLPatterns())
+      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]),
+      urlPatterns: URLPatterns())
 
     let html = try #require(rootView(in: files))
     #expect(html.hasPrefix(#"<div class="allume""#))
@@ -37,7 +39,7 @@ import Testing
     let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: urlPatterns)
+      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]), urlPatterns: urlPatterns)
 
     let html = try #require(rootView(in: files))
     #expect(html.contains(#"href="/boards/\#(slug)/""#))
@@ -52,7 +54,7 @@ import Testing
     let urlPatterns = URLPatterns(files: "/allume/files/")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:]), urlPatterns: urlPatterns)
+      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]), urlPatterns: urlPatterns)
 
     let html = try #require(rootView(in: files))
     #expect(html.contains(#"href="allume:board/functional""#))

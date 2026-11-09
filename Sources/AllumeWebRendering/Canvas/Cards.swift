@@ -5,7 +5,8 @@ import Foundation
 /// which leave out whatever can be clicked.
 func drawCard(
   _ card: Card, on board: Document.Board, depth: Int, contents: Contents,
-  layouts: [Document.ID: BoardLayout], favicons: [String: Asset]
+  layouts: [Document.ID: BoardLayout], favicons: [String: Asset],
+  thumbnails: [String: Asset]
 ) -> HTML? {
   let interactive = depth == 0
   let menu =
@@ -20,7 +21,7 @@ func drawCard(
   case .board(let child)?:
     let preview = drawPreview(
       of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
-      favicons: favicons)
+      favicons: favicons, thumbnails: thumbnails)
     return drawBoardCard(
       card, showing: child, preview: preview, menu: menu, interactive: interactive,
       contents: contents)
@@ -34,7 +35,10 @@ func drawCard(
   case .image(let image)?:
     return cardElement(
       card, kind: "image", style: boxStyle(card.frame), interactive: interactive,
-      children: [drawImage(image, contents: contents)] + menu)
+      children: [
+        drawImage(
+          image, thumbnail: interactive ? nil : thumbnails[image.file.name], contents: contents)
+      ] + menu)
 
   case .link(let link)?:
     return cardElement(
@@ -125,14 +129,20 @@ private func linkedIcon(of board: Document.Board, menu: [HTML], contents: Conten
   return menu
 }
 
-private func drawImage(_ image: Document.Image, contents: Contents) -> HTML {
+/// The image, or its thumbnail, which previews show instead when there's one.
+private func drawImage(_ image: Document.Image, thumbnail: Asset?, contents: Contents) -> HTML {
   let sourceLabel = image.excerpt.flatMap { excerpt in label(of: excerpt.sourceID, in: contents) }
+  let file =
+    thumbnail.map { thumbnail in
+      PublishedFile(path: "thumbs/\(thumbnail.name)", source: thumbnail.url)
+    }
+    ?? PublishedFile(path: image.file.name, source: image.file.url)
 
   return .element(
     "img",
     [
       "class": "allume-body",
-      "src": .file(PublishedFile(path: image.file.name, source: image.file.url)),
+      "src": .file(file),
       "alt": .text(image.label ?? ""),
       "title": sourceLabel.map { label in .text("From \(label)") },
       "loading": "lazy",

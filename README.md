@@ -38,7 +38,8 @@ The site's folder then holds:
 - `index.html`, the exported board's page;
 - a page for every board inside it, named after its label with a short code, such as
   `functional-q5tbqj.html`;
-- `files/`, with the images, handwriting, avatars and favicons the pages show;
+- `files/`, with the images, handwriting, avatars and favicons the pages show, and in `thumbs/`,
+  smaller copies of the images, which the previews of boards inside boards show;
 - `allume.css` and `allume.js`, the viewer.
 
 #### Embed
