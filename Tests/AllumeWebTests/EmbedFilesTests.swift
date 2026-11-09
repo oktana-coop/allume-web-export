@@ -6,7 +6,7 @@ import Testing
 @testable import AllumeWeb
 
 @Suite struct EmbedFilesTests {
-  @Test func areTheIndexThenTheViewsThenTheFilesTheyReferToThenTheViewer() throws {
+  @Test func areTheIndexThenTheViewsThenThePreviewThenTheFilesThenTheViewer() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
@@ -15,8 +15,23 @@ import Testing
 
     #expect(
       files.map(\.path) == [
-        "boards.json", "boards/root.html", "files/image.png", "allume.css", "allume.js",
+        "boards.json", "boards/root.html", "preview.html", "files/image.png", "allume.css",
+        "allume.js",
       ])
+  }
+
+  @Test func resolveThePreviewsReferencesAndCopyItsFiles() throws {
+    let contents = try makeContents(with: [makeImage("image.png")])
+    let urlPatterns = URLPatterns(files: "/allume/files")
+
+    let files = embedFiles(
+      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage),
+      urlPatterns: urlPatterns)
+
+    let preview = try #require(text(of: "preview.html", in: files))
+    #expect(preview.hasPrefix(#"<div class="allume allume-board-preview""#))
+    #expect(preview.contains(#"src="/allume/files/thumbs/image.jpg""#))
+    #expect(files.map(\.path).contains("files/thumbs/image.jpg"))
   }
 
   @Test func keepTheViewsReferencesWithoutPatterns() throws {
@@ -64,8 +79,13 @@ import Testing
 
 /// The root's view, if it's among the files as text.
 private func rootView(in files: [OutputFile]) -> String? {
+  text(of: "boards/root.html", in: files)
+}
+
+/// The file's text, if it's among the files as text.
+private func text(of path: String, in files: [OutputFile]) -> String? {
   files.compactMap { file -> String? in
-    guard file.path == "boards/root.html", case .text(let html) = file.source else { return nil }
-    return html
+    guard file.path == path, case .text(let text) = file.source else { return nil }
+    return text
   }.first
 }

@@ -15,24 +15,23 @@ package struct URLPatterns: Sendable {
   }
 }
 
-/// The view's HTML, with each reference that has a pattern resolved to its URL.
-func resolvingReferences(in view: BoardView, urlPatterns: URLPatterns, index: BoardsIndex) -> String
-{
+/// The HTML, with each reference that has a pattern resolved to its URL.
+func resolvingReferences(in html: String, urlPatterns: URLPatterns, index: BoardsIndex) -> String {
   let urls = ReferenceURLs(
     boards: urlPatterns.board.map { pattern in boardURLs(pattern: pattern, in: index) } ?? [:],
     files: urlPatterns.files.map { url in url.hasSuffix("/") ? url : url + "/" } ?? "")
 
-  // The index lists every published board, which are all a view can refer to.
+  // The index lists every published board, which are all a view or preview can refer to.
   guard
-    let html = try? resolvingReferences(
-      in: view.html,
+    let resolved = try? resolvingReferences(
+      in: html,
       with: { reference throws(UnknownBoardError) in
         try resolved(reference, urlPatterns: urlPatterns, urls: urls)
       })
   else {
-    preconditionFailure("A view refers to a board the index doesn't list.")
+    preconditionFailure("A view or preview refers to a board the index doesn't list.")
   }
-  return html
+  return resolved
 }
 
 /// The reference's URL, from the pattern for its kind, or the reference itself without one.

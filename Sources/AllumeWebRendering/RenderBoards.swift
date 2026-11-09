@@ -6,6 +6,12 @@ package struct BoardView: Equatable, Sendable {
   package let html: String
 }
 
+/// The root board's preview, whose images are references, and the files it refers to.
+package struct BoardPreview: Equatable, Sendable {
+  package let html: String
+  package let files: [PublishedFile]
+}
+
 /// Each board's view, in breadth-first order from the root, and the files the views refer to,
 /// once each, in the order they're first referred to. An image's files, found by its file name,
 /// are those publishing made for it: a copy browsers can show, and a thumbnail for previews.
@@ -32,4 +38,19 @@ package func renderBoards(
   }
   let files = drawn.flatMap { _, view in view.files }.uniqued(on: \.path)
   return (views, files)
+}
+
+/// The root board's preview, as an element for a page to show. Its images are those of the views.
+package func renderRootPreview(
+  _ contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
+) -> BoardPreview {
+  guard let root = contents.board(contents.rootID) else {
+    preconditionFailure("The contents' root is always a board.")
+  }
+
+  let preview = drawBoardPreview(
+    of: root, contents: contents, layouts: layouts(in: contents), favicons: favicons,
+    images: images)
+  return BoardPreview(
+    html: preview.rendered(resolving: \.text), files: preview.files.uniqued(on: \.path))
 }

@@ -76,4 +76,23 @@ import Testing
 
     #expect(files.map(\.path) == ["image.png", "root_ink.svg"])
   }
+
+  @Test func previewTheRootWithThumbnailsListingItsFilesOnce() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        makeBoard("root", cards: ["image", "child"]), makeBoard("child", cards: ["image"]),
+        makeImage("image"),
+      ],
+      users: [:]
+    )
+    let images = [
+      "image.png": ImageFiles(image: makeAsset("image.png"), thumbnail: makeAsset("image.jpg"))
+    ]
+
+    let preview = renderRootPreview(contents, favicons: [:], images: images)
+
+    #expect(preview.html.contains(#"src="allume:file/thumbs/image.jpg""#))
+    #expect(preview.files.map(\.path) == ["thumbs/image.jpg"])
+  }
 }

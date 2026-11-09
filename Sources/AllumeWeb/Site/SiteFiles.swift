@@ -16,7 +16,7 @@ package func siteFiles(from boards: RenderedBoards, theme: SiteTheme) -> [Output
     preconditionFailure("A page refers to a board the site doesn't publish.")
   }
 
-  return sitePages + referredFiles(of: boards) + viewerFiles()
+  return sitePages + referredFiles(boards.files) + viewerFiles()
 }
 
 /// The view's standalone page, at its board's URL, with each reference resolved to the site's URL.

@@ -1005,7 +1005,9 @@
   }
 
   // viewer/main.ts
-  for (const root of document.querySelectorAll(".allume")) {
+  for (const root of document.querySelectorAll(
+    ".allume[data-allume-board]"
+  )) {
     setUpBoardView(root);
   }
 })();

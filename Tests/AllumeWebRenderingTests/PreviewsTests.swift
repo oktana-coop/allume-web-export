@@ -40,6 +40,48 @@ import Testing
           """#))
   }
 
+  @Test func showABoardOnAPageWholeAtItsProportions() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "root"), label: nil,
+            cards: [makeCard("note", frame: Rect(x: 100, y: 50, width: 200, height: 100))],
+            chains: [], connections: [], ink: [])),
+        makeNote("note"),
+      ],
+      users: [:]
+    )
+    let root = try #require(contents.board(Document.ID(rawValue: "root")))
+
+    let html = drawBoardPreview(
+      of: root, contents: contents, layouts: layouts(in: contents), favicons: [:], images: [:]
+    )
+    .rendered(resolving: describe)
+
+    // 100 + 200 wide, with the margin at the origin repeated; room for titles, then 50 + 100,
+    // and the margin.
+    #expect(
+      html.hasPrefix(
+        #"<div class="allume allume-board-preview" aria-hidden="true" style="aspect-ratio:400/232">"#
+      ))
+    let style =
+      "width:400px;height:232px;"
+      + "transform:scale(var(--allume-preview-scale, 1)) translateY(32px)"
+    #expect(
+      html.contains(
+        #"<div class="allume-preview" style="\#(style)">"#
+          + markup(
+            #"""
+            <div class="allume-card allume-note-card" data-allume-doc="note"
+              style="left:100px;top:50px;width:200px;height:100px;z-index:0">
+              <div class="allume-body">A note</div>
+            </div>
+            </div>
+            """#)))
+  }
+
   @Test func leaveOutWhateverCanBeClicked() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),

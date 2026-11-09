@@ -3,13 +3,14 @@ import AllumeWebRendering
 import Foundation
 
 /// The published boards as rendered: their index, each board's view, with its references kept,
-/// and the files the views refer to. `embed` writes them to a folder, and the site is made from
-/// them.
+/// the files the views refer to, and the root board's preview. `embed` writes them to a folder,
+/// and the site is made from them.
 package struct RenderedBoards: Sendable {
   package let index: BoardsIndex
   /// In breadth-first order from the root.
   package let views: [BoardView]
   package let files: [PublishedFile]
+  package let preview: BoardPreview
 }
 
 /// The boards published from the export, rendered. The favicons are each link host's icon, and
@@ -18,13 +19,15 @@ package func renderedBoards(
   for contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
 ) -> RenderedBoards {
   let (views, files) = renderBoards(contents, favicons: favicons, images: images)
+  let preview = renderRootPreview(contents, favicons: favicons, images: images)
 
-  return RenderedBoards(index: boardsIndex(for: contents), views: views, files: files)
+  return RenderedBoards(
+    index: boardsIndex(for: contents), views: views, files: files, preview: preview)
 }
 
-/// The files the views refer to, under `files/`.
-func referredFiles(of boards: RenderedBoards) -> [OutputFile] {
-  boards.files.map { file in OutputFile(path: "files/\(file.path)", source: .copy(file.source)) }
+/// The files, under `files/`.
+func referredFiles(_ files: [PublishedFile]) -> [OutputFile] {
+  files.map { file in OutputFile(path: "files/\(file.path)", source: .copy(file.source)) }
 }
 
 /// The viewer's style sheet and script, for pages to include.

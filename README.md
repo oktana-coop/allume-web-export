@@ -56,10 +56,13 @@ allume-web-export embed path/to/export --out allume
 Its folder holds:
 
 - `boards.json`, which lists the boards, each with its label, a suggested slug, the boards it's on
-  and its view's path;
+  and its view's path, and gives the preview's path;
 - `boards/`, each board's view, an element for a page to include, whose links and images are
   `allume:` references for the site to replace with its own URLs, as
   [References](docs/References.md) explains;
+- `preview.html`, a preview of the exported board, as its card on another board would show it,
+  for a page to include, e.g. in a link to the board's page. It keeps the board's proportions, and
+  is as wide as its box;
 - `files/`, as for a site;
 - `allume.css` and `allume.js`, the viewer, for the site's pages to include.
 

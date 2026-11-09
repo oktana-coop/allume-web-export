@@ -41,6 +41,9 @@ func viewPath(of boardID: Document.ID) -> String {
   "boards/\(boardID.rawValue).html"
 }
 
+/// Where the root board's preview is in the folder.
+let previewPath = "preview.html"
+
 /// The index as `boards.json`, its keys sorted, so the same boards give the same file.
 package func boardsJSON(_ index: BoardsIndex) -> String {
   let encoder = JSONEncoder()
@@ -55,13 +58,14 @@ package func boardsJSON(_ index: BoardsIndex) -> String {
 
 extension BoardsIndex: Encodable {
   private enum CodingKeys: String, CodingKey {
-    case version, root, boards
+    case version, root, preview, boards
   }
 
   package func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(1, forKey: .version)
     try container.encode(root.rawValue, forKey: .root)
+    try container.encode(previewPath, forKey: .preview)
     try container.encode(
       Dictionary(uniqueKeysWithValues: boards.map { boardID, board in (boardID.rawValue, board) }),
       forKey: .boards)

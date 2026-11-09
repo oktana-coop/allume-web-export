@@ -60,6 +60,7 @@ import Testing
               "view" : "boards/root.html"
             }
           },
+          "preview" : "preview.html",
           "root" : "root",
           "version" : 1
         }

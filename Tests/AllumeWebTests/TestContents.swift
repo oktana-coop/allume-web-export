@@ -1,4 +1,5 @@
 import AllumeWebModels
+import AllumeWebRendering
 import Foundation
 
 /// A root board with a card for each document.
@@ -40,3 +41,10 @@ func makeImage(_ name: String) -> Document {
 func makeLink(_ id: String, url: String) -> Document {
   .link(Document.Link(id: Document.ID(rawValue: id), url: url, title: nil, label: nil))
 }
+
+/// The files publishing makes for `image.png`: the original, and a thumbnail.
+let thumbnailedImage = [
+  "image.png": ImageFiles(
+    image: Asset(name: "image.png", url: URL(filePath: "/bundle/files/image.png")),
+    thumbnail: Asset(name: "image.jpg", url: URL(filePath: "/made/thumbs/image.jpg")))
+]

@@ -23,7 +23,7 @@ import Testing
         BoardView(boardID: root, html: #"<a href="allume:board/functional">Functional</a>"#),
         BoardView(boardID: functional, html: #"<a href="allume:board/root">Languages</a>"#),
       ],
-      files: [])
+      files: [], preview: BoardPreview(html: "", files: []))
 
     let files = siteFiles(from: boards, theme: .light)
 
@@ -61,6 +61,17 @@ import Testing
     }
     #expect(page.hasPrefix("<!doctype html>"))
     #expect(sources.dropFirst().first == .copy(URL(filePath: "/bundle/files/image.png")))
+  }
+
+  @Test func copyOnlyTheFilesTheViewsShow() throws {
+    // The root's own image shows whole on its page, and as a thumbnail in its preview alone.
+    let contents = try makeContents(with: [makeImage("image.png")])
+
+    let files = siteFiles(
+      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage), theme: .light)
+
+    #expect(files.map(\.path).contains("files/image.png"))
+    #expect(!files.map(\.path).contains("files/thumbs/image.jpg"))
   }
 
   @Test func copyTheLinksFavicons() throws {
