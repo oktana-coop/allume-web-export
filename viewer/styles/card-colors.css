@@ -1,24 +1,51 @@
-.allume-card[data-allume-color] > .allume-body {
-  --allume-tint: var(--allume-gray-tint);
+/* A card's color, by what the card shows, as in Allume. */
+.allume-card[data-allume-color='purple'] {
+  --allume-note-color: var(--allume-purple-note);
+  --allume-board-color: var(--allume-purple-board);
+  --allume-border-color: var(--allume-purple-border);
 }
-.allume-card[data-allume-color='purple'] > .allume-body {
-  --allume-tint: var(--allume-purple-tint);
+.allume-card[data-allume-color='red'] {
+  --allume-note-color: var(--allume-red-note);
+  --allume-board-color: var(--allume-red-board);
+  --allume-border-color: var(--allume-red-border);
 }
-.allume-card[data-allume-color='red'] > .allume-body {
-  --allume-tint: var(--allume-red-tint);
+.allume-card[data-allume-color='green'] {
+  --allume-note-color: var(--allume-green-note);
+  --allume-board-color: var(--allume-green-board);
+  --allume-border-color: var(--allume-green-border);
 }
-.allume-card[data-allume-color='green'] > .allume-body {
-  --allume-tint: var(--allume-green-tint);
+.allume-card[data-allume-color='yellow'] {
+  --allume-note-color: var(--allume-yellow-note);
+  --allume-board-color: var(--allume-yellow-board);
+  --allume-border-color: var(--allume-yellow-border);
 }
-.allume-card[data-allume-color='yellow'] > .allume-body {
-  --allume-tint: var(--allume-yellow-tint);
+.allume-card[data-allume-color='blue'] {
+  --allume-note-color: var(--allume-blue-note);
+  --allume-board-color: var(--allume-blue-board);
+  --allume-border-color: var(--allume-blue-border);
 }
-.allume-card[data-allume-color='blue'] > .allume-body {
-  --allume-tint: var(--allume-blue-tint);
+/* Unset, so that gray falls back to a card's own color rather than taking a
+   colored board's from around its preview. */
+.allume-card[data-allume-color='gray'] {
+  --allume-note-color: initial;
+  --allume-board-color: initial;
+  --allume-border-color: var(--allume-gray-border);
 }
-.allume-card[data-allume-color]:not(.allume-image-card) > .allume-body {
-  background: var(--allume-tint);
+
+.allume-note-card[data-allume-color] > .allume-body {
+  background: var(--allume-note-color, var(--allume-card-muted));
+}
+.allume-board-card[data-allume-color] > .allume-panel {
+  background: var(--allume-board-color, var(--allume-panel));
 }
 .allume-image-card[data-allume-color] > .allume-body {
-  box-shadow: 0 0 0 3px var(--allume-tint);
+  box-shadow:
+    0 0 0 3px var(--allume-border-color),
+    var(--allume-image-shadow);
+}
+.allume-link-card[data-allume-color] > .allume-body,
+.allume-pdf-card[data-allume-color] > .allume-body {
+  box-shadow:
+    0 0 0 3px var(--allume-border-color),
+    var(--allume-card-shadow);
 }

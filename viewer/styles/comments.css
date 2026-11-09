@@ -5,7 +5,7 @@
   overflow: hidden;
   border-radius: 16px;
   background: color-mix(in srgb, var(--allume-author, #d8b682) 38%, white);
-  box-shadow: var(--allume-card-shadow);
+  box-shadow: var(--allume-comment-shadow);
   /* Calibrated like notes to fit the size Allume gave each comment. */
   font-size: 13.5px;
   letter-spacing: -0.1px;

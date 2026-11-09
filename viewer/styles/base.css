@@ -1,38 +1,50 @@
 /* Without specificity, so that a site's own values for .allume win, whichever
    stylesheet comes first. */
 :where(.allume) {
+  /* Allume's own colors, from its color sets, converted to sRGB where they're
+     Display P3. The white, the hairline, the muted text and the green are
+     ours: the view's controls, which Allume draws its own way. */
   --allume-canvas: #e0dfde;
-  --allume-panel: #efefed;
+  --allume-panel: #f1f0ee;
   --allume-card: #ffffff;
   --allume-card-muted: #e9e8e7;
   --allume-hairline: rgb(0 0 0 / 0.07);
-  --allume-text: #1d1d1c;
+  --allume-text: #272624;
   --allume-muted: #7b7b78;
   --allume-connection: #c2c0c0;
-  /* Cards and comments barely lift off the canvas, as in Allume. */
-  --allume-card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-  /* Boards float a little higher than the cards on them. */
-  --allume-board-shadow:
-    0 2px 4px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
+  /* Allume's shadows, whose radius CSS's blur doubles. */
+  --allume-board-shadow: 0 0 14px rgb(38 36 32 / 0.07);
+  --allume-image-shadow: 0 0 6px rgb(38 36 32 / 0.07);
+  --allume-card-shadow: 0 0 6px rgb(38 36 32 / 0.05);
+  --allume-comment-shadow: 0 1px 1px rgb(38 36 32 / 0.05);
   --allume-bar-height: 48px;
 
   --allume-green: #36884a;
 
-  /* Colors tint cards and highlight text blocks. Allume's purple highlight is
-     sampled from a screenshot; the others share its lightness and chroma. */
-  --allume-purple-tint: #e4defb;
-  --allume-purple-highlight: oklch(86.5% 0.056 300);
-  --allume-red-tint: #fadcd8;
-  --allume-red-highlight: oklch(86.5% 0.056 25);
-  --allume-green-tint: #d8efdc;
-  --allume-green-highlight: oklch(86.5% 0.056 150);
-  --allume-yellow-tint: #faefbd;
-  --allume-yellow-highlight: oklch(86.5% 0.056 95);
-  --allume-blue-tint: #dbe7fb;
-  --allume-blue-highlight: oklch(86.5% 0.056 255);
-  /* Allume's gray is its plain card color. */
-  --allume-gray-tint: var(--allume-card-muted);
-  --allume-gray-highlight: oklch(86.5% 0 0);
+  /* A user's color is a note's background, a board's, the border of an image,
+     link or PDF, or a text block's highlight. Gray is a note's or board's own
+     color, and no highlight. */
+  --allume-purple-note: #ebe2fd;
+  --allume-purple-board: #f0e9ff;
+  --allume-purple-border: #b88df8;
+  --allume-purple-highlight: #d8cbf3;
+  --allume-red-note: #ffe4df;
+  --allume-red-board: #ffeeeb;
+  --allume-red-border: #f88d8d;
+  --allume-red-highlight: #f4c8bf;
+  --allume-green-note: #dff4da;
+  --allume-green-board: #e6f7e2;
+  --allume-green-border: #8fce80;
+  --allume-green-highlight: #bee7b4;
+  --allume-yellow-note: #faf0da;
+  --allume-yellow-board: #fff8e8;
+  --allume-yellow-border: #f8dd8d;
+  --allume-yellow-highlight: #fbeac0;
+  --allume-blue-note: #dce8f9;
+  --allume-blue-board: #e5f0ff;
+  --allume-blue-border: #8db8f8;
+  --allume-blue-highlight: #c1d3ef;
+  --allume-gray-border: #bebbb8;
 }
 
 /* Each element of the view starts from the browser's defaults, which these

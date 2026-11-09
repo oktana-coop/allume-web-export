@@ -2,29 +2,40 @@
 /* viewer/styles/base.css */
 :where(.allume) {
   --allume-canvas: #e0dfde;
-  --allume-panel: #efefed;
+  --allume-panel: #f1f0ee;
   --allume-card: #ffffff;
   --allume-card-muted: #e9e8e7;
   --allume-hairline: rgb(0 0 0 / 0.07);
-  --allume-text: #1d1d1c;
+  --allume-text: #272624;
   --allume-muted: #7b7b78;
   --allume-connection: #c2c0c0;
-  --allume-card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-  --allume-board-shadow: 0 2px 4px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
+  --allume-board-shadow: 0 0 14px rgb(38 36 32 / 0.07);
+  --allume-image-shadow: 0 0 6px rgb(38 36 32 / 0.07);
+  --allume-card-shadow: 0 0 6px rgb(38 36 32 / 0.05);
+  --allume-comment-shadow: 0 1px 1px rgb(38 36 32 / 0.05);
   --allume-bar-height: 48px;
   --allume-green: #36884a;
-  --allume-purple-tint: #e4defb;
-  --allume-purple-highlight: oklch(86.5% 0.056 300);
-  --allume-red-tint: #fadcd8;
-  --allume-red-highlight: oklch(86.5% 0.056 25);
-  --allume-green-tint: #d8efdc;
-  --allume-green-highlight: oklch(86.5% 0.056 150);
-  --allume-yellow-tint: #faefbd;
-  --allume-yellow-highlight: oklch(86.5% 0.056 95);
-  --allume-blue-tint: #dbe7fb;
-  --allume-blue-highlight: oklch(86.5% 0.056 255);
-  --allume-gray-tint: var(--allume-card-muted);
-  --allume-gray-highlight: oklch(86.5% 0 0);
+  --allume-purple-note: #ebe2fd;
+  --allume-purple-board: #f0e9ff;
+  --allume-purple-border: #b88df8;
+  --allume-purple-highlight: #d8cbf3;
+  --allume-red-note: #ffe4df;
+  --allume-red-board: #ffeeeb;
+  --allume-red-border: #f88d8d;
+  --allume-red-highlight: #f4c8bf;
+  --allume-green-note: #dff4da;
+  --allume-green-board: #e6f7e2;
+  --allume-green-border: #8fce80;
+  --allume-green-highlight: #bee7b4;
+  --allume-yellow-note: #faf0da;
+  --allume-yellow-board: #fff8e8;
+  --allume-yellow-border: #f8dd8d;
+  --allume-yellow-highlight: #fbeac0;
+  --allume-blue-note: #dce8f9;
+  --allume-blue-board: #e5f0ff;
+  --allume-blue-border: #8db8f8;
+  --allume-blue-highlight: #c1d3ef;
+  --allume-gray-border: #bebbb8;
 }
 .allume :where(:not(svg, svg *)),
 .allume ::before,
@@ -210,7 +221,7 @@
   height: 100%;
   border-radius: 4px;
   background: var(--allume-card);
-  box-shadow: var(--allume-card-shadow);
+  box-shadow: var(--allume-image-shadow);
   object-fit: cover;
 }
 
@@ -300,29 +311,48 @@
 }
 
 /* viewer/styles/card-colors.css */
-.allume-card[data-allume-color] > .allume-body {
-  --allume-tint: var(--allume-gray-tint);
+.allume-card[data-allume-color=purple] {
+  --allume-note-color: var(--allume-purple-note);
+  --allume-board-color: var(--allume-purple-board);
+  --allume-border-color: var(--allume-purple-border);
 }
-.allume-card[data-allume-color=purple] > .allume-body {
-  --allume-tint: var(--allume-purple-tint);
+.allume-card[data-allume-color=red] {
+  --allume-note-color: var(--allume-red-note);
+  --allume-board-color: var(--allume-red-board);
+  --allume-border-color: var(--allume-red-border);
 }
-.allume-card[data-allume-color=red] > .allume-body {
-  --allume-tint: var(--allume-red-tint);
+.allume-card[data-allume-color=green] {
+  --allume-note-color: var(--allume-green-note);
+  --allume-board-color: var(--allume-green-board);
+  --allume-border-color: var(--allume-green-border);
 }
-.allume-card[data-allume-color=green] > .allume-body {
-  --allume-tint: var(--allume-green-tint);
+.allume-card[data-allume-color=yellow] {
+  --allume-note-color: var(--allume-yellow-note);
+  --allume-board-color: var(--allume-yellow-board);
+  --allume-border-color: var(--allume-yellow-border);
 }
-.allume-card[data-allume-color=yellow] > .allume-body {
-  --allume-tint: var(--allume-yellow-tint);
+.allume-card[data-allume-color=blue] {
+  --allume-note-color: var(--allume-blue-note);
+  --allume-board-color: var(--allume-blue-board);
+  --allume-border-color: var(--allume-blue-border);
 }
-.allume-card[data-allume-color=blue] > .allume-body {
-  --allume-tint: var(--allume-blue-tint);
+.allume-card[data-allume-color=gray] {
+  --allume-note-color: initial;
+  --allume-board-color: initial;
+  --allume-border-color: var(--allume-gray-border);
 }
-.allume-card[data-allume-color]:not(.allume-image-card) > .allume-body {
-  background: var(--allume-tint);
+.allume-note-card[data-allume-color] > .allume-body {
+  background: var(--allume-note-color, var(--allume-card-muted));
+}
+.allume-board-card[data-allume-color] > .allume-panel {
+  background: var(--allume-board-color, var(--allume-panel));
 }
 .allume-image-card[data-allume-color] > .allume-body {
-  box-shadow: 0 0 0 3px var(--allume-tint);
+  box-shadow: 0 0 0 3px var(--allume-border-color), var(--allume-image-shadow);
+}
+.allume-link-card[data-allume-color] > .allume-body,
+.allume-pdf-card[data-allume-color] > .allume-body {
+  box-shadow: 0 0 0 3px var(--allume-border-color), var(--allume-card-shadow);
 }
 
 /* viewer/styles/text-blocks.css */
@@ -342,7 +372,7 @@
   width: fit-content;
   padding: 4px 9px;
   border-radius: 4px;
-  background: var(--allume-highlight);
+  background: var(--allume-highlight, none);
 }
 .allume-text-block [data-allume-color=purple] {
   --allume-highlight: var(--allume-purple-highlight);
@@ -359,9 +389,6 @@
 .allume-text-block [data-allume-color=blue] {
   --allume-highlight: var(--allume-blue-highlight);
 }
-.allume-text-block [data-allume-color=gray] {
-  --allume-highlight: var(--allume-gray-highlight);
-}
 
 /* viewer/styles/comments.css */
 .allume-comment {
@@ -370,7 +397,7 @@
   overflow: hidden;
   border-radius: 16px;
   background: color-mix(in srgb, var(--allume-author, #d8b682) 38%, white);
-  box-shadow: var(--allume-card-shadow);
+  box-shadow: var(--allume-comment-shadow);
   font-size: 13.5px;
   letter-spacing: -0.1px;
   line-height: 20px;

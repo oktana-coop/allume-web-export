@@ -12,12 +12,13 @@
   margin: 0;
 }
 
-/* Colored paragraphs are highlighted like labels. */
+/* Colored paragraphs are highlighted like labels, and gray ones not at all, as
+   in Allume. */
 .allume-text-block [data-allume-color] {
   width: fit-content;
   padding: 4px 9px;
   border-radius: 4px;
-  background: var(--allume-highlight);
+  background: var(--allume-highlight, none);
 }
 .allume-text-block [data-allume-color='purple'] {
   --allume-highlight: var(--allume-purple-highlight);
@@ -33,7 +34,4 @@
 }
 .allume-text-block [data-allume-color='blue'] {
   --allume-highlight: var(--allume-blue-highlight);
-}
-.allume-text-block [data-allume-color='gray'] {
-  --allume-highlight: var(--allume-gray-highlight);
 }
