@@ -24,7 +24,7 @@ import Testing
         == markup(
           #"""
           <div class="allume-comment"
-            style="left:0px;top:0px;width:100px;height:100px;z-index:9000;--author:#7f0bd5">
+            style="left:0px;top:0px;width:100px;height:100px;z-index:9000;--allume-author:#7f0bd5">
             <img class="allume-avatar" src="file:user_mira.png" alt="Mira Okafor" title="Mira Okafor"
               draggable="false">
             <div class="allume-text">A comment</div>

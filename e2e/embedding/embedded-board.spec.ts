@@ -25,6 +25,17 @@ test.describe("a board's view in a site's page", () => {
     await expectHeading({ page, board: paradigms });
   });
 
+  test("keeps its styles off the site's page", async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+
+    await page.goto(sitePage);
+
+    await expect(page.locator('body')).toHaveCSS(
+      'background-color',
+      'rgba(0, 0, 0, 0)'
+    );
+  });
+
   test("keeps the site's classes off its cards", async ({ page }) => {
     const sitePage = await embedBoard({ page, board: languages });
 

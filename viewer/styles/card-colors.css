@@ -1,24 +1,24 @@
 .allume-card[data-allume-color] > .allume-body {
-  --tint: var(--gray-tint);
+  --allume-tint: var(--allume-gray-tint);
 }
 .allume-card[data-allume-color='purple'] > .allume-body {
-  --tint: var(--purple-tint);
+  --allume-tint: var(--allume-purple-tint);
 }
 .allume-card[data-allume-color='red'] > .allume-body {
-  --tint: var(--red-tint);
+  --allume-tint: var(--allume-red-tint);
 }
 .allume-card[data-allume-color='green'] > .allume-body {
-  --tint: var(--green-tint);
+  --allume-tint: var(--allume-green-tint);
 }
 .allume-card[data-allume-color='yellow'] > .allume-body {
-  --tint: var(--yellow-tint);
+  --allume-tint: var(--allume-yellow-tint);
 }
 .allume-card[data-allume-color='blue'] > .allume-body {
-  --tint: var(--blue-tint);
+  --allume-tint: var(--allume-blue-tint);
 }
 .allume-card[data-allume-color]:not(.allume-image-card) > .allume-body {
-  background: var(--tint);
+  background: var(--allume-tint);
 }
 .allume-image-card[data-allume-color] > .allume-body {
-  box-shadow: 0 0 0 3px var(--tint);
+  box-shadow: 0 0 0 3px var(--allume-tint);
 }

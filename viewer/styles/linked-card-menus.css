@@ -7,7 +7,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--muted);
+  color: var(--allume-muted);
   font: inherit;
 }
 
@@ -22,7 +22,7 @@ button.allume-linked {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--card);
+  background: var(--allume-card);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
   z-index: 1;
 }
@@ -36,7 +36,7 @@ button.allume-linked {
   padding: 6px;
   border: 0;
   border-radius: 12px;
-  background: var(--card);
+  background: var(--allume-card);
   box-shadow: 0 10px 32px rgb(0 0 0 / 0.2);
   font-size: 15px;
   line-height: 20px;
@@ -46,7 +46,7 @@ button.allume-linked {
 .allume-linked-menu p {
   margin: 4px 10px 6px;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--allume-muted);
 }
 
 .allume-linked-menu ul {
@@ -60,12 +60,12 @@ button.allume-linked {
   display: block;
   padding: 7px 10px 7px 30px;
   border-radius: 8px;
-  color: var(--text);
+  color: var(--allume-text);
   text-decoration: none;
 }
 
 .allume-linked-menu a:hover {
-  background: var(--panel);
+  background: var(--allume-panel);
 }
 
 /* The check mark only shows the current board, which aria-current already

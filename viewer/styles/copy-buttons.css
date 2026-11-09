@@ -9,11 +9,11 @@
   padding: 0;
   border: 0;
   border-radius: 6px;
-  background: var(--card);
+  background: var(--allume-card);
   box-shadow:
-    0 0 0 1px var(--hairline),
+    0 0 0 1px var(--allume-hairline),
     0 1px 2px rgb(0 0 0 / 0.08);
-  color: var(--muted);
+  color: var(--allume-muted);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s;
@@ -53,7 +53,7 @@
 }
 
 .allume-copy:hover {
-  color: var(--text);
+  color: var(--allume-text);
 }
 
 .allume-copy .allume-icon-copied,
@@ -66,5 +66,5 @@
 }
 
 .allume-copy[data-allume-copied] {
-  color: var(--green);
+  color: var(--allume-green);
 }

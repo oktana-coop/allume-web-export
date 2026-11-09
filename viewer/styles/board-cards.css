@@ -2,8 +2,8 @@
 
 .allume-board-card > .allume-panel {
   border-radius: 14px;
-  background: var(--panel);
-  box-shadow: var(--board-shadow);
+  background: var(--allume-panel);
+  box-shadow: var(--allume-board-shadow);
 }
 
 .allume-board-title {

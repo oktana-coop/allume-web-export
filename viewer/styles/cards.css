@@ -13,8 +13,8 @@
 .allume-note-card > .allume-body {
   padding: 10px 12px;
   border-radius: 8px;
-  background: var(--card-muted);
-  box-shadow: var(--card-shadow);
+  background: var(--allume-card-muted);
+  box-shadow: var(--allume-card-shadow);
   /* Allume sizes notes to fit their text; with the system font, this
      size reproduces its line breaks without clipping. */
   font-size: 13.5px;
@@ -28,7 +28,7 @@
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  background: var(--card);
-  box-shadow: var(--card-shadow);
+  background: var(--allume-card);
+  box-shadow: var(--allume-card-shadow);
   object-fit: cover;
 }

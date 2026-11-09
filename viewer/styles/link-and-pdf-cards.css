@@ -8,9 +8,9 @@
   align-content: space-between;
   padding: 10px 12px 9px 11px;
   border-radius: 8px;
-  background: var(--card-muted);
-  box-shadow: var(--card-shadow);
-  color: var(--text);
+  background: var(--allume-card-muted);
+  box-shadow: var(--allume-card-shadow);
+  color: var(--allume-text);
   text-decoration: none;
 }
 
@@ -20,7 +20,7 @@
   width: 16px;
   height: 16px;
   margin-top: 1px;
-  color: var(--muted);
+  color: var(--allume-muted);
 }
 
 .allume-link-card .allume-favicon {
@@ -43,7 +43,7 @@
   grid-column: 2;
   font-size: 11px;
   line-height: 14px;
-  color: var(--muted);
+  color: var(--allume-muted);
 }
 
 /* A PDF tile takes its height from the title, which may wrap once. */

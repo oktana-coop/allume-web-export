@@ -1,49 +1,45 @@
-:root {
-  --canvas: #e0dfde;
-  --panel: #efefed;
-  --card: #ffffff;
-  --card-muted: #e9e8e7;
-  --hairline: rgb(0 0 0 / 0.07);
-  --text: #1d1d1c;
-  --muted: #7b7b78;
-  --connection: #c2c0c0;
+/* Without specificity, so that a site's own values for .allume win, whichever
+   stylesheet comes first. */
+:where(.allume) {
+  --allume-canvas: #e0dfde;
+  --allume-panel: #efefed;
+  --allume-card: #ffffff;
+  --allume-card-muted: #e9e8e7;
+  --allume-hairline: rgb(0 0 0 / 0.07);
+  --allume-text: #1d1d1c;
+  --allume-muted: #7b7b78;
+  --allume-connection: #c2c0c0;
   /* Cards and comments barely lift off the canvas, as in Allume. */
-  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  --allume-card-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   /* Boards float a little higher than the cards on them. */
-  --board-shadow: 0 2px 4px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
-  --bar-height: 48px;
+  --allume-board-shadow:
+    0 2px 4px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
+  --allume-bar-height: 48px;
 
-  --green: #36884a;
+  --allume-green: #36884a;
 
   /* Colors tint cards and highlight text blocks. Allume's purple highlight is
      sampled from a screenshot; the others share its lightness and chroma. */
-  --purple-tint: #e4defb;
-  --purple-highlight: oklch(86.5% 0.056 300);
-  --red-tint: #fadcd8;
-  --red-highlight: oklch(86.5% 0.056 25);
-  --green-tint: #d8efdc;
-  --green-highlight: oklch(86.5% 0.056 150);
-  --yellow-tint: #faefbd;
-  --yellow-highlight: oklch(86.5% 0.056 95);
-  --blue-tint: #dbe7fb;
-  --blue-highlight: oklch(86.5% 0.056 255);
+  --allume-purple-tint: #e4defb;
+  --allume-purple-highlight: oklch(86.5% 0.056 300);
+  --allume-red-tint: #fadcd8;
+  --allume-red-highlight: oklch(86.5% 0.056 25);
+  --allume-green-tint: #d8efdc;
+  --allume-green-highlight: oklch(86.5% 0.056 150);
+  --allume-yellow-tint: #faefbd;
+  --allume-yellow-highlight: oklch(86.5% 0.056 95);
+  --allume-blue-tint: #dbe7fb;
+  --allume-blue-highlight: oklch(86.5% 0.056 255);
   /* Allume's gray is its plain card color. */
-  --gray-tint: var(--card-muted);
-  --gray-highlight: oklch(86.5% 0 0);
-
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    sans-serif;
-  color: var(--text);
+  --allume-gray-tint: var(--allume-card-muted);
+  --allume-gray-highlight: oklch(86.5% 0 0);
 }
 
-* {
+.allume {
+  color: var(--allume-text);
+}
+
+.allume,
+.allume * {
   box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--canvas);
 }

@@ -11,7 +11,7 @@ func drawComment(_ card: Card, contents: Contents, interactive: Bool) -> HTML? {
   // Comments are drawn above the cards and text blocks.
   let style =
     boxStyle(card.frame) + ";z-index:\(9000 + card.zIndex)"
-    + (author.map { author in ";--author:\(author.color.hex)" } ?? "")
+    + (author.map { author in ";--allume-author:\(author.color.hex)" } ?? "")
   let time = HTML.element(
     "time", ["datetime": .text(comment.modifiedAt.formatted(.iso8601))],
     [.text(comment.modifiedAt.formatted(commentDate))])

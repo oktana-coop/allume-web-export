@@ -2,8 +2,9 @@
 
 .allume-viewport {
   position: fixed;
-  inset: var(--bar-height) 0 0;
+  inset: var(--allume-bar-height) 0 0;
   overflow: auto;
+  background: var(--allume-canvas);
 }
 
 .allume-js .allume-viewport {

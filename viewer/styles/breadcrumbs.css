@@ -13,18 +13,18 @@
   flex-shrink: 100;
   min-width: 1.5em;
   overflow: hidden;
-  color: var(--muted);
+  color: var(--allume-muted);
   text-decoration: none;
   text-overflow: ellipsis;
 }
 
 .allume-breadcrumbs a:hover {
-  color: var(--text);
+  color: var(--allume-text);
 }
 
 .allume-breadcrumbs .allume-separator {
   flex: none;
-  color: var(--muted);
+  color: var(--allume-muted);
 }
 
 @media (max-width: 600px) {

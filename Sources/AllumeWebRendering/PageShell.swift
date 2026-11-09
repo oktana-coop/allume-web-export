@@ -10,6 +10,7 @@ func drawPageShell(title: String, view: HTML) -> [HTML] {
       .element("meta", ["name": "viewport", "content": "width=device-width, initial-scale=1"], []),
       .element("title", [:], [.text(title)]),
       .element("link", ["rel": "stylesheet", "href": "viewer.css"], []),
+      .element("style", [:], [.text(pageStyle)]),
     ]))
   let body = HTML.element(
     "body", [:],
@@ -23,6 +24,11 @@ func drawPageShell(title: String, view: HTML) -> [HTML] {
     .text("\n"),
   ]
 }
+
+// The view takes the page's font. The family names are unquoted, since a style element's text
+// isn't unescaped.
+private let pageStyle =
+  "body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }"
 
 /// The board's label, then the root's, except on the root's own page.
 func pageTitle(of board: Document.Board, in contents: Contents) -> String {
