@@ -20,7 +20,7 @@ test.describe("the sample export's boards", () => {
       await page.goto(board.url);
       await primaryParentLink({ page }).click();
 
-      await boardCard({ page, board }).locator('a.panel').click();
+      await boardCard({ page, board }).locator('a.allume-panel').click();
 
       await expect(page).toHaveURL(board.url);
       await expectHeading({ page, board });

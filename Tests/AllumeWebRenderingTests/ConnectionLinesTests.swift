@@ -18,7 +18,7 @@ import Testing
       html
         == markup(
           #"""
-          <svg class="connections" width="1708" height="880" aria-hidden="true">
+          <svg class="allume-connections" width="1708" height="880" aria-hidden="true">
             <line x1="606" y1="372.5" x2="626" y2="372.5"/>
             <line x1="1384.25" y1="554" x2="1370.5" y2="590.75"/>
           </svg>

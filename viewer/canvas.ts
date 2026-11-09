@@ -38,8 +38,8 @@ export type Canvas = {
  * there's none. Its viewport stops scrolling natively.
  */
 export function setUpCanvas(root: ParentNode): Canvas | null {
-  const viewport = root.querySelector<HTMLElement>('.viewport');
-  const element = viewport?.querySelector<HTMLElement>('.world');
+  const viewport = root.querySelector<HTMLElement>('.allume-viewport');
+  const element = viewport?.querySelector<HTMLElement>('.allume-canvas');
   if (!viewport || !element) return null;
 
   // The camera is a transform, so undo any native scrolling, such as the
@@ -50,12 +50,12 @@ export function setUpCanvas(root: ParentNode): Canvas | null {
   });
 
   const [minX, minY, maxX, maxY] = element.dataset
-    .bounds!.split(',')
+    .allumeBounds!.split(',')
     .map(Number);
   return {
     viewport,
     element,
-    zoomLevelLabel: root.querySelector<HTMLElement>('.zoom-level'),
+    zoomLevelLabel: root.querySelector<HTMLElement>('.allume-zoom-level'),
     contentBounds: {
       x: minX,
       y: minY,

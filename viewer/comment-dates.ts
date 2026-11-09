@@ -21,7 +21,9 @@ const relativeTime = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
 export function makeCommentDatesRelative(root: ParentNode) {
   const now = Date.now();
-  for (const time of root.querySelectorAll<HTMLTimeElement>('.comment time')) {
+  for (const time of root.querySelectorAll<HTMLTimeElement>(
+    '.allume-comment time'
+  )) {
     const date = relativeDate({ written: Date.parse(time.dateTime), now });
     if (date) time.textContent = date;
   }

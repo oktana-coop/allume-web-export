@@ -33,7 +33,8 @@ import Testing
     let (pages, _) = renderBoards(contents, favicons: [:])
 
     let root = try #require(pages.first)
-    #expect(root.html.contains(#"<a class="body panel" href="allume:board/functional""#))
+    #expect(
+      root.html.contains(#"<a class="allume-body allume-panel" href="allume:board/functional""#))
     #expect(root.html.contains(#"<a href="allume:board/functional#card-note">Functional</a>"#))
     let functional = try #require(pages.last)
     #expect(functional.html.contains(#"<a href="allume:board/root" rel="up">Languages</a>"#))

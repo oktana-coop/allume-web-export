@@ -1,33 +1,33 @@
 /* Without JS the board scrolls at its natural size. */
 
-.viewport {
+.allume-viewport {
   position: fixed;
   inset: var(--bar-height) 0 0;
   overflow: auto;
 }
 
-.allume.js .viewport {
+.allume-js .allume-viewport {
   overflow: hidden;
   touch-action: none;
   user-select: none;
   cursor: grab;
 }
 
-.allume.js .viewport.is-dragging {
+.allume-js .allume-viewport.allume-dragging {
   cursor: grabbing;
 }
 
-.world {
+.allume-canvas {
   position: relative;
   transform-origin: 0 0;
 }
 
-.world a,
-.world img {
+.allume-canvas a,
+.allume-canvas img {
   -webkit-user-drag: none;
 }
 
-.world a {
+.allume-canvas a {
   color: inherit;
   text-decoration: none;
 }

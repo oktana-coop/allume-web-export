@@ -13,7 +13,7 @@ import Testing
       html
         == markup(
           #"""
-          <img class="ink" src="file:root_ink.svg" alt="" draggable="false"
+          <img class="allume-ink" src="file:root_ink.svg" alt="" draggable="false"
             style="width:1305.5px;height:193px">
           """#))
   }

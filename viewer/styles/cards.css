@@ -1,16 +1,16 @@
-/* Cards: the outer element is placed on the board, .body draws it. */
+/* Cards: the outer element is placed on the board, .allume-body draws it. */
 
-.card {
+.allume-card {
   position: absolute;
 }
 
-.card > .body {
+.allume-card > .allume-body {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
 
-.card--text > .body {
+.allume-note-card > .allume-body {
   padding: 10px 12px;
   border-radius: 8px;
   background: var(--card-muted);
@@ -24,7 +24,7 @@
   overflow-wrap: anywhere;
 }
 
-.card--image > .body {
+.allume-image-card > .allume-body {
   width: 100%;
   height: 100%;
   border-radius: 4px;

@@ -16,7 +16,7 @@ enum Icon: String, CaseIterable {
         "class": className.map { name in .text(name) }, "width": "14", "height": "14",
         "aria-hidden": "true",
       ],
-      [.element("use", ["href": "#icon-\(rawValue)"], [])])
+      [.element("use", ["href": "#allume-icon-\(rawValue)"], [])])
   }
 
   /// Every icon once, with Font Awesome's attribution, for the view's icons to be drawn from.
@@ -24,10 +24,11 @@ enum Icon: String, CaseIterable {
     let attribution =
       "Icons: Font Awesome Free by @fontawesome - https://fontawesome.com License - "
       + "https://fontawesome.com/license/free (CC BY 4.0)"
-    let symbols = allCases.map { icon in symbol(id: "icon-\(icon.rawValue)", svg: icon.svg) }
+    let symbols = allCases.map { icon in symbol(id: "allume-icon-\(icon.rawValue)", svg: icon.svg) }
 
     return .element(
-      "svg", ["class": "icon-sprite", "aria-hidden": "true"], [.comment(attribution)] + symbols)
+      "svg", ["class": "allume-icon-sprite", "aria-hidden": "true"],
+      [.comment(attribution)] + symbols)
   }
 
   private var svg: String {

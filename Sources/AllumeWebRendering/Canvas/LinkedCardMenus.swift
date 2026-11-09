@@ -31,11 +31,11 @@ func drawLinkedCardMenu(
     .element(
       "button",
       [
-        "type": "button", "class": "linked", "popovertarget": .text(popoverID),
+        "type": "button", "class": "allume-linked", "popovertarget": .text(popoverID),
         "aria-label": .text(appearsIn),
       ], [Icon.linked.html()]),
     .element(
-      "div", ["popover": .empty, "id": .text(popoverID), "class": "linked-menu"],
+      "div", ["popover": .empty, "id": .text(popoverID), "class": "allume-linked-menu"],
       [.element("p", [:], [.text(appearsIn)]), .element("ul", [:], items)]),
   ]
 }

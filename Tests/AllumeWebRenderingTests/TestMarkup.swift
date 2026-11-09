@@ -16,18 +16,18 @@ func markup(_ lines: String) -> String {
 func iconMarkup(_ name: String) -> String {
   markup(
     #"""
-    <svg width="14" height="14" aria-hidden="true"><use href="#icon-\#(name)"/></svg>
+    <svg width="14" height="14" aria-hidden="true"><use href="#allume-icon-\#(name)"/></svg>
     """#)
 }
 
 let copyButtonMarkup = markup(
   #"""
-  <button type="button" class="copy" aria-label="Copy text">
-    <svg class="icon-copy" width="14" height="14" aria-hidden="true">
-      <use href="#icon-copy"/>
+  <button type="button" class="allume-copy" aria-label="Copy text">
+    <svg class="allume-icon-copy" width="14" height="14" aria-hidden="true">
+      <use href="#allume-icon-copy"/>
     </svg>
-    <svg class="icon-copied" width="14" height="14" aria-hidden="true">
-      <use href="#icon-copied"/>
+    <svg class="allume-icon-copied" width="14" height="14" aria-hidden="true">
+      <use href="#allume-icon-copied"/>
     </svg>
   </button>
   """#)

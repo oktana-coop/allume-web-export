@@ -11,7 +11,8 @@ func drawCard(
   let menu =
     interactive && isLinked(card.documentID, in: contents)
     ? drawLinkedCardMenu(
-      for: card.documentID, current: board.id, popoverID: "linked-\(card.documentID.rawValue)",
+      for: card.documentID, current: board.id,
+      popoverID: "allume-linked-\(card.documentID.rawValue)",
       contents: contents)
     : []
 
@@ -25,9 +26,9 @@ func drawCard(
       contents: contents)
 
   case .note(let note)?:
-    let body = HTML.element("div", ["class": "body"], [.text(note.text)])
+    let body = HTML.element("div", ["class": "allume-body"], [.text(note.text)])
     return cardElement(
-      card, kind: "text", style: boxStyle(card.frame), interactive: interactive,
+      card, kind: "note", style: boxStyle(card.frame), interactive: interactive,
       children: [body] + (interactive ? [copyButton] : []) + menu)
 
   case .image(let image)?:
@@ -37,7 +38,7 @@ func drawCard(
 
   case .link(let link)?:
     return cardElement(
-      card, kind: "url", style: boxStyle(card.frame), interactive: interactive,
+      card, kind: "link", style: boxStyle(card.frame), interactive: interactive,
       children: [drawLink(link, favicons: favicons, interactive: interactive)] + menu)
 
   case .pdf(let pdf)?:
@@ -57,8 +58,8 @@ func boxStyle(_ frame: Rect) -> String {
 
 var copyButton: HTML {
   .element(
-    "button", ["type": "button", "class": "copy", "aria-label": "Copy text"],
-    [Icon.copy.html(class: "icon-copy"), Icon.copied.html(class: "icon-copied")])
+    "button", ["type": "button", "class": "allume-copy", "aria-label": "Copy text"],
+    [Icon.copy.html(class: "allume-icon-copy"), Icon.copied.html(class: "allume-icon-copied")])
 }
 
 /// The host whose favicon a link shows, lowercased. Nil when the link isn't a web address.
@@ -78,10 +79,10 @@ private func cardElement(
   .element(
     "div",
     [
-      "class": "card card--\(kind)",
-      "data-doc": .text(card.documentID.rawValue),
+      "class": "allume-card allume-\(kind)-card",
+      "data-allume-doc": .text(card.documentID.rawValue),
       "id": interactive ? .text("card-\(card.documentID.rawValue)") : nil,
-      "data-color": card.color.map { color in .text(color.rawValue) },
+      "data-allume-color": card.color.map { color in .text(color.rawValue) },
       "style": .text("\(style);z-index:\(card.zIndex)"),
     ],
     children)
@@ -92,7 +93,7 @@ private func drawBoardCard(
   contents: Contents
 ) -> HTML {
   let title = HTML.element(
-    "div", ["class": "board-title"],
+    "div", ["class": "allume-board-title"],
     linkedIcon(of: child, menu: menu, contents: contents)
       + [.element("span", [:], [.text(child.displayLabel)])])
   let panelContents = preview.map { preview in [preview] } ?? []
@@ -101,10 +102,10 @@ private func drawBoardCard(
     ? .element(
       "a",
       [
-        "class": "body panel", "href": .board(child.id),
+        "class": "allume-body allume-panel", "href": .board(child.id),
         "aria-label": .text(child.displayLabel),
       ], panelContents)
-    : .element("div", ["class": "body panel"], panelContents)
+    : .element("div", ["class": "allume-body allume-panel"], panelContents)
 
   return cardElement(
     card, kind: "board", style: boxStyle(card.frame), interactive: interactive,
@@ -119,7 +120,7 @@ private func linkedIcon(of board: Document.Board, menu: [HTML], contents: Conten
   }
 
   if menu.isEmpty {
-    return [.element("span", ["class": "linked"], [Icon.linked.html()])]
+    return [.element("span", ["class": "allume-linked"], [Icon.linked.html()])]
   }
   return menu
 }
@@ -130,7 +131,7 @@ private func drawImage(_ image: Document.Image, contents: Contents) -> HTML {
   return .element(
     "img",
     [
-      "class": "body",
+      "class": "allume-body",
       "src": .file(PublishedFile(path: image.file.name, source: image.file.url)),
       "alt": .text(image.label ?? ""),
       "title": sourceLabel.map { label in .text("From \(label)") },
@@ -147,7 +148,7 @@ private func drawLink(_ link: Document.Link, favicons: [String: Asset], interact
       .element(
         "img",
         [
-          "class": "favicon",
+          "class": "allume-favicon",
           "src": .file(PublishedFile(path: "favicons/\(favicon.name)", source: favicon.url)),
           "alt": "",
           "loading": "lazy",
@@ -156,25 +157,26 @@ private func drawLink(_ link: Document.Link, favicons: [String: Asset], interact
     } ?? Icon.url.html()
   let content = [
     logo,
-    .element("span", ["class": "title"], [.text(link.title ?? link.label ?? link.url)]),
-    .element("span", ["class": "host"], [.text(shownHost(of: link.url))]),
+    .element("span", ["class": "allume-title"], [.text(link.title ?? link.label ?? link.url)]),
+    .element("span", ["class": "allume-host"], [.text(shownHost(of: link.url))]),
   ]
 
   return interactive
     ? .element(
-      "a", ["class": "body", "href": .text(link.url), "target": "_blank", "rel": "noopener"],
+      "a",
+      ["class": "allume-body", "href": .text(link.url), "target": "_blank", "rel": "noopener"],
       content)
-    : .element("div", ["class": "body"], content)
+    : .element("div", ["class": "allume-body"], content)
 }
 
 /// PDFs aren't published, so their cards show only the title.
 private func drawPDF(_ pdf: Document.PDF) -> HTML {
   .element(
-    "div", ["class": "body", "title": .text(pdf.label ?? "")],
+    "div", ["class": "allume-body", "title": .text(pdf.label ?? "")],
     [
       Icon.pdf.html(),
-      .element("span", ["class": "title"], [.text(pdf.label ?? "PDF")]),
-      .element("span", ["class": "host"], [.text("PDF")]),
+      .element("span", ["class": "allume-title"], [.text(pdf.label ?? "PDF")]),
+      .element("span", ["class": "allume-host"], [.text("PDF")]),
     ])
 }
 

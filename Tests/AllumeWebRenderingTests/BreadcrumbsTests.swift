@@ -17,7 +17,7 @@ import Testing
       html
         == markup(
           #"""
-          <nav class="breadcrumbs" aria-label="Breadcrumbs">
+          <nav class="allume-breadcrumbs" aria-label="Breadcrumbs">
             <h1><span>Languages</span></h1>
           </nav>
           """#))
@@ -41,11 +41,11 @@ import Testing
       html
         == markup(
           #"""
-          <nav class="breadcrumbs" aria-label="Breadcrumbs">
+          <nav class="allume-breadcrumbs" aria-label="Breadcrumbs">
             <a href="board:root">Languages</a>
-            <span class="separator" aria-hidden="true">/</span>
+            <span class="allume-separator" aria-hidden="true">/</span>
             <a href="board:paradigms" rel="up">Paradigms</a>
-            <span class="separator" aria-hidden="true">/</span>
+            <span class="allume-separator" aria-hidden="true">/</span>
             <h1><span>Functional</span></h1>
           </nav>
           """#))
@@ -71,11 +71,11 @@ import Testing
         markup(
           #"""
           <h1>
-            <button type="button" class="linked" popovertarget="linked-self"
+            <button type="button" class="allume-linked" popovertarget="allume-linked-self"
               aria-label="Appears in 2 boards">
               \#(iconMarkup("linked"))
             </button>
-            <div popover id="linked-self" class="linked-menu">
+            <div popover id="allume-linked-self" class="allume-linked-menu">
               <p>Appears in 2 boards</p>
               <ul>
                 <li><a href="board:functional#haskell" aria-current="true">Functional</a></li>

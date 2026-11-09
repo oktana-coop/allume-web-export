@@ -17,21 +17,24 @@ func drawComment(_ card: Card, contents: Contents, interactive: Bool) -> HTML? {
     [.text(comment.modifiedAt.formatted(commentDate))])
 
   return .element(
-    "div", ["class": "comment", "style": .text(style)],
-    [drawAvatar(of: author), .element("div", ["class": "text"], [.text(comment.text)]), time]
+    "div", ["class": "allume-comment", "style": .text(style)],
+    [
+      drawAvatar(of: author), .element("div", ["class": "allume-text"], [.text(comment.text)]),
+      time,
+    ]
       + (interactive ? [copyButton] : []))
 }
 
 /// The author's picture, or a circle in their color without one.
 private func drawAvatar(of author: User?) -> HTML {
   guard let author, let avatar = author.avatar else {
-    return .element("span", ["class": "avatar"], [])
+    return .element("span", ["class": "allume-avatar"], [])
   }
 
   return .element(
     "img",
     [
-      "class": "avatar",
+      "class": "allume-avatar",
       "src": .file(PublishedFile(path: avatar.name, source: avatar.url)),
       "alt": .text(author.name),
       "title": .text(author.name),

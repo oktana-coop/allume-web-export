@@ -21,15 +21,15 @@ import Testing
       html
         == markup(
           #"""
-          <div class="card card--text" data-doc="note" id="card-note"
+          <div class="allume-card allume-note-card" data-allume-doc="note" id="card-note"
             style="left:0px;top:0px;width:100px;height:100px;z-index:0">
-            <div class="body">A note</div>
+            <div class="allume-body">A note</div>
             \#(copyButtonMarkup)
-            <button type="button" class="linked" popovertarget="linked-note"
+            <button type="button" class="allume-linked" popovertarget="allume-linked-note"
               aria-label="Appears in 2 boards">
               \#(iconMarkup("linked"))
             </button>
-            <div popover id="linked-note" class="linked-menu">
+            <div popover id="allume-linked-note" class="allume-linked-menu">
               <p>Appears in 2 boards</p>
               <ul>
                 <li><a href="board:root#note">Languages</a></li>

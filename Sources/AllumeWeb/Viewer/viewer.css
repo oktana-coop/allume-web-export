@@ -41,7 +41,7 @@ body {
 }
 
 /* viewer/styles/icons.css */
-.icon-sprite {
+.allume-icon-sprite {
   position: absolute;
   width: 0;
   height: 0;
@@ -49,7 +49,7 @@ body {
 }
 
 /* viewer/styles/bar.css */
-.bar {
+.allume-bar {
   position: fixed;
   inset: 0 0 auto;
   height: var(--bar-height);
@@ -64,7 +64,7 @@ body {
 }
 
 /* viewer/styles/breadcrumbs.css */
-.breadcrumbs {
+.allume-breadcrumbs {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -73,7 +73,7 @@ body {
   font-size: 14px;
   white-space: nowrap;
 }
-.breadcrumbs a {
+.allume-breadcrumbs a {
   flex-shrink: 100;
   min-width: 1.5em;
   overflow: hidden;
@@ -81,20 +81,20 @@ body {
   text-decoration: none;
   text-overflow: ellipsis;
 }
-.breadcrumbs a:hover {
+.allume-breadcrumbs a:hover {
   color: var(--text);
 }
-.breadcrumbs .separator {
+.allume-breadcrumbs .allume-separator {
   flex: none;
   color: var(--muted);
 }
 @media (max-width: 600px) {
-  .breadcrumbs a:not([rel=up]),
-  .breadcrumbs a:not([rel=up]) + .separator {
+  .allume-breadcrumbs a:not([rel=up]),
+  .allume-breadcrumbs a:not([rel=up]) + .allume-separator {
     display: none;
   }
 }
-.breadcrumbs h1 {
+.allume-breadcrumbs h1 {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -103,19 +103,19 @@ body {
   font-size: 15px;
   font-weight: 600;
 }
-.breadcrumbs h1 span {
+.allume-breadcrumbs h1 span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 /* viewer/styles/zoom-controls.css */
-.zoom {
+.allume-zoom {
   flex: none;
   display: flex;
   align-items: center;
   gap: 4px;
 }
-.zoom button {
+.allume-zoom button {
   min-width: 32px;
   height: 28px;
   border: 0;
@@ -126,55 +126,55 @@ body {
   font-size: 13px;
   cursor: pointer;
 }
-.zoom output {
+.allume-zoom output {
   min-width: 48px;
   text-align: center;
   font-size: 13px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.allume:not(.js) .zoom {
+.allume:not(.allume-js) .allume-zoom {
   display: none;
 }
 
 /* viewer/styles/canvas.css */
-.viewport {
+.allume-viewport {
   position: fixed;
   inset: var(--bar-height) 0 0;
   overflow: auto;
 }
-.allume.js .viewport {
+.allume-js .allume-viewport {
   overflow: hidden;
   touch-action: none;
   user-select: none;
   cursor: grab;
 }
-.allume.js .viewport.is-dragging {
+.allume-js .allume-viewport.allume-dragging {
   cursor: grabbing;
 }
-.world {
+.allume-canvas {
   position: relative;
   transform-origin: 0 0;
 }
-.world a,
-.world img {
+.allume-canvas a,
+.allume-canvas img {
   -webkit-user-drag: none;
 }
-.world a {
+.allume-canvas a {
   color: inherit;
   text-decoration: none;
 }
 
 /* viewer/styles/cards.css */
-.card {
+.allume-card {
   position: absolute;
 }
-.card > .body {
+.allume-card > .allume-body {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
-.card--text > .body {
+.allume-note-card > .allume-body {
   padding: 10px 12px;
   border-radius: 8px;
   background: var(--card-muted);
@@ -185,7 +185,7 @@ body {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.card--image > .body {
+.allume-image-card > .allume-body {
   width: 100%;
   height: 100%;
   border-radius: 4px;
@@ -195,8 +195,8 @@ body {
 }
 
 /* viewer/styles/link-and-pdf-cards.css */
-.card--url > .body,
-.card--pdf > .body {
+.allume-link-card > .allume-body,
+.allume-pdf-card > .allume-body {
   display: grid;
   grid-template-columns: 16px 1fr;
   column-gap: 13px;
@@ -208,20 +208,20 @@ body {
   color: var(--text);
   text-decoration: none;
 }
-.card--url svg,
-.card--url .favicon,
-.card--pdf svg {
+.allume-link-card svg,
+.allume-link-card .allume-favicon,
+.allume-pdf-card svg {
   width: 16px;
   height: 16px;
   margin-top: 1px;
   color: var(--muted);
 }
-.card--url .favicon {
+.allume-link-card .allume-favicon {
   border-radius: 3px;
   object-fit: contain;
 }
-.card--url .title,
-.card--pdf .title {
+.allume-link-card .allume-title,
+.allume-pdf-card .allume-title {
   overflow: hidden;
   font-size: 13px;
   font-weight: 600;
@@ -229,18 +229,18 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.card--url .host,
-.card--pdf .host {
+.allume-link-card .allume-host,
+.allume-pdf-card .allume-host {
   grid-column: 2;
   font-size: 11px;
   line-height: 14px;
   color: var(--muted);
 }
-.card--pdf > .body {
+.allume-pdf-card > .allume-body {
   position: relative;
   min-height: 56px;
 }
-.card--pdf .title {
+.allume-pdf-card .allume-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -248,12 +248,12 @@ body {
 }
 
 /* viewer/styles/board-cards.css */
-.card--board > .panel {
+.allume-board-card > .allume-panel {
   border-radius: 14px;
   background: var(--panel);
   box-shadow: var(--board-shadow);
 }
-.board-title {
+.allume-board-title {
   position: absolute;
   bottom: 100%;
   left: 2px;
@@ -266,12 +266,12 @@ body {
   font-weight: 600;
   line-height: 18px;
 }
-.board-title span {
+.allume-board-title span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.preview {
+.allume-preview {
   position: absolute;
   top: 0;
   left: 0;
@@ -280,33 +280,33 @@ body {
 }
 
 /* viewer/styles/card-colors.css */
-.card[data-color] > .body {
+.allume-card[data-allume-color] > .allume-body {
   --tint: var(--gray-tint);
 }
-.card[data-color=purple] > .body {
+.allume-card[data-allume-color=purple] > .allume-body {
   --tint: var(--purple-tint);
 }
-.card[data-color=red] > .body {
+.allume-card[data-allume-color=red] > .allume-body {
   --tint: var(--red-tint);
 }
-.card[data-color=green] > .body {
+.allume-card[data-allume-color=green] > .allume-body {
   --tint: var(--green-tint);
 }
-.card[data-color=yellow] > .body {
+.allume-card[data-allume-color=yellow] > .allume-body {
   --tint: var(--yellow-tint);
 }
-.card[data-color=blue] > .body {
+.allume-card[data-allume-color=blue] > .allume-body {
   --tint: var(--blue-tint);
 }
-.card[data-color]:not(.card--image) > .body {
+.allume-card[data-allume-color]:not(.allume-image-card) > .allume-body {
   background: var(--tint);
 }
-.card--image[data-color] > .body {
+.allume-image-card[data-allume-color] > .allume-body {
   box-shadow: 0 0 0 3px var(--tint);
 }
 
 /* viewer/styles/text-blocks.css */
-.chain {
+.allume-text-block {
   position: absolute;
   width: max-content;
   font-size: 18px;
@@ -315,36 +315,36 @@ body {
   white-space: pre-wrap;
   z-index: 8000;
 }
-.chain p {
+.allume-text-block p {
   margin: 0;
 }
-.chain [data-color] {
+.allume-text-block [data-allume-color] {
   width: fit-content;
   padding: 4px 9px;
   border-radius: 4px;
   background: var(--highlight);
 }
-.chain [data-color=purple] {
+.allume-text-block [data-allume-color=purple] {
   --highlight: var(--purple-highlight);
 }
-.chain [data-color=red] {
+.allume-text-block [data-allume-color=red] {
   --highlight: var(--red-highlight);
 }
-.chain [data-color=green] {
+.allume-text-block [data-allume-color=green] {
   --highlight: var(--green-highlight);
 }
-.chain [data-color=yellow] {
+.allume-text-block [data-allume-color=yellow] {
   --highlight: var(--yellow-highlight);
 }
-.chain [data-color=blue] {
+.allume-text-block [data-allume-color=blue] {
   --highlight: var(--blue-highlight);
 }
-.chain [data-color=gray] {
+.allume-text-block [data-allume-color=gray] {
   --highlight: var(--gray-highlight);
 }
 
 /* viewer/styles/comments.css */
-.comment {
+.allume-comment {
   position: absolute;
   padding: 12px 14px 12px 56px;
   overflow: hidden;
@@ -356,7 +356,7 @@ body {
   line-height: 20px;
   overflow-wrap: anywhere;
 }
-.comment .avatar {
+.allume-comment .allume-avatar {
   position: absolute;
   top: 12px;
   left: 12px;
@@ -366,16 +366,16 @@ body {
   background: var(--author, #d8b682);
   object-fit: cover;
 }
-.comment .text {
+.allume-comment .allume-text {
   white-space: pre-wrap;
 }
-.comment time {
+.allume-comment time {
   display: block;
   color: rgb(0 0 0 / 0.5);
 }
 
 /* viewer/styles/connections.css */
-.connections {
+.allume-connections {
   position: absolute;
   top: 0;
   left: 0;
@@ -383,14 +383,14 @@ body {
   pointer-events: none;
   z-index: 0;
 }
-.connections line {
+.allume-connections line {
   stroke: var(--connection);
   stroke-width: 2;
   stroke-linecap: round;
 }
 
 /* viewer/styles/ink.css */
-.ink {
+.allume-ink {
   position: absolute;
   top: 0;
   left: 0;
@@ -400,16 +400,16 @@ body {
 }
 
 /* viewer/styles/selectable-text.css */
-.world > .card--text > .body,
-.world > .comment > .text,
-.world > .chain {
+.allume-canvas > .allume-note-card > .allume-body,
+.allume-canvas > .allume-comment > .allume-text,
+.allume-canvas > .allume-text-block {
   -webkit-user-select: text;
   user-select: text;
   cursor: text;
 }
 
 /* viewer/styles/copy-buttons.css */
-.copy {
+.allume-copy {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -428,47 +428,47 @@ body {
   transition: opacity 0.15s;
   z-index: 1;
 }
-.card:has(> button.linked) > .copy {
+.allume-card:has(> button.allume-linked) > .allume-copy {
   right: 18px;
 }
-.chain > .copy {
+.allume-text-block > .allume-copy {
   top: -1px;
   right: auto;
   left: calc(100% + 8px);
 }
-.chain > .copy::before {
+.allume-text-block > .allume-copy::before {
   content: "";
   position: absolute;
   inset: 0 100% 0 -8px;
 }
-.card:hover > .copy,
-.comment:hover > .copy,
-.chain:hover > .copy,
-.copy:focus-visible,
-.copy[data-copied] {
+.allume-card:hover > .allume-copy,
+.allume-comment:hover > .allume-copy,
+.allume-text-block:hover > .allume-copy,
+.allume-copy:focus-visible,
+.allume-copy[data-allume-copied] {
   opacity: 1;
 }
 @media (hover: none) {
-  .copy {
+  .allume-copy {
     opacity: 1;
   }
 }
-.copy:hover {
+.allume-copy:hover {
   color: var(--text);
 }
-.copy .icon-copied,
-.copy[data-copied] .icon-copy {
+.allume-copy .allume-icon-copied,
+.allume-copy[data-allume-copied] .allume-icon-copy {
   display: none;
 }
-.copy[data-copied] .icon-copied {
+.allume-copy[data-allume-copied] .allume-icon-copied {
   display: block;
 }
-.copy[data-copied] {
+.allume-copy[data-allume-copied] {
   color: var(--green);
 }
 
 /* viewer/styles/linked-card-menus.css */
-.linked {
+.allume-linked {
   display: inline-grid;
   place-items: center;
   flex: none;
@@ -478,10 +478,10 @@ body {
   color: var(--muted);
   font: inherit;
 }
-button.linked {
+button.allume-linked {
   cursor: pointer;
 }
-.card:not(.card--board) > button.linked {
+.allume-card:not(.allume-board-card) > button.allume-linked {
   position: absolute;
   top: -11px;
   right: -11px;
@@ -492,7 +492,7 @@ button.linked {
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
   z-index: 1;
 }
-.linked-menu {
+.allume-linked-menu {
   position: fixed;
   inset: auto;
   min-width: 220px;
@@ -507,17 +507,17 @@ button.linked {
   line-height: 20px;
   user-select: none;
 }
-.linked-menu p {
+.allume-linked-menu p {
   margin: 4px 10px 6px;
   font-size: 12px;
   color: var(--muted);
 }
-.linked-menu ul {
+.allume-linked-menu ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.linked-menu a {
+.allume-linked-menu a {
   position: relative;
   display: block;
   padding: 7px 10px 7px 30px;
@@ -525,10 +525,10 @@ button.linked {
   color: var(--text);
   text-decoration: none;
 }
-.linked-menu a:hover {
+.allume-linked-menu a:hover {
   background: var(--panel);
 }
-.linked-menu a[aria-current]::before {
+.allume-linked-menu a[aria-current]::before {
   content: "✓";
   content: "✓" / "";
   position: absolute;

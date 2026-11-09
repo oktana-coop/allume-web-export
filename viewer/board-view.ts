@@ -12,11 +12,11 @@ import { setUpZoomControls } from './zoom-controls';
 export function setUpBoardView(root: HTMLElement) {
   const canvas = setUpCanvas(root);
   if (!canvas) {
-    throw new Error('The board view has no .viewport with a .world in it.');
+    throw new Error("The board's view has no viewport with a canvas in it.");
   }
 
   // Switches the view's styles from a natively scrolling board to the camera's.
-  root.classList.add('js');
+  root.classList.add('allume-js');
 
   setUpScrolling(canvas);
   setUpGestures(canvas);

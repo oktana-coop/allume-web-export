@@ -1,12 +1,12 @@
 /* Board cards: the title sits above a panel previewing the board. */
 
-.card--board > .panel {
+.allume-board-card > .allume-panel {
   border-radius: 14px;
   background: var(--panel);
   box-shadow: var(--board-shadow);
 }
 
-.board-title {
+.allume-board-title {
   position: absolute;
   bottom: 100%;
   left: 2px;
@@ -20,13 +20,13 @@
   line-height: 18px;
 }
 
-.board-title span {
+.allume-board-title span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.preview {
+.allume-preview {
   position: absolute;
   top: 0;
   left: 0;

@@ -20,7 +20,7 @@ import Testing
     let sprite = Icon.sprite.rendered(resolving: describe)
     let ink = markup(
       #"""
-      <img class="ink" src="file:root_ink.svg" alt="" draggable="false"
+      <img class="allume-ink" src="file:root_ink.svg" alt="" draggable="false"
         style="width:200px;height:100px">
       """#)
 
@@ -28,19 +28,19 @@ import Testing
 
     #expect(
       html == #"""
-        <div class="allume" data-board="root">
+        <div class="allume" data-allume-board="root">
         \#(sprite)
-        <header class="bar">
-        <nav class="breadcrumbs" aria-label="Breadcrumbs"><h1><span>Languages</span></h1></nav>
-        <div class="zoom" role="toolbar" aria-label="Zoom">
-        <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
-        <output class="zoom-level">100%</output>
-        <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
-        <button type="button" data-zoom="home">Fit</button>
+        <header class="allume-bar">
+        <nav class="allume-breadcrumbs" aria-label="Breadcrumbs"><h1><span>Languages</span></h1></nav>
+        <div class="allume-zoom" role="toolbar" aria-label="Zoom">
+        <button type="button" data-allume-zoom="out" aria-label="Zoom out">−</button>
+        <output class="allume-zoom-level">100%</output>
+        <button type="button" data-allume-zoom="in" aria-label="Zoom in">+</button>
+        <button type="button" data-allume-zoom="home">Fit</button>
         </div>
         </header>
-        <div class="viewport">
-        <div class="world" data-bounds="0,0,200,100" style="width:600px;height:500px">
+        <div class="allume-viewport">
+        <div class="allume-canvas" data-allume-bounds="0,0,200,100" style="width:600px;height:500px">
         \#(ink)
         </div>
         </div>
@@ -69,7 +69,7 @@ import Testing
       html.contains(
         markup(
           #"""
-          <div class="world" data-bounds="100,50,300,150" style="width:700px;height:550px">
+          <div class="allume-canvas" data-allume-bounds="100,50,300,150" style="width:700px;height:550px">
           """#)))
   }
 }

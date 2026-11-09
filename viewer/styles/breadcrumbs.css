@@ -1,5 +1,5 @@
 /* Long trails shrink their ancestors first, keeping the board's title. */
-.breadcrumbs {
+.allume-breadcrumbs {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -9,7 +9,7 @@
   white-space: nowrap;
 }
 
-.breadcrumbs a {
+.allume-breadcrumbs a {
   flex-shrink: 100;
   min-width: 1.5em;
   overflow: hidden;
@@ -18,23 +18,23 @@
   text-overflow: ellipsis;
 }
 
-.breadcrumbs a:hover {
+.allume-breadcrumbs a:hover {
   color: var(--text);
 }
 
-.breadcrumbs .separator {
+.allume-breadcrumbs .allume-separator {
   flex: none;
   color: var(--muted);
 }
 
 @media (max-width: 600px) {
-  .breadcrumbs a:not([rel='up']),
-  .breadcrumbs a:not([rel='up']) + .separator {
+  .allume-breadcrumbs a:not([rel='up']),
+  .allume-breadcrumbs a:not([rel='up']) + .allume-separator {
     display: none;
   }
 }
 
-.breadcrumbs h1 {
+.allume-breadcrumbs h1 {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -44,7 +44,7 @@
   font-weight: 600;
 }
 
-.breadcrumbs h1 span {
+.allume-breadcrumbs h1 span {
   overflow: hidden;
   text-overflow: ellipsis;
 }

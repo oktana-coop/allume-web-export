@@ -97,7 +97,7 @@ test.describe('escape', () => {
       .getByRole('navigation', { name: 'Breadcrumbs' })
       .getByRole('button', { name: 'Appears in 2 boards' })
       .click();
-    const menu = page.locator('#linked-self');
+    const menu = page.locator('#allume-linked-self');
     await expect(menu).toBeVisible();
 
     await page.keyboard.press('Escape');

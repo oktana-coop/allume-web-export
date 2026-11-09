@@ -22,7 +22,9 @@ export function setUpLinkedCardMenus({
     passive: true,
   });
 
-  for (const menu of root.querySelectorAll<HTMLElement>('.linked-menu')) {
+  for (const menu of root.querySelectorAll<HTMLElement>(
+    '.allume-linked-menu'
+  )) {
     const button = root.querySelector(`[popovertarget="${menu.id}"]`);
 
     menu.addEventListener('beforetoggle', (event) => {
@@ -92,7 +94,7 @@ export function menuPosition({
 
 function closeOpenMenus(root: ParentNode) {
   for (const menu of root.querySelectorAll<HTMLElement>(
-    '.linked-menu:popover-open'
+    '.allume-linked-menu:popover-open'
   )) {
     menu.hidePopover();
   }

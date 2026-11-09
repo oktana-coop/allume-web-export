@@ -143,7 +143,7 @@ const openHeadingMenu = async ({ page }: { page: Page }) =>
     button: page
       .getByRole('navigation', { name: 'Breadcrumbs' })
       .getByRole('button', { name: /^Appears in \d+ boards$/ }),
-    menu: page.locator('#linked-self'),
+    menu: page.locator('#allume-linked-self'),
   });
 
 /** The menu's links marked as the current board. */

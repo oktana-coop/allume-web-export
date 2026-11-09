@@ -1,24 +1,24 @@
-.card[data-color] > .body {
+.allume-card[data-allume-color] > .allume-body {
   --tint: var(--gray-tint);
 }
-.card[data-color='purple'] > .body {
+.allume-card[data-allume-color='purple'] > .allume-body {
   --tint: var(--purple-tint);
 }
-.card[data-color='red'] > .body {
+.allume-card[data-allume-color='red'] > .allume-body {
   --tint: var(--red-tint);
 }
-.card[data-color='green'] > .body {
+.allume-card[data-allume-color='green'] > .allume-body {
   --tint: var(--green-tint);
 }
-.card[data-color='yellow'] > .body {
+.allume-card[data-allume-color='yellow'] > .allume-body {
   --tint: var(--yellow-tint);
 }
-.card[data-color='blue'] > .body {
+.allume-card[data-allume-color='blue'] > .allume-body {
   --tint: var(--blue-tint);
 }
-.card[data-color]:not(.card--image) > .body {
+.allume-card[data-allume-color]:not(.allume-image-card) > .allume-body {
   background: var(--tint);
 }
-.card--image[data-color] > .body {
+.allume-image-card[data-allume-color] > .allume-body {
   box-shadow: 0 0 0 3px var(--tint);
 }

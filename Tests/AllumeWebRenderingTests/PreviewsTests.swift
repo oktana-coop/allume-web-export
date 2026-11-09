@@ -30,10 +30,10 @@ import Testing
       html
         == markup(
           #"""
-          <div class="preview" style="width:400px;height:200px;transform:scale(0.5)">
-            <div class="card card--text" data-doc="note"
+          <div class="allume-preview" style="width:400px;height:200px;transform:scale(0.5)">
+            <div class="allume-card allume-note-card" data-allume-doc="note"
               style="left:100px;top:50px;width:200px;height:100px;z-index:0">
-              <div class="body">A note</div>
+              <div class="allume-body">A note</div>
             </div>
           </div>
           """#))
@@ -59,7 +59,8 @@ import Testing
       )?
       .rendered(resolving: describe))
 
-    #expect(html.contains(#"data-doc="link""#) && html.contains(#"<div class="comment""#))
+    #expect(
+      html.contains(#"data-allume-doc="link""#) && html.contains(#"<div class="allume-comment""#))
     #expect(!html.contains("<button"))
     #expect(!html.contains(" id="))
     #expect(!html.contains("<a "))
@@ -77,8 +78,8 @@ import Testing
 
     let html = try #require(drawnContents(of: "root", in: contents)).joined()
 
-    #expect(html.components(separatedBy: #"<div class="preview""#).count - 1 == 3)
-    #expect(html.contains(#"<div class="body panel"></div>"#))
+    #expect(html.components(separatedBy: #"<div class="allume-preview""#).count - 1 == 3)
+    #expect(html.contains(#"<div class="allume-body allume-panel"></div>"#))
   }
 
   @Test func putEachPieceOnALineOfItsOwn() throws {
@@ -99,7 +100,9 @@ import Testing
     .rendered(resolving: describe)
 
     #expect(
-      html?.contains(#"</div>"# + "\n" + #"<div class="card card--text" data-doc="b""#) == true)
+      html?.contains(
+        #"</div>"# + "\n" + #"<div class="allume-card allume-note-card" data-allume-doc="b""#)
+        == true)
     #expect(html?.hasSuffix("</div></div>") == true)
   }
 }

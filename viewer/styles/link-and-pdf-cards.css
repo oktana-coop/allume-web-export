@@ -1,7 +1,7 @@
 /* Link and PDF cards: the icon sits on the title's line, the host at the
    bottom, at Allume's sizes. */
-.card--url > .body,
-.card--pdf > .body {
+.allume-link-card > .allume-body,
+.allume-pdf-card > .allume-body {
   display: grid;
   grid-template-columns: 16px 1fr;
   column-gap: 13px;
@@ -14,22 +14,22 @@
   text-decoration: none;
 }
 
-.card--url svg,
-.card--url .favicon,
-.card--pdf svg {
+.allume-link-card svg,
+.allume-link-card .allume-favicon,
+.allume-pdf-card svg {
   width: 16px;
   height: 16px;
   margin-top: 1px;
   color: var(--muted);
 }
 
-.card--url .favicon {
+.allume-link-card .allume-favicon {
   border-radius: 3px;
   object-fit: contain;
 }
 
-.card--url .title,
-.card--pdf .title {
+.allume-link-card .allume-title,
+.allume-pdf-card .allume-title {
   overflow: hidden;
   font-size: 13px;
   font-weight: 600;
@@ -38,8 +38,8 @@
   white-space: nowrap;
 }
 
-.card--url .host,
-.card--pdf .host {
+.allume-link-card .allume-host,
+.allume-pdf-card .allume-host {
   grid-column: 2;
   font-size: 11px;
   line-height: 14px;
@@ -47,12 +47,12 @@
 }
 
 /* A PDF tile takes its height from the title, which may wrap once. */
-.card--pdf > .body {
+.allume-pdf-card > .allume-body {
   position: relative;
   min-height: 56px;
 }
 
-.card--pdf .title {
+.allume-pdf-card .allume-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

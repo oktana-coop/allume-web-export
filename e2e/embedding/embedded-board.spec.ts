@@ -1,8 +1,8 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { expectZoomLevel } from '../camera/helpers';
 import { languages, paradigms } from '../shared/boards';
-import { enterBoard, expectHeading } from '../shared/helpers';
+import { boardCard, enterBoard, expectHeading } from '../shared/helpers';
 import { embedBoard } from './helpers';
 
 test.describe("a board's view in a site's page", () => {
@@ -23,5 +23,17 @@ test.describe("a board's view in a site's page", () => {
     await enterBoard({ page, board: paradigms });
 
     await expectHeading({ page, board: paradigms });
+  });
+
+  test("keeps the site's classes off its cards", async ({ page }) => {
+    const sitePage = await embedBoard({ page, board: languages });
+
+    await page.goto(sitePage);
+
+    // The site's rule for its own .card class would give them a border.
+    await expect(boardCard({ page, board: paradigms })).toHaveCSS(
+      'border-top-width',
+      '0px'
+    );
   });
 });

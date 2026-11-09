@@ -32,13 +32,13 @@ The link from Functional's card for Haskell to Haskell's board is, in each case:
 
 ```html
 <!-- On the tool's own site -->
-<a class="body panel" href="haskell-zkdb1w.html">…</a>
+<a class="allume-body allume-panel" href="haskell-zkdb1w.html">…</a>
 
 <!-- From the patterns /boards/{slug}/ and /allume/ -->
-<a class="body panel" href="/boards/haskell-zkdb1w/">…</a>
+<a class="allume-body allume-panel" href="/boards/haskell-zkdb1w/">…</a>
 
 <!-- With the reference kept -->
-<a class="body panel" href="allume:board/0b92912e0774056fbb869596628560b7">…</a>
+<a class="allume-body allume-panel" href="allume:board/0b92912e0774056fbb869596628560b7">…</a>
 ```
 
 A reference that's kept is written as `allume:board/` and a board's ID, with `#card-` and a

@@ -16,9 +16,10 @@ export function setUpZoomControls({
   root: ParentNode;
   canvas: Canvas;
 }) {
-  root.querySelector('.zoom')?.addEventListener('click', (event) => {
-    const action = (event.target as Element).closest<HTMLElement>('[data-zoom]')
-      ?.dataset.zoom;
+  root.querySelector('.allume-zoom')?.addEventListener('click', (event) => {
+    const action = (event.target as Element).closest<HTMLElement>(
+      '[data-allume-zoom]'
+    )?.dataset.allumeZoom;
     const { scale } = canvas.camera;
 
     if (action === 'in') {

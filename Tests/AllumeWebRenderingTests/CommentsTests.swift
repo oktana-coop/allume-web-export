@@ -23,11 +23,11 @@ import Testing
       html
         == markup(
           #"""
-          <div class="comment"
+          <div class="allume-comment"
             style="left:0px;top:0px;width:100px;height:100px;z-index:9000;--author:#7f0bd5">
-            <img class="avatar" src="file:user_mira.png" alt="Mira Okafor" title="Mira Okafor"
+            <img class="allume-avatar" src="file:user_mira.png" alt="Mira Okafor" title="Mira Okafor"
               draggable="false">
-            <div class="text">A comment</div>
+            <div class="allume-text">A comment</div>
             <time datetime="2024-11-01T09:11:44Z">Nov 1, 2024</time>
           </div>
           """#))
@@ -42,7 +42,7 @@ import Testing
 
     let html = drawnComment("comment", on: "root", in: contents, interactive: true)
 
-    #expect(html?.contains(#"z-index:9000"><span class="avatar"></span>"#) == true)
+    #expect(html?.contains(#"z-index:9000"><span class="allume-avatar"></span>"#) == true)
     #expect(html?.hasSuffix(copyButtonMarkup + "</div>") == true)
   }
 }

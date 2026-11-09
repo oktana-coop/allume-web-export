@@ -116,7 +116,7 @@ test.describe('copy buttons', () => {
  * text.
  */
 const boardItem = ({ page, text }: { page: Page; text: string }) =>
-  page.locator('.world > *', { hasText: text });
+  page.locator('.allume-canvas > *', { hasText: text });
 
 /** The copy button of the item on the board that shows the text. */
 const copyButton = ({ page, text }: { page: Page; text: string }) =>

@@ -1,6 +1,6 @@
 /* Linked cards: an icon that opens the list of boards showing the card. */
 
-.linked {
+.allume-linked {
   display: inline-grid;
   place-items: center;
   flex: none;
@@ -11,11 +11,11 @@
   font: inherit;
 }
 
-button.linked {
+button.allume-linked {
   cursor: pointer;
 }
 
-.card:not(.card--board) > button.linked {
+.allume-card:not(.allume-board-card) > button.allume-linked {
   position: absolute;
   top: -11px;
   right: -11px;
@@ -27,7 +27,7 @@ button.linked {
   z-index: 1;
 }
 
-.linked-menu {
+.allume-linked-menu {
   position: fixed;
   inset: auto;
   min-width: 220px;
@@ -43,19 +43,19 @@ button.linked {
   user-select: none;
 }
 
-.linked-menu p {
+.allume-linked-menu p {
   margin: 4px 10px 6px;
   font-size: 12px;
   color: var(--muted);
 }
 
-.linked-menu ul {
+.allume-linked-menu ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.linked-menu a {
+.allume-linked-menu a {
   position: relative;
   display: block;
   padding: 7px 10px 7px 30px;
@@ -64,14 +64,14 @@ button.linked {
   text-decoration: none;
 }
 
-.linked-menu a:hover {
+.allume-linked-menu a:hover {
   background: var(--panel);
 }
 
 /* The check mark only shows the current board, which aria-current already
    names, so its empty alternative text keeps it out of the link's name.
    Browsers without alternative text keep the first declaration. */
-.linked-menu a[aria-current]::before {
+.allume-linked-menu a[aria-current]::before {
   content: '✓';
   content: '✓' / '';
   position: absolute;

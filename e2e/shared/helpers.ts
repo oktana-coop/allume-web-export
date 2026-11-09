@@ -5,7 +5,8 @@ import { type Board } from './boards';
 export type Point = { x: number; y: number };
 
 /** The part of the page that shows the board's canvas, below the bar. */
-export const viewport = ({ page }: { page: Page }) => page.locator('.viewport');
+export const viewport = ({ page }: { page: Page }) =>
+  page.locator('.allume-viewport');
 
 /**
  * The board's card on the current page's board. Other cards' previews also
@@ -75,7 +76,7 @@ export const openLinkedCardMenu = async ({
 }) =>
   openMenu({
     button: linkedCardButton({ page, card }),
-    menu: page.locator(`#linked-${card.id}`),
+    menu: page.locator(`#allume-linked-${card.id}`),
   });
 
 /**

@@ -15,8 +15,8 @@ import Testing
       html
         == markup(
           #"""
-          <div class="chain" style="left:700px;top:40px;max-width:400px">
-            <p data-color="purple">Pure functions</p>
+          <div class="allume-text-block" style="left:700px;top:40px;max-width:400px">
+            <p data-allume-color="purple">Pure functions</p>
             <p>Same input, same output.</p>
           </div>
           """#))

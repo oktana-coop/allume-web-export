@@ -1,4 +1,4 @@
-.connections {
+.allume-connections {
   position: absolute;
   top: 0;
   left: 0;
@@ -7,7 +7,7 @@
   z-index: 0;
 }
 
-.connections line {
+.allume-connections line {
   stroke: var(--connection);
   stroke-width: 2;
   stroke-linecap: round;

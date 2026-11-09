@@ -20,7 +20,7 @@ func drawPreview(
     + "transform:scale(\(number: scale))"
 
   return .element(
-    "div", ["class": "preview", "style": .text(style)],
+    "div", ["class": "allume-preview", "style": .text(style)],
     separatedByLineBreaks(
       drawBoardContents(
         board, depth: depth, contents: contents, layouts: layouts, favicons: favicons)))

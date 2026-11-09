@@ -30,7 +30,9 @@ test.describe('comment dates', () => {
 
       await expect(
         page
-          .locator('.world > .comment', { hasText: 'Datalog would fit here' })
+          .locator('.allume-canvas > .allume-comment', {
+            hasText: 'Datalog would fit here',
+          })
           .locator('time')
       ).toHaveText(reads);
     });

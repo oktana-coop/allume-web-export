@@ -5,7 +5,7 @@ func drawInk(_ ink: Ink) -> HTML {
   .element(
     "img",
     [
-      "class": "ink",
+      "class": "allume-ink",
       "src": .file(PublishedFile(path: ink.file.name, source: ink.file.url)),
       "alt": "",
       "draggable": "false",

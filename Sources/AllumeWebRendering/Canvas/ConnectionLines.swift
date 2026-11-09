@@ -19,7 +19,7 @@ func drawConnectionLines(_ layout: BoardLayout) -> HTML? {
   return .element(
     "svg",
     [
-      "class": "connections", "width": .text("\(number: layout.contentBounds.maxX)"),
+      "class": "allume-connections", "width": .text("\(number: layout.contentBounds.maxX)"),
       "height": .text("\(number: layout.contentBounds.maxY)"), "aria-hidden": "true",
     ], lines)
 }

@@ -6,7 +6,7 @@ func drawTextBlock(_ block: TextBlock, interactive: Bool) -> HTML {
     + "max-width:\(number: block.maxWidth)px"
 
   return .element(
-    "div", ["class": "chain", "style": .text(style)],
+    "div", ["class": "allume-text-block", "style": .text(style)],
     block.paragraphs.map(drawParagraph) + (interactive ? [copyButton] : []))
 }
 
@@ -17,6 +17,6 @@ private func drawParagraph(_ paragraph: TextBlock.Paragraph) -> HTML {
   }
 
   return .element(
-    "p", ["data-color": paragraph.highlight.map { color in .text(color.rawValue) }],
+    "p", ["data-allume-color": paragraph.highlight.map { color in .text(color.rawValue) }],
     [.text(paragraph.text)])
 }

@@ -39,12 +39,14 @@ import Testing
 
     #expect(
       pieces.compactMap { piece in piece.firstMatch(of: /^<\w+ class="([^"]*)"/)?.1 } == [
-        "connections", "card card--text", "card card--text", "chain", "comment", "ink",
+        "allume-connections", "allume-card allume-note-card", "allume-card allume-note-card",
+        "allume-text-block", "allume-comment", "allume-ink",
       ])
     #expect(
-      pieces.compactMap { piece in piece.firstMatch(of: /^<div [^>]*data-doc="([^"]*)"/)?.1 } == [
-        "below", "above",
-      ])
+      pieces.compactMap { piece in piece.firstMatch(of: /^<div [^>]*data-allume-doc="([^"]*)"/)?.1 }
+        == [
+          "below", "above",
+        ])
   }
 
   @Test func keepTheExportsOrderForCardsWithTheSameZIndex() throws {
@@ -59,7 +61,7 @@ import Testing
     let pieces = try #require(drawnContents(of: "root", in: contents))
 
     #expect(
-      pieces.compactMap { piece in piece.firstMatch(of: /data-doc="([^"]*)"/)?.1 } == [
+      pieces.compactMap { piece in piece.firstMatch(of: /data-allume-doc="([^"]*)"/)?.1 } == [
         "c", "a", "b",
       ])
   }

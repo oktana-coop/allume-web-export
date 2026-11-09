@@ -18,9 +18,9 @@ import Testing
         html
           == markup(
             #"""
-            <div class="card card--text" data-doc="note" id="card-note"
+            <div class="allume-card allume-note-card" data-allume-doc="note" id="card-note"
               style="left:0px;top:0px;width:100px;height:100px;z-index:0">
-              <div class="body">Tom &amp; Jerry</div>
+              <div class="allume-body">Tom &amp; Jerry</div>
               \#(copyButtonMarkup)
             </div>
             """#))
@@ -39,9 +39,9 @@ import Testing
         html
           == markup(
             #"""
-            <div class="card card--text" data-doc="note"
+            <div class="allume-card allume-note-card" data-allume-doc="note"
               style="left:0px;top:0px;width:100px;height:100px;z-index:0">
-              <div class="body">A note</div>
+              <div class="allume-body">A note</div>
             </div>
             """#))
     }
@@ -65,7 +65,7 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <img class="body" src="file:image.png" alt="Figure" title="From Monoids"
+            <img class="allume-body" src="file:image.png" alt="Figure" title="From Monoids"
               loading="lazy" decoding="async" draggable="false">
             """#)) == true)
     }
@@ -88,10 +88,10 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <a class="body" href="https://www.Haskell.org/learn" target="_blank" rel="noopener">
+            <a class="allume-body" href="https://www.Haskell.org/learn" target="_blank" rel="noopener">
               \#(iconMarkup("url"))
-              <span class="title">Learn</span>
-              <span class="host">haskell.org</span>
+              <span class="allume-title">Learn</span>
+              <span class="allume-host">haskell.org</span>
             </a>
             """#)) == true)
     }
@@ -112,7 +112,7 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <img class="favicon" src="file:favicons/ocaml.org.png" alt="" loading="lazy"
+            <img class="allume-favicon" src="file:favicons/ocaml.org.png" alt="" loading="lazy"
               draggable="false">
             """#)) == true)
     }
@@ -132,10 +132,10 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <div class="body">
+            <div class="allume-body">
               \#(iconMarkup("url"))
-              <span class="title">example.com/talks/lambda</span>
-              <span class="host">example.com/talks/lambda</span>
+              <span class="allume-title">example.com/talks/lambda</span>
+              <span class="allume-host">example.com/talks/lambda</span>
             </div>
             """#)) == true)
     }
@@ -163,12 +163,12 @@ import Testing
         html
           == markup(
             #"""
-            <div class="card card--pdf" data-doc="pdf"
+            <div class="allume-card allume-pdf-card" data-allume-doc="pdf"
               style="left:10px;top:20px;width:320px;z-index:3">
-              <div class="body" title="">
+              <div class="allume-body" title="">
                 \#(iconMarkup("pdf"))
-                <span class="title">PDF</span>
-                <span class="host">PDF</span>
+                <span class="allume-title">PDF</span>
+                <span class="allume-host">PDF</span>
               </div>
             </div>
             """#))
@@ -189,11 +189,11 @@ import Testing
         html
           == markup(
             #"""
-            <div class="card card--board" data-doc="child" id="card-child"
+            <div class="allume-card allume-board-card" data-allume-doc="child" id="card-child"
               style="left:0px;top:0px;width:100px;height:100px;z-index:0">
-              <div class="board-title"><span>Untitled board</span></div>
-              <a class="body panel" href="board:child" aria-label="Untitled board">
-                <div class="preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+              <div class="allume-board-title"><span>Untitled board</span></div>
+              <a class="allume-body allume-panel" href="board:child" aria-label="Untitled board">
+                <div class="allume-preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
               </a>
             </div>
             """#))
@@ -215,12 +215,12 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <div class="board-title">
-              <span class="linked">\#(iconMarkup("linked"))</span>
+            <div class="allume-board-title">
+              <span class="allume-linked">\#(iconMarkup("linked"))</span>
               <span>Monoids</span>
             </div>
-            <div class="body panel">
-              <div class="preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
+            <div class="allume-body allume-panel">
+              <div class="allume-preview" style="width:125px;height:125px;transform:scale(0.8)"></div>
             </div>
             """#)) == true)
     }
@@ -241,6 +241,6 @@ import Testing
 
     let html = drawn("note", on: "root", in: contents, depth: 1)
 
-    #expect(html?.contains(#"data-doc="note" data-color="purple" style="#) == true)
+    #expect(html?.contains(#"data-allume-doc="note" data-allume-color="purple" style="#) == true)
   }
 }

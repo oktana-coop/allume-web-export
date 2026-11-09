@@ -188,18 +188,18 @@
 
   // viewer/canvas.ts
   function setUpCanvas(root) {
-    const viewport = root.querySelector(".viewport");
-    const element = viewport?.querySelector(".world");
+    const viewport = root.querySelector(".allume-viewport");
+    const element = viewport?.querySelector(".allume-canvas");
     if (!viewport || !element) return null;
     viewport.addEventListener("scroll", () => {
       viewport.scrollTop = 0;
       viewport.scrollLeft = 0;
     });
-    const [minX, minY, maxX2, maxY2] = element.dataset.bounds.split(",").map(Number);
+    const [minX, minY, maxX2, maxY2] = element.dataset.allumeBounds.split(",").map(Number);
     return {
       viewport,
       element,
-      zoomLevelLabel: root.querySelector(".zoom-level"),
+      zoomLevelLabel: root.querySelector(".allume-zoom-level"),
       contentBounds: {
         x: minX,
         y: minY,
@@ -312,7 +312,9 @@
   var relativeTime = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
   function makeCommentDatesRelative(root) {
     const now = Date.now();
-    for (const time of root.querySelectorAll(".comment time")) {
+    for (const time of root.querySelectorAll(
+      ".allume-comment time"
+    )) {
       const date = relativeDate({ written: Date.parse(time.dateTime), now });
       if (date) time.textContent = date;
     }
@@ -331,7 +333,9 @@
   var COPIED_FOR = 1500;
   function setUpCopyButtons(canvas) {
     canvas.element.addEventListener("click", async (event) => {
-      const button = event.target.closest(".copy");
+      const button = event.target.closest(
+        ".allume-copy"
+      );
       if (!button) return;
       const element = copyTargetElement(button);
       if (!element || !await copyText(element)) return;
@@ -340,8 +344,8 @@
   }
   function copyTargetElement(button) {
     const owner = button.parentElement;
-    if (owner?.matches(".chain")) return owner;
-    return owner?.querySelector(":scope > .body, :scope > .text") ?? null;
+    if (owner?.matches(".allume-text-block")) return owner;
+    return owner?.querySelector(":scope > .allume-body, :scope > .allume-text") ?? null;
   }
   async function copyText(element) {
     try {
@@ -360,23 +364,23 @@
     }
   }
   function textOf(element) {
-    if (!element.matches(".chain")) return element.textContent;
+    if (!element.matches(".allume-text-block")) return element.textContent;
     return [...element.querySelectorAll(":scope > p")].map((paragraph) => paragraph.textContent).join("\n");
   }
   function showCopied(button) {
     const mark = String(performance.now());
-    button.dataset.copied = mark;
+    button.dataset.allumeCopied = mark;
     button.setAttribute("aria-label", "Copied");
     setTimeout(() => {
-      if (button.dataset.copied !== mark) return;
-      delete button.dataset.copied;
+      if (button.dataset.allumeCopied !== mark) return;
+      delete button.dataset.allumeCopied;
       button.setAttribute("aria-label", "Copy text");
     }, COPIED_FOR);
   }
 
   // viewer/gestures.ts
   var DRAG_THRESHOLD = 4;
-  var SELECTABLE_TEXT = ".world > .card--text > .body, .world > .comment > .text, .world > .chain";
+  var SELECTABLE_TEXT = ".allume-canvas > .allume-note-card > .allume-body, .allume-canvas > .allume-comment > .allume-text, .allume-canvas > .allume-text-block";
   function setUpGestures(canvas) {
     const { viewport } = canvas;
     let pointers = /* @__PURE__ */ new Map();
@@ -410,7 +414,7 @@
       if (!gesture.dragging && !isPastDragThreshold({ gesture, points })) return;
       if (!gesture.dragging) {
         canvas.gesture = { ...gesture, dragging: true };
-        viewport.classList.add("is-dragging");
+        viewport.classList.add("allume-dragging");
       }
       if (!viewport.hasPointerCapture(event.pointerId)) {
         viewport.setPointerCapture(event.pointerId);
@@ -437,7 +441,7 @@
       }
       suppressClick = Boolean(canvas.gesture?.dragging);
       canvas.gesture = null;
-      viewport.classList.remove("is-dragging");
+      viewport.classList.remove("allume-dragging");
       startBounceBack(canvas);
     };
     viewport.addEventListener("pointerup", endPointer);
@@ -522,7 +526,9 @@
     canvas.viewport.addEventListener("wheel", () => closeOpenMenus(root), {
       passive: true
     });
-    for (const menu of root.querySelectorAll(".linked-menu")) {
+    for (const menu of root.querySelectorAll(
+      ".allume-linked-menu"
+    )) {
       const button = root.querySelector(`[popovertarget="${menu.id}"]`);
       menu.addEventListener("beforetoggle", (event) => {
         if (event.newState !== "open" || !button) return;
@@ -569,7 +575,7 @@
   }
   function closeOpenMenus(root) {
     for (const menu of root.querySelectorAll(
-      ".linked-menu:popover-open"
+      ".allume-linked-menu:popover-open"
     )) {
       menu.hidePopover();
     }
@@ -619,7 +625,7 @@
     const heading = breadcrumbsElement?.querySelector(":scope > h1");
     if (!heading) return;
     const shown = breadcrumbsElement.querySelectorAll(
-      ":scope > a, :scope > .separator"
+      ":scope > a, :scope > .allume-separator"
     );
     for (const element of shown) element.remove();
     breadcrumbs.forEach(({ href, label }, index) => {
@@ -628,7 +634,7 @@
       link.textContent = label;
       if (index === breadcrumbs.length - 1) link.rel = "up";
       const separator = document.createElement("span");
-      separator.className = "separator";
+      separator.className = "allume-separator";
       separator.setAttribute("aria-hidden", "true");
       separator.textContent = "/";
       heading.before(link, separator);
@@ -642,7 +648,7 @@
     if (!parent) return;
     const path = new URL(parent.href).pathname;
     for (const link of heading.querySelectorAll(
-      ".linked-menu a"
+      ".allume-linked-menu a"
     )) {
       if (link.pathname === path) link.setAttribute("aria-current", "true");
       else link.removeAttribute("aria-current");
@@ -682,7 +688,7 @@
   // viewer/navigation.ts
   var ARRIVAL_KEY = "arrival";
   function setUpNavigation(root) {
-    const breadcrumbsElement = root.querySelector(".breadcrumbs");
+    const breadcrumbsElement = root.querySelector(".allume-breadcrumbs");
     const recorded = takeSession({ key: ARRIVAL_KEY, parse: parseArrivalRecord });
     if (recorded?.path === location.pathname) {
       const { how, breadcrumbs: breadcrumbs2 } = recorded;
@@ -772,9 +778,9 @@
   }) {
     const index = breadcrumbLinks(breadcrumbsElement).indexOf(link);
     if (index >= 0) return { kind: "breadcrumb", index };
-    if (link.closest(".breadcrumbs")) return { kind: "heading menu" };
-    if (link.closest(".linked-menu")) return { kind: "linked card menu" };
-    if (link.matches(".panel")) return { kind: "board card" };
+    if (link.closest(".allume-breadcrumbs")) return { kind: "heading menu" };
+    if (link.closest(".allume-linked-menu")) return { kind: "linked card menu" };
+    if (link.matches(".allume-panel")) return { kind: "board card" };
     return null;
   }
   function isArrival(value) {
@@ -908,8 +914,10 @@
     root,
     canvas
   }) {
-    root.querySelector(".zoom")?.addEventListener("click", (event) => {
-      const action = event.target.closest("[data-zoom]")?.dataset.zoom;
+    root.querySelector(".allume-zoom")?.addEventListener("click", (event) => {
+      const action = event.target.closest(
+        "[data-allume-zoom]"
+      )?.dataset.allumeZoom;
       const { scale } = canvas.camera;
       if (action === "in") {
         zoomAtCenter({ canvas, scale: scale * ZOOM_IN });
@@ -941,9 +949,9 @@
   function setUpBoardView(root) {
     const canvas = setUpCanvas(root);
     if (!canvas) {
-      throw new Error("The board view has no .viewport with a .world in it.");
+      throw new Error("The board's view has no viewport with a canvas in it.");
     }
-    root.classList.add("js");
+    root.classList.add("allume-js");
     setUpScrolling(canvas);
     setUpGestures(canvas);
     setUpZoomControls({ root, canvas });

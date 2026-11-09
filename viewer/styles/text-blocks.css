@@ -1,4 +1,4 @@
-.chain {
+.allume-text-block {
   position: absolute;
   width: max-content;
   font-size: 18px;
@@ -8,32 +8,32 @@
   z-index: 8000;
 }
 
-.chain p {
+.allume-text-block p {
   margin: 0;
 }
 
 /* Colored paragraphs are highlighted like labels. */
-.chain [data-color] {
+.allume-text-block [data-allume-color] {
   width: fit-content;
   padding: 4px 9px;
   border-radius: 4px;
   background: var(--highlight);
 }
-.chain [data-color='purple'] {
+.allume-text-block [data-allume-color='purple'] {
   --highlight: var(--purple-highlight);
 }
-.chain [data-color='red'] {
+.allume-text-block [data-allume-color='red'] {
   --highlight: var(--red-highlight);
 }
-.chain [data-color='green'] {
+.allume-text-block [data-allume-color='green'] {
   --highlight: var(--green-highlight);
 }
-.chain [data-color='yellow'] {
+.allume-text-block [data-allume-color='yellow'] {
   --highlight: var(--yellow-highlight);
 }
-.chain [data-color='blue'] {
+.allume-text-block [data-allume-color='blue'] {
   --highlight: var(--blue-highlight);
 }
-.chain [data-color='gray'] {
+.allume-text-block [data-allume-color='gray'] {
   --highlight: var(--gray-highlight);
 }

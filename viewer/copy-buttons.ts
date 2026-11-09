@@ -7,7 +7,9 @@ const COPIED_FOR = 1500;
 
 export function setUpCopyButtons(canvas: Canvas) {
   canvas.element.addEventListener('click', async (event) => {
-    const button = (event.target as Element).closest<HTMLElement>('.copy');
+    const button = (event.target as Element).closest<HTMLElement>(
+      '.allume-copy'
+    );
     if (!button) return;
 
     const element = copyTargetElement(button);
@@ -20,8 +22,10 @@ export function setUpCopyButtons(canvas: Canvas) {
 /** The element whose text the button copies. */
 function copyTargetElement(button: Element) {
   const owner = button.parentElement;
-  if (owner?.matches('.chain')) return owner;
-  return owner?.querySelector(':scope > .body, :scope > .text') ?? null;
+  if (owner?.matches('.allume-text-block')) return owner;
+  return (
+    owner?.querySelector(':scope > .allume-body, :scope > .allume-text') ?? null
+  );
 }
 
 async function copyText(element: Element) {
@@ -46,7 +50,7 @@ async function copyText(element: Element) {
 
 // A text block has a paragraph per line, which textContent runs together.
 function textOf(element: Element) {
-  if (!element.matches('.chain')) return element.textContent;
+  if (!element.matches('.allume-text-block')) return element.textContent;
 
   return [...element.querySelectorAll(':scope > p')]
     .map((paragraph) => paragraph.textContent)
@@ -60,13 +64,13 @@ function textOf(element: Element) {
  */
 function showCopied(button: HTMLElement) {
   const mark = String(performance.now());
-  button.dataset.copied = mark;
+  button.dataset.allumeCopied = mark;
   button.setAttribute('aria-label', 'Copied');
 
   setTimeout(() => {
-    if (button.dataset.copied !== mark) return;
+    if (button.dataset.allumeCopied !== mark) return;
 
-    delete button.dataset.copied;
+    delete button.dataset.allumeCopied;
     button.setAttribute('aria-label', 'Copy text');
   }, COPIED_FOR);
 }

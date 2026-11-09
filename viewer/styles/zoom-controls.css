@@ -1,11 +1,11 @@
-.zoom {
+.allume-zoom {
   flex: none;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.zoom button {
+.allume-zoom button {
   min-width: 32px;
   height: 28px;
   border: 0;
@@ -17,7 +17,7 @@
   cursor: pointer;
 }
 
-.zoom output {
+.allume-zoom output {
   min-width: 48px;
   text-align: center;
   font-size: 13px;
@@ -25,6 +25,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.allume:not(.js) .zoom {
+.allume:not(.allume-js) .allume-zoom {
   display: none;
 }

@@ -98,7 +98,9 @@ files with it. All of these need Node and `npm install`, as for the end-to-end t
 
 The renderer in `Sources/AllumeWebRendering/`, the stylesheets and the script share the page's
 classes and `data-*` attributes, so renaming one means renaming it in all three. The integration
-tests' expected pages and the end-to-end tests catch one that's missed.
+tests' expected pages and the end-to-end tests catch one that's missed. Each class, ID and `data-*`
+attribute starts with `allume-`, as in `data-allume-color`, so that a site's own styles and scripts
+can't reach the board's view. The one exception is a card's `card-<id>`, which links point to.
 
 ### Formatting
 

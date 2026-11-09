@@ -1,8 +1,8 @@
 /* Text on the page's board can be selected; previews stay inert. */
 
-.world > .card--text > .body,
-.world > .comment > .text,
-.world > .chain {
+.allume-canvas > .allume-note-card > .allume-body,
+.allume-canvas > .allume-comment > .allume-text,
+.allume-canvas > .allume-text-block {
   -webkit-user-select: text;
   user-select: text;
   cursor: text;

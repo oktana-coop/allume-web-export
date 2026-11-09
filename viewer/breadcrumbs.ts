@@ -75,7 +75,7 @@ export function showBreadcrumbs({
   if (!heading) return;
 
   const shown = breadcrumbsElement!.querySelectorAll(
-    ':scope > a, :scope > .separator'
+    ':scope > a, :scope > .allume-separator'
   );
   for (const element of shown) element.remove();
 
@@ -86,7 +86,7 @@ export function showBreadcrumbs({
     if (index === breadcrumbs.length - 1) link.rel = 'up';
 
     const separator = document.createElement('span');
-    separator.className = 'separator';
+    separator.className = 'allume-separator';
     separator.setAttribute('aria-hidden', 'true');
     separator.textContent = '/';
     heading.before(link, separator);
@@ -108,7 +108,7 @@ function markParent({
 
   const path = new URL(parent.href).pathname;
   for (const link of heading.querySelectorAll<HTMLAnchorElement>(
-    '.linked-menu a'
+    '.allume-linked-menu a'
   )) {
     if (link.pathname === path) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');

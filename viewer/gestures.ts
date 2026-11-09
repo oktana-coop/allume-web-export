@@ -30,7 +30,7 @@ type Pointers = ReadonlyMap<number, Point>;
 
 const DRAG_THRESHOLD = 4;
 const SELECTABLE_TEXT =
-  '.world > .card--text > .body, .world > .comment > .text, .world > .chain';
+  '.allume-canvas > .allume-note-card > .allume-body, .allume-canvas > .allume-comment > .allume-text, .allume-canvas > .allume-text-block';
 
 /**
  * Dragging with one pointer pans; pinching with two zooms, as does Safari's
@@ -80,7 +80,7 @@ export function setUpGestures(canvas: Canvas) {
 
     if (!gesture.dragging) {
       canvas.gesture = { ...gesture, dragging: true };
-      viewport.classList.add('is-dragging');
+      viewport.classList.add('allume-dragging');
     }
     if (!viewport.hasPointerCapture(event.pointerId)) {
       viewport.setPointerCapture(event.pointerId);
@@ -111,7 +111,7 @@ export function setUpGestures(canvas: Canvas) {
 
     suppressClick = Boolean(canvas.gesture?.dragging);
     canvas.gesture = null;
-    viewport.classList.remove('is-dragging');
+    viewport.classList.remove('allume-dragging');
     startBounceBack(canvas);
   };
   viewport.addEventListener('pointerup', endPointer);

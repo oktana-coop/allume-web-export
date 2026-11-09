@@ -1,4 +1,4 @@
-.copy {
+.allume-copy {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -20,51 +20,51 @@
   z-index: 1;
 }
 
-.card:has(> button.linked) > .copy {
+.allume-card:has(> button.allume-linked) > .allume-copy {
   right: 18px;
 }
 
 /* A text block has no box to hold the button, so it sits beside its first
    line, with an invisible bridge so it stays shown on the way to it. */
-.chain > .copy {
+.allume-text-block > .allume-copy {
   top: -1px;
   right: auto;
   left: calc(100% + 8px);
 }
 
-.chain > .copy::before {
+.allume-text-block > .allume-copy::before {
   content: '';
   position: absolute;
   inset: 0 100% 0 -8px;
 }
 
-.card:hover > .copy,
-.comment:hover > .copy,
-.chain:hover > .copy,
-.copy:focus-visible,
-.copy[data-copied] {
+.allume-card:hover > .allume-copy,
+.allume-comment:hover > .allume-copy,
+.allume-text-block:hover > .allume-copy,
+.allume-copy:focus-visible,
+.allume-copy[data-allume-copied] {
   opacity: 1;
 }
 
 @media (hover: none) {
-  .copy {
+  .allume-copy {
     opacity: 1;
   }
 }
 
-.copy:hover {
+.allume-copy:hover {
   color: var(--text);
 }
 
-.copy .icon-copied,
-.copy[data-copied] .icon-copy {
+.allume-copy .allume-icon-copied,
+.allume-copy[data-allume-copied] .allume-icon-copy {
   display: none;
 }
 
-.copy[data-copied] .icon-copied {
+.allume-copy[data-allume-copied] .allume-icon-copied {
   display: block;
 }
 
-.copy[data-copied] {
+.allume-copy[data-allume-copied] {
   color: var(--green);
 }

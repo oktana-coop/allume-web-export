@@ -1,5 +1,5 @@
 /* Comments are tinted with their author's color, like in Allume. */
-.comment {
+.allume-comment {
   position: absolute;
   padding: 12px 14px 12px 56px;
   overflow: hidden;
@@ -13,7 +13,7 @@
   overflow-wrap: anywhere;
 }
 
-.comment .avatar {
+.allume-comment .allume-avatar {
   position: absolute;
   top: 12px;
   left: 12px;
@@ -24,11 +24,11 @@
   object-fit: cover;
 }
 
-.comment .text {
+.allume-comment .allume-text {
   white-space: pre-wrap;
 }
 
-.comment time {
+.allume-comment time {
   display: block;
   color: rgb(0 0 0 / 0.5);
 }
