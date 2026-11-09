@@ -7,7 +7,7 @@ func drawBreadcrumbs(of board: Document.Board, contents: Contents) -> HTML {
       .element(
         "a",
         [
-          "href": .reference(.board(ancestorID)),
+          "href": .board(ancestorID),
           "rel": ancestorID == ancestorIDs.last ? "up" : nil,
         ], [.text(contents.board(ancestorID)?.displayLabel ?? "")]),
       .element("span", ["class": "separator", "aria-hidden": "true"], [.text("/")]),

@@ -1,6 +1,5 @@
 import AllumeWeb
 import AllumeWebBundleReader
-import AllumeWebRendering
 import Foundation
 import Testing
 
@@ -8,11 +7,16 @@ import Testing
   @Test func rendersTheExpectedPagesAndFiles() throws {
     let (contents, _) = try readBundle(at: fixtureURL)
 
-    let (pages, files) = renderBoards(contents, favicons: [:])
+    let siteFiles = siteFiles(for: contents, favicons: [:])
 
+    let pages = siteFiles.compactMap { file -> (String, String)? in
+      guard case .text(let html) = file.source else { return nil }
+      return (file.path, html)
+    }
+    let files = siteFiles.map(\.path).filter { path in path.hasPrefix("files/") }
+      .map { path in String(path.dropFirst("files/".count)) }
     let output = [String: String](
-      uniqueKeysWithValues: pages.map { page in (page.path, page.html) }
-        + [("files.txt", files.map(\.path).joined(separator: "\n") + "\n")])
+      uniqueKeysWithValues: pages + [("files.txt", files.joined(separator: "\n") + "\n")])
     try compareWithExpectedFiles(output, in: expectedURL.appending(path: "SampleExport"))
   }
 

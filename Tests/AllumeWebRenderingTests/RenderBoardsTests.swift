@@ -4,7 +4,7 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct RenderBoardsTests {
-  @Test func nameTheRootsPageIndexAndTheOthersAfterTheirSlugs() throws {
+  @Test func renderEachBoardAsAPageInBreadthFirstOrder() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -13,15 +13,14 @@ import Testing
       ],
       users: [:]
     )
-    let slug = try #require(slugs(in: contents)[Document.ID(rawValue: "functional")])
 
     let (pages, _) = renderBoards(contents, favicons: [:])
 
-    #expect(pages.map(\.path) == ["index.html", "\(slug).html"])
+    #expect(pages.map(\.boardID.rawValue) == ["root", "functional"])
     #expect(pages.allSatisfy { page in page.html.hasSuffix("</html>\n") })
   }
 
-  @Test func linkBoardsAndCardsToTheirPages() throws {
+  @Test func linkBoardsAndCardsWithReferences() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -30,17 +29,17 @@ import Testing
       ],
       users: [:]
     )
-    let slug = try #require(slugs(in: contents)[Document.ID(rawValue: "functional")])
 
     let (pages, _) = renderBoards(contents, favicons: [:])
 
     let root = try #require(pages.first)
-    #expect(root.html.contains(#"<a class="body panel" href="\#(slug).html""#))
-    #expect(root.html.contains(#"<a href="\#(slug).html#card-note">Functional</a>"#))
-    #expect(pages.last?.html.contains(#"<a href="index.html" rel="up">Languages</a>"#) == true)
+    #expect(root.html.contains(#"<a class="body panel" href="allume:board/functional""#))
+    #expect(root.html.contains(#"<a href="allume:board/functional#card-note">Functional</a>"#))
+    let functional = try #require(pages.last)
+    #expect(functional.html.contains(#"<a href="allume:board/root" rel="up">Languages</a>"#))
   }
 
-  @Test func referToFilesUnderFilesWithEachSegmentEncoded() throws {
+  @Test func referToFilesWithEachSegmentOfTheirPathEncoded() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -50,12 +49,11 @@ import Testing
       users: [:]
     )
 
-    let (pages, _) = renderBoards(
-      contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")])
+    let (pages, _) = renderBoards(contents, favicons: ["ocaml.org": makeAsset("ocaml.org.png")])
 
     let html = try #require(pages.first?.html)
-    #expect(html.contains(#"src="files/Tom%20%26%20Jerry.png""#))
-    #expect(html.contains(#"src="files/favicons/ocaml.org.png""#))
+    #expect(html.contains(#"src="allume:file/Tom%20%26%20Jerry.png""#))
+    #expect(html.contains(#"src="allume:file/favicons/ocaml.org.png""#))
   }
 
   @Test func listEachFileOnceInTheOrderFirstReferredTo() throws {

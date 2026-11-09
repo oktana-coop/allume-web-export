@@ -21,7 +21,7 @@ func drawLinkedCardMenu(
         .element(
           "a",
           [
-            "href": .reference(.board(boardID, card: documentID)),
+            "href": .board(boardID, card: documentID),
             "aria-current": boardID == currentBoardID ? "true" : nil,
           ], [.text(contents.board(boardID)?.displayLabel ?? "")])
       ])

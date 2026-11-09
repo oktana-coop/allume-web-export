@@ -101,7 +101,7 @@ private func drawBoardCard(
     ? .element(
       "a",
       [
-        "class": "body panel", "href": .reference(.board(child.id)),
+        "class": "body panel", "href": .board(child.id),
         "aria-label": .text(child.displayLabel),
       ], panelContents)
     : .element("div", ["class": "body panel"], panelContents)
@@ -131,7 +131,7 @@ private func drawImage(_ image: Document.Image, contents: Contents) -> HTML {
     "img",
     [
       "class": "body",
-      "src": .reference(.file(PublishedFile(path: image.file.name, source: image.file.url))),
+      "src": .file(PublishedFile(path: image.file.name, source: image.file.url)),
       "alt": .text(image.label ?? ""),
       "title": sourceLabel.map { label in .text("From \(label)") },
       "loading": "lazy",
@@ -148,8 +148,7 @@ private func drawLink(_ link: Document.Link, favicons: [String: Asset], interact
         "img",
         [
           "class": "favicon",
-          "src": .reference(
-            .file(PublishedFile(path: "favicons/\(favicon.name)", source: favicon.url))),
+          "src": .file(PublishedFile(path: "favicons/\(favicon.name)", source: favicon.url)),
           "alt": "",
           "loading": "lazy",
           "draggable": "false",

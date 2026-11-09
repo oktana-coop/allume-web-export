@@ -76,8 +76,8 @@ import Testing
     @Test func rendersReferencesAsTheResolverSays() {
       let html = HTML.element(
         "a",
-        ["href": .reference(.board(Document.ID(rawValue: "b"), card: Document.ID(rawValue: "c")))],
-        [.element("img", ["src": .reference(.file(makeFile("a&b.png")))], [])])
+        ["href": .board(Document.ID(rawValue: "b"), card: Document.ID(rawValue: "c"))],
+        [.element("img", ["src": .file(makeFile("a&b.png"))], [])])
 
       let rendered = html.rendered(resolving: describe)
 
@@ -114,11 +114,11 @@ import Testing
   @Suite struct Files {
     @Test func listTheFileReferencesInOrderWithRepeats() {
       let html = HTML.element(
-        "div", ["data-image": .reference(.file(makeFile("a.png")))],
+        "div", ["data-image": .file(makeFile("a.png"))],
         [
-          .element("a", ["href": .reference(.board(Document.ID(rawValue: "b")))], [.text("B")]),
-          .element("img", ["src": .reference(.file(makeFile("b.svg")))], []),
-          .element("p", [:], [.element("img", ["src": .reference(.file(makeFile("a.png")))], [])]),
+          .element("a", ["href": .board(Document.ID(rawValue: "b"))], [.text("B")]),
+          .element("img", ["src": .file(makeFile("b.svg"))], []),
+          .element("p", [:], [.element("img", ["src": .file(makeFile("a.png"))], [])]),
         ])
 
       let files = html.files

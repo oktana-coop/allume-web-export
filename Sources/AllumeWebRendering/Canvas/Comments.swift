@@ -32,7 +32,7 @@ private func drawAvatar(of author: User?) -> HTML {
     "img",
     [
       "class": "avatar",
-      "src": .reference(.file(PublishedFile(path: avatar.name, source: avatar.url))),
+      "src": .file(PublishedFile(path: avatar.name, source: avatar.url)),
       "alt": .text(author.name),
       "title": .text(author.name),
       "draggable": "false",

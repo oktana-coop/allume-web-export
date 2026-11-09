@@ -1,3 +1,5 @@
+import AllumeWebModels
+
 enum HTML {
   case doctype
   /// Rendered as is, so it mustn't contain `-->`.
@@ -41,7 +43,7 @@ enum HTML {
     }
 
     let own = attributes.compactMap { _, value -> PublishedFile? in
-      guard case .reference(.file(let file))? = value else {
+      guard case .file(let file)? = value else {
         return nil
       }
       return file
@@ -53,7 +55,10 @@ enum HTML {
 enum AttributeValue: ExpressibleByStringInterpolation {
   /// Escaped when rendered.
   case text(String)
-  case reference(Reference)
+  /// Written as a reference to the board, or to a card on it.
+  case board(Document.ID, card: Document.ID? = nil)
+  /// Written as a reference to the file, which is then published.
+  case file(PublishedFile)
   /// Rendered as the attribute's name alone, like `popover`.
   case empty
 
@@ -86,14 +91,20 @@ private func attribute(
   _ name: String, _ value: AttributeValue?, resolving url: (Reference) -> String
 ) -> String {
   switch value {
-  case nil: ""
-  case .empty?: " \(name)"
-  case .text(let text)?: " \(name)=\"\(escaped(text))\""
-  case .reference(let reference)?: " \(name)=\"\(escaped(url(reference)))\""
+  case nil:
+    ""
+  case .empty?:
+    " \(name)"
+  case .text(let text)?:
+    " \(name)=\"\(escaped(text))\""
+  case .board(let boardID, let cardID)?:
+    " \(name)=\"\(escaped(url(.board(BoardReference(boardID: boardID, cardID: cardID)))))\""
+  case .file(let file)?:
+    " \(name)=\"\(escaped(url(.file(FileReference(path: file.path)))))\""
   }
 }
 
-private func escaped(_ text: String) -> String {
+func escaped(_ text: String) -> String {
   text.unicodeScalars.map { scalar in
     switch scalar {
     case "&": "&amp;"

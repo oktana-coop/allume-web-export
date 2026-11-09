@@ -4,7 +4,7 @@ import Foundation
 
 /// Each board's slug: its label's slug, then `-` and a code hashed from its ID, so a slug depends
 /// only on its board. Boards that would share a slug get their whole ID instead of the code.
-func slugs(in contents: Contents) -> [Document.ID: String] {
+package func slugs(in contents: Contents) -> [Document.ID: String] {
   let boards = contents.hierarchy.boardIDs.map { boardID in
     (id: boardID, label: slugify(contents.board(boardID)?.displayLabel ?? ""))
   }

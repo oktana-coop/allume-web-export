@@ -6,7 +6,7 @@ func drawInk(_ ink: Ink) -> HTML {
     "img",
     [
       "class": "ink",
-      "src": .reference(.file(PublishedFile(path: ink.file.name, source: ink.file.url))),
+      "src": .file(PublishedFile(path: ink.file.name, source: ink.file.url)),
       "alt": "",
       "draggable": "false",
       "style": .text("width:\(number: ink.size.width)px;height:\(number: ink.size.height)px"),

@@ -21,6 +21,12 @@ func makeContents(with documents: [Document]) throws -> Contents {
   )
 }
 
+func makeBoard(_ id: String, label: String) -> Document {
+  .board(
+    Document.Board(
+      id: Document.ID(rawValue: id), label: label, cards: [], chains: [], connections: [], ink: []))
+}
+
 func makeImage(_ name: String) -> Document {
   .image(
     Document.Image(

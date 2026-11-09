@@ -15,16 +15,36 @@ public struct SiteFile: Equatable, Sendable {
   }
 }
 
-/// Every file of the standalone site: a page for each board, the files the pages refer to, under
+/// Every file of the site: a page for each board, the files the pages refer to, under
 /// `files/`, and the viewer's style sheet and script. The favicons are each link host's icon.
 public func siteFiles(for contents: Contents, favicons: [String: Asset]) -> [SiteFile] {
   let (pages, files) = renderBoards(contents, favicons: favicons)
+  let urls = siteURLs(for: contents)
 
-  return pages.map { page in SiteFile(path: page.path, source: .text(page.html)) }
+  // The site's URLs list every published board, which are all a page can refer to.
+  guard
+    let sitePages = try? pages.map({ page throws(UnknownBoardError) in
+      try sitePage(page, urls: urls)
+    })
+  else {
+    preconditionFailure("A page refers to a board the site doesn't publish.")
+  }
+
+  return sitePages
     + files.map { file in SiteFile(path: "files/\(file.path)", source: .copy(file.source)) }
     + ["viewer.css", "viewer.js"].map { name in
       SiteFile(path: name, source: .copy(viewerFile(name)))
     }
+}
+
+/// The page at its board's URL, with each reference filled with the site's URL.
+private func sitePage(_ page: Page, urls: ReferenceURLs) throws(UnknownBoardError) -> SiteFile {
+  let html = try resolvingReferences(in: page.html) { reference throws(UnknownBoardError) in
+    try reference.url(in: urls)
+  }
+
+  return SiteFile(
+    path: try BoardReference(boardID: page.boardID).url(in: urls), source: .text(html))
 }
 
 private func viewerFile(_ name: String) -> URL {
