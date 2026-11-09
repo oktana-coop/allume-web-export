@@ -43,7 +43,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
 
     #expect(files.map(\.path) == ["index.html", "files/image.png", "allume.css", "allume.js"])
   }
@@ -52,7 +52,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
 
     let sources = files.map(\.source)
     guard case .text(let page) = sources.first else {
@@ -70,7 +70,7 @@ import Testing
     let files = siteFiles(
       from: renderedBoards(
         for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)],
-        thumbnails: [:]), theme: .light)
+        images: [:]), theme: .light)
 
     #expect(files.contains(OutputFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
   }
@@ -79,7 +79,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], thumbnails: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
 
     let viewerURLs = files.suffix(2).compactMap { file -> URL? in
       guard case .copy(let url) = file.source else {

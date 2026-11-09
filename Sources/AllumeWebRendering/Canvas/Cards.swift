@@ -6,7 +6,7 @@ import Foundation
 func drawCard(
   _ card: Card, on board: Document.Board, depth: Int, contents: Contents,
   layouts: [Document.ID: BoardLayout], favicons: [String: Asset],
-  thumbnails: [String: Asset]
+  images: [String: ImageFiles]
 ) -> HTML? {
   let interactive = depth == 0
   let menu =
@@ -21,7 +21,7 @@ func drawCard(
   case .board(let child)?:
     let preview = drawPreview(
       of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
-      favicons: favicons, thumbnails: thumbnails)
+      favicons: favicons, images: images)
     return drawBoardCard(
       card, showing: child, preview: preview, menu: menu, interactive: interactive,
       contents: contents)
@@ -37,7 +37,7 @@ func drawCard(
       card, kind: "image", style: boxStyle(card.frame), interactive: interactive,
       children: [
         drawImage(
-          image, thumbnail: interactive ? nil : thumbnails[image.file.name], contents: contents)
+          image, files: images[image.file.name], inPreview: !interactive, contents: contents)
       ] + menu)
 
   case .link(let link)?:
@@ -129,14 +129,18 @@ private func linkedIcon(of board: Document.Board, menu: [HTML], contents: Conten
   return menu
 }
 
-/// The image, or its thumbnail, which previews show instead when there's one.
-private func drawImage(_ image: Document.Image, thumbnail: Asset?, contents: Contents) -> HTML {
+/// The image, as publishing made it if it did, or in a preview its thumbnail, when there's one.
+private func drawImage(
+  _ image: Document.Image, files: ImageFiles?, inPreview: Bool, contents: Contents
+) -> HTML {
   let sourceLabel = image.excerpt.flatMap { excerpt in label(of: excerpt.sourceID, in: contents) }
+  let shown = files?.image ?? image.file
+  let thumbnail = inPreview ? files?.thumbnail : nil
   let file =
     thumbnail.map { thumbnail in
       PublishedFile(path: "thumbs/\(thumbnail.name)", source: thumbnail.url)
     }
-    ?? PublishedFile(path: image.file.name, source: image.file.url)
+    ?? PublishedFile(path: shown.name, source: shown.url)
 
   return .element(
     "img",

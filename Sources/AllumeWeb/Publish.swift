@@ -1,7 +1,7 @@
 import AllumeWebFavicons
+import AllumeWebImages
 import AllumeWebModels
 import AllumeWebRendering
-import AllumeWebThumbnails
 import Foundation
 
 /// Writes the files made from the export's rendered boards into the folder, with its links'
@@ -13,14 +13,14 @@ func publish(
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   let (favicons, faviconWarnings) = await favicons(of: contents, cache: faviconCache)
 
-  let thumbnailFolder = FileManager.default.temporaryDirectory.appending(
-    path: "allume-web-export-thumbnails-\(UUID())")
-  defer { try? FileManager.default.removeItem(at: thumbnailFolder) }
+  let imageFolder = FileManager.default.temporaryDirectory.appending(
+    path: "allume-web-export-images-\(UUID())")
+  defer { try? FileManager.default.removeItem(at: imageFolder) }
 
-  let thumbnails = makeThumbnails(of: contents, in: thumbnailFolder)
+  let images = makeImageFiles(of: contents, in: imageFolder)
 
   let writingWarnings = try writeFolder(
-    files(renderedBoards(for: contents, favicons: favicons, thumbnails: thumbnails)), to: folder,
+    files(renderedBoards(for: contents, favicons: favicons, images: images)), to: folder,
     replacingContents: replacingContents)
 
   return (favicons.count, faviconWarnings + writingWarnings)
@@ -30,9 +30,10 @@ func publish(
 /// high-density screens.
 private let thumbnailWidth = 256
 
-/// The thumbnail of each image card's file wider than a thumbnail, written into the folder, by the
-/// image's file name. An image without one is shown as it is.
-package func makeThumbnails(of contents: Contents, in folder: URL) -> [String: Asset] {
+/// The files made for each image card's file, written into the folder, by the image's file name:
+/// a copy browsers can show, when they can't show the original, and a thumbnail, when the image is
+/// wider than one. An image needing neither isn't listed, and is shown as it is.
+package func makeImageFiles(of contents: Contents, in folder: URL) -> [String: ImageFiles] {
   let images = Dictionary(
     contents.documents.compactMap { document -> (String, URL)? in
       guard case .image(let image) = document else {
@@ -42,28 +43,39 @@ package func makeThumbnails(of contents: Contents, in folder: URL) -> [String: A
       return (image.file.name, image.file.url)
     },
     uniquingKeysWith: { first, _ in first })
-
+  // Apart, since a copy and a thumbnail can have the same name.
+  let thumbnailFolder = folder.appending(path: "thumbs")
   guard
-    (try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true))
-      != nil
+    (try? FileManager.default.createDirectory(
+      at: thumbnailFolder, withIntermediateDirectories: true)) != nil
   else {
     return [:]
   }
 
-  let thumbnails = images.compactMap { name, url -> (String, Asset)? in
-    guard let thumbnail = thumbnail(of: url, width: thumbnailWidth) else {
+  let files = images.compactMap { name, url -> (String, ImageFiles)? in
+    let copy = webCopy(of: url).flatMap { image in written(image, named: name, into: folder) }
+    let thumbnail = thumbnail(of: url, width: thumbnailWidth).flatMap { image in
+      written(image, named: name, into: thumbnailFolder)
+    }
+    guard copy != nil || thumbnail != nil else {
       return nil
     }
 
-    let file = folder.appending(
-      path: "\((name as NSString).deletingPathExtension).\(thumbnail.format.fileExtension)")
-    guard (try? thumbnail.data.write(to: file)) != nil else {
-      return nil
-    }
-
-    return (name, Asset(name: file.lastPathComponent, url: file))
+    return (name, ImageFiles(image: copy ?? Asset(name: name, url: url), thumbnail: thumbnail))
   }
-  return Dictionary(uniqueKeysWithValues: thumbnails)
+  return Dictionary(uniqueKeysWithValues: files)
+}
+
+/// The web image written into the folder, named after the image's file, with its own format's
+/// extension.
+private func written(_ image: WebImage, named name: String, into folder: URL) -> Asset? {
+  let file = folder.appending(
+    path: "\((name as NSString).deletingPathExtension).\(image.format.fileExtension)")
+  guard (try? image.data.write(to: file)) != nil else {
+    return nil
+  }
+
+  return Asset(name: file.lastPathComponent, url: file)
 }
 
 /// The hosts whose icons the link cards show.

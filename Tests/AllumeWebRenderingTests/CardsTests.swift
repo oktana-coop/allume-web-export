@@ -76,14 +76,32 @@ import Testing
         documents: [makeBoard("root", cards: ["image"]), makeImage("image")],
         users: [:]
       )
-      let thumbnails = ["image.png": makeAsset("image.jpg")]
+      let images = [
+        "image.png": ImageFiles(image: makeAsset("image.png"), thumbnail: makeAsset("image.jpg"))
+      ]
 
       let sources = [0, 1].map { depth in
-        drawn("image", on: "root", in: contents, depth: depth, thumbnails: thumbnails)
+        drawn("image", on: "root", in: contents, depth: depth, images: images)
       }
 
       #expect(sources[0]?.contains(#"src="file:image.png""#) == true)
       #expect(sources[1]?.contains(#"src="file:thumbs/image.jpg""#) == true)
+    }
+
+    @Test func showTheCopyBrowsersCanShowOfAnImageTheyCant() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["image"]), makeImage("image")],
+        users: [:]
+      )
+      // As for a HEIC image, made a JPEG, without a thumbnail.
+      let images = ["image.png": ImageFiles(image: makeAsset("image.jpg"), thumbnail: nil)]
+
+      let sources = [0, 1].map { depth in
+        drawn("image", on: "root", in: contents, depth: depth, images: images)
+      }
+
+      #expect(sources.allSatisfy { html in html?.contains(#"src="file:image.jpg""#) == true })
     }
 
     @Test func showTheOriginalInPreviewsWithoutAThumbnail() throws {
@@ -183,7 +201,7 @@ import Testing
       let board = try #require(contents.board(Document.ID(rawValue: "root")))
 
       let html = drawCard(
-        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:], thumbnails: [:]
+        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:], images: [:]
       )?
       .rendered(resolving: describe)
 

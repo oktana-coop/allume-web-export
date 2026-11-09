@@ -5,7 +5,7 @@ import AllumeWebModels
 func drawBoardView(
   _ board: Document.Board, contents: Contents, layouts: [Document.ID: BoardLayout],
   favicons: [String: Asset],
-  thumbnails: [String: Asset]
+  images: [String: ImageFiles]
 ) -> HTML {
   let bounds = (layouts[board.id] ?? layout(of: board)).contentBounds
   let canvas = HTML.element(
@@ -21,7 +21,7 @@ func drawBoardView(
     onLinesOfTheirOwn(
       drawBoardContents(
         board, depth: 0, contents: contents, layouts: layouts, favicons: favicons,
-        thumbnails: thumbnails)))
+        images: images)))
 
   let bar = HTML.element(
     "header", ["class": "allume-bar"],

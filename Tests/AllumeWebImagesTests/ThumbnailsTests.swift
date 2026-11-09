@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import AllumeWebThumbnails
+@testable import AllumeWebImages
 
 @Suite struct ThumbnailsTests {
   @Test func scaleAnImageToTheWidthKeepingItsAspectRatio() throws {

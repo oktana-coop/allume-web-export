@@ -5,7 +5,7 @@ import AllumeWebModels
 func drawBoardContents(
   _ board: Document.Board, depth: Int, contents: Contents, layouts: [Document.ID: BoardLayout],
   favicons: [String: Asset],
-  thumbnails: [String: Asset]
+  images: [String: ImageFiles]
 ) -> [HTML] {
   let interactive = depth == 0
   let connectionLines = drawConnectionLines(layouts[board.id] ?? layout(of: board))
@@ -15,7 +15,7 @@ func drawBoardContents(
     .compactMap { _, card in
       drawCard(
         card, on: board, depth: depth, contents: contents, layouts: layouts, favicons: favicons,
-        thumbnails: thumbnails)
+        images: images)
     }
   let chains = board.chains.flatMap { chain in
     drawChain(chain, contents: contents, interactive: interactive)

@@ -39,7 +39,9 @@ The site's folder then holds:
 - a page for every board inside it, named after its label with a short code, such as
   `functional-q5tbqj.html`;
 - `files/`, with the images, handwriting, avatars and favicons the pages show, and in `thumbs/`,
-  smaller copies of the images, which the previews of boards inside boards show;
+  smaller copies of the images, which the previews of boards inside boards show. Images in a
+  format browsers can't show, such as HEIC, are published as JPEG instead, or as PNG when they
+  have transparent pixels;
 - `allume.css` and `allume.js`, the viewer.
 
 The site is light, unless `--theme dark` makes it dark, or `--theme system` has it follow each

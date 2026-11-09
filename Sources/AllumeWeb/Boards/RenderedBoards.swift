@@ -13,11 +13,11 @@ package struct RenderedBoards: Sendable {
 }
 
 /// The boards published from the export, rendered. The favicons are each link host's icon, and
-/// the thumbnails, which previews show, each image's by its file name.
+/// the images each image's files, by its file name.
 package func renderedBoards(
-  for contents: Contents, favicons: [String: Asset], thumbnails: [String: Asset]
+  for contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
 ) -> RenderedBoards {
-  let (views, files) = renderBoards(contents, favicons: favicons, thumbnails: thumbnails)
+  let (views, files) = renderBoards(contents, favicons: favicons, images: images)
 
   return RenderedBoards(index: boardsIndex(for: contents), views: views, files: files)
 }

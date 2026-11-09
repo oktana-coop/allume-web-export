@@ -22,7 +22,7 @@ import Testing
 
     let html = drawPreview(
       of: child, in: Rect(x: 0, y: 0, width: 200, height: 100), depth: 1, contents: contents,
-      layouts: layouts(in: contents), favicons: [:], thumbnails: [:]
+      layouts: layouts(in: contents), favicons: [:], images: [:]
     )?
     .rendered(resolving: describe)
 
@@ -55,7 +55,7 @@ import Testing
     let html = try #require(
       drawPreview(
         of: child, in: Rect(x: 0, y: 0, width: 200, height: 100), depth: 1, contents: contents,
-        layouts: layouts(in: contents), favicons: [:], thumbnails: [:]
+        layouts: layouts(in: contents), favicons: [:], images: [:]
       )?
       .rendered(resolving: describe))
 
@@ -95,7 +95,7 @@ import Testing
 
     let html = drawPreview(
       of: child, in: Rect(x: 0, y: 0, width: 100, height: 100), depth: 1, contents: contents,
-      layouts: layouts(in: contents), favicons: [:], thumbnails: [:]
+      layouts: layouts(in: contents), favicons: [:], images: [:]
     )?
     .rendered(resolving: describe)
 

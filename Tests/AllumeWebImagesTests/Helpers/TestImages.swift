@@ -18,7 +18,7 @@ func makeImageFile(
   context.fill(CGRect(x: 0, y: 0, width: transparent ? width / 2 : width, height: height))
 
   let file = FileManager.default.temporaryDirectory.appending(
-    path: "ThumbnailsTests-\(UUID()).\(type.preferredFilenameExtension ?? "image")")
+    path: "AllumeWebImagesTests-\(UUID()).\(type.preferredFilenameExtension ?? "image")")
   let destination = try #require(
     CGImageDestinationCreateWithURL(file as CFURL, type.identifier as CFString, 1, nil))
   CGImageDestinationAddImage(

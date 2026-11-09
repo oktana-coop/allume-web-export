@@ -61,17 +61,17 @@ import Testing
   }
 }
 
-/// The sample's boards, rendered as publishing renders them, with thumbnails but no favicons, which
-/// would need the network. The thumbnails' files are gone once it returns, which the tests that
+/// The sample's boards, rendered as publishing renders them, with its images' files but no favicons,
+/// which would need the network. The images' files are gone once it returns, which the tests that
 /// compare only text and paths don't read.
 private func renderedSample() throws -> RenderedBoards {
   let (contents, _) = try readBundle(at: fixtureURL)
-  let thumbnailFolder = FileManager.default.temporaryDirectory.appending(
+  let imageFolder = FileManager.default.temporaryDirectory.appending(
     path: "SampleExportTests-\(UUID())")
-  defer { try? FileManager.default.removeItem(at: thumbnailFolder) }
+  defer { try? FileManager.default.removeItem(at: imageFolder) }
 
   return renderedBoards(
-    for: contents, favicons: [:], thumbnails: makeThumbnails(of: contents, in: thumbnailFolder))
+    for: contents, favicons: [:], images: makeImageFiles(of: contents, in: imageFolder))
 }
 
 /// The files written as text, by path, and `files.txt`, listing the paths of those copied under

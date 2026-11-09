@@ -3,8 +3,8 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-/// A smaller copy of an image, for showing it small.
-package struct Thumbnail: Equatable, Sendable {
+/// An image in a format every browser shows.
+package struct WebImage: Equatable, Sendable {
   package let data: Data
   package let format: Format
 
@@ -23,29 +23,20 @@ package struct Thumbnail: Equatable, Sendable {
   }
 }
 
-/// The image at the URL, scaled down to the width with its aspect ratio kept, as JPEG, or as PNG
-/// when any of its pixels is transparent. Nil when the image is no wider than that already, or
-/// can't be read.
-package func thumbnail(of image: URL, width: Int) -> Thumbnail? {
-  guard let source = CGImageSourceCreateWithURL(image as CFURL, nil),
-    let size = displayedSize(of: source), size.width > width,
-    let scaled = CGImageSourceCreateThumbnailAtIndex(
-      source, 0,
-      [
-        kCGImageSourceCreateThumbnailFromImageAlways: true,
-        kCGImageSourceCreateThumbnailWithTransform: true,
-        kCGImageSourceThumbnailMaxPixelSize: longerSide(of: size, scaledTo: width),
-      ] as CFDictionary)
-  else {
-    return nil
-  }
-
-  let format: Thumbnail.Format = hasTransparentPixel(scaled) ? .png : .jpeg
-  return encoded(scaled, as: format).map { data in Thumbnail(data: data, format: format) }
+/// The image drawn the way it's shown, after the rotation its orientation asks for, with its
+/// longer side at most the given length.
+func drawnImage(from source: CGImageSource, longerSide: Int) -> CGImage? {
+  CGImageSourceCreateThumbnailAtIndex(
+    source, 0,
+    [
+      kCGImageSourceCreateThumbnailFromImageAlways: true,
+      kCGImageSourceCreateThumbnailWithTransform: true,
+      kCGImageSourceThumbnailMaxPixelSize: longerSide,
+    ] as CFDictionary)
 }
 
 /// The image's width and height as shown, after the rotation its orientation asks for.
-private func displayedSize(of source: CGImageSource) -> (width: Int, height: Int)? {
+func displayedSize(of source: CGImageSource) -> (width: Int, height: Int)? {
   guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
     let width = properties[kCGImagePropertyPixelWidth] as? Int,
     let height = properties[kCGImagePropertyPixelHeight] as? Int
@@ -58,10 +49,10 @@ private func displayedSize(of source: CGImageSource) -> (width: Int, height: Int
   return (5...8).contains(orientation) ? (height, width) : (width, height)
 }
 
-/// The longer side's length once the width is scaled to the given one, which is how ImageIO sizes
-/// thumbnails.
-private func longerSide(of size: (width: Int, height: Int), scaledTo width: Int) -> Int {
-  Int((Double(width) * Double(max(size.width, size.height)) / Double(size.width)).rounded())
+/// The image as JPEG, or as PNG when any of its pixels is transparent.
+func encoded(_ image: CGImage) -> WebImage? {
+  let format: WebImage.Format = hasTransparentPixel(image) ? .png : .jpeg
+  return encoded(image, as: format).map { data in WebImage(data: data, format: format) }
 }
 
 /// Whether any pixel isn't fully opaque. Many images, screenshots especially, have an alpha
@@ -85,10 +76,10 @@ private func hasTransparentPixel(_ image: CGImage) -> Bool {
   return drawn && stride(from: 3, to: pixels.count, by: 4).contains { index in pixels[index] < 255 }
 }
 
-/// Measured on real boards' screenshots, 0.9 makes thumbnails only about a seventh bigger than 0.8.
+/// Measured on real boards' screenshots, 0.9 makes images only about a seventh bigger than 0.8.
 private let jpegQuality = 0.9
 
-private func encoded(_ image: CGImage, as format: Thumbnail.Format) -> Data? {
+private func encoded(_ image: CGImage, as format: WebImage.Format) -> Data? {
   let type: UTType =
     switch format {
     case .jpeg: .jpeg

@@ -63,7 +63,7 @@ func makeAsset(_ name: String) -> Asset {
 /// What the renderer draws for the card of the document on the board, with references described.
 func drawn(
   _ documentID: String, on boardID: String, in contents: Contents, depth: Int = 0,
-  favicons: [String: Asset] = [:], thumbnails: [String: Asset] = [:]
+  favicons: [String: Asset] = [:], images: [String: ImageFiles] = [:]
 ) -> String? {
   let board = contents.board(Document.ID(rawValue: boardID))
   let card = board?.cards.first { card in card.documentID.rawValue == documentID }
@@ -72,7 +72,7 @@ func drawn(
     card.flatMap { card in
       drawCard(
         card, on: board, depth: depth, contents: contents, layouts: layouts(in: contents),
-        favicons: favicons, thumbnails: thumbnails
+        favicons: favicons, images: images
       )?
       .rendered(resolving: describe)
     }
@@ -84,7 +84,7 @@ func drawnContents(of boardID: String, in contents: Contents, depth: Int = 0) ->
   contents.board(Document.ID(rawValue: boardID)).map { board in
     drawBoardContents(
       board, depth: depth, contents: contents, layouts: layouts(in: contents), favicons: [:],
-      thumbnails: [:]
+      images: [:]
     )
     .map { piece in piece.rendered(resolving: describe) }
   }

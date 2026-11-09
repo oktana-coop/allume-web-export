@@ -7,11 +7,11 @@ package struct BoardView: Equatable, Sendable {
 }
 
 /// Each board's view, in breadth-first order from the root, and the files the views refer to,
-/// once each, in the order they're first referred to. Previews show an image's thumbnail, found by
-/// the image's file name, when it has one.
+/// once each, in the order they're first referred to. An image's files, found by its file name,
+/// are those publishing made for it: a copy browsers can show, and a thumbnail for previews.
 package func renderBoards(
   _ contents: Contents, favicons: [String: Asset],
-  thumbnails: [String: Asset]
+  images: [String: ImageFiles]
 )
   -> (views: [BoardView], files: [PublishedFile])
 {
@@ -22,7 +22,7 @@ package func renderBoards(
         boardID: boardID,
         view: drawBoardView(
           board, contents: contents, layouts: boardLayouts, favicons: favicons,
-          thumbnails: thumbnails)
+          images: images)
       )
     }
   }
