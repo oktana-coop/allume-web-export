@@ -27,6 +27,7 @@
   var MAX_BOUNCE = 80;
   var SPRING = 0.8;
   var FOCUS_PADDING = 80;
+  var FIT_TOP_PADDING = 32;
   function parseCamera(value) {
     if (!isRecord(value)) return null;
     const { x, y, scale } = value;
@@ -39,7 +40,7 @@
     return Math.min(
       1,
       viewport.width / (maxX(contentBounds) + contentBounds.x),
-      viewport.height / (maxY(contentBounds) + contentBounds.y)
+      viewport.height / (FIT_TOP_PADDING + maxY(contentBounds) + contentBounds.y)
     );
   }
   function clampScale({
@@ -54,7 +55,8 @@
     viewport,
     contentBounds
   }) {
-    return { x: 0, y: 0, scale: fitScale({ viewport, contentBounds }) };
+    const scale = fitScale({ viewport, contentBounds });
+    return { x: 0, y: FIT_TOP_PADDING * scale, scale };
   }
   function focus({
     frame,

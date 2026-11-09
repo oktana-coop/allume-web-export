@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { functional, haskell, haskellNotes } from '../shared/boards';
+import {
+  families,
+  functional,
+  haskell,
+  haskellNotes,
+  mlFamily,
+} from '../shared/boards';
 import {
   boardCard,
   enterBoard,
@@ -20,6 +26,19 @@ test.describe('starting view', () => {
     for (const card of cards) {
       await expectFullyInView({ card });
     }
+  });
+
+  test("a first visit frames the titles of the board's top cards", async ({
+    page,
+  }) => {
+    // ML family's card is at the top of Families, with its title above it.
+    await page.goto(families.url);
+
+    await expectFullyInView({
+      card: boardCard({ page, board: mlFamily }).getByText(mlFamily.label, {
+        exact: true,
+      }),
+    });
   });
 
   test('a board reopens where it was left in the session', async ({ page }) => {

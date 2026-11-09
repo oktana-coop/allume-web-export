@@ -44,6 +44,13 @@ describe('fitScale', () => {
       fitScale({ viewport: { width: 500, height: 600 }, contentBounds: offset })
     ).toBe(0.5);
   });
+
+  it('leaves room above the origin for the titles of cards at the top', () => {
+    // 32 px of room, then 1168 of contents: twice the viewport's height.
+    const tall = { x: 0, y: 0, width: 100, height: 1168 };
+
+    expect(fitScale({ viewport, contentBounds: tall })).toBe(0.5);
+  });
 });
 
 describe('clampScale', () => {
@@ -70,10 +77,10 @@ describe('clampScale', () => {
 });
 
 describe('fit', () => {
-  it('shows the whole board from the canvas origin', () => {
+  it('shows the whole board from the canvas origin, with room above it for titles', () => {
     expect(fit({ viewport, contentBounds: wideBounds })).toEqual({
       x: 0,
-      y: 0,
+      y: 32 * 0.25,
       scale: 0.25,
     });
   });

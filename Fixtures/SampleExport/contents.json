@@ -50,7 +50,7 @@
         {
           "document_id" : "f76ff6d97ad777dac223434a205e0a59",
           "position_x" : 80,
-          "position_y" : 80,
+          "position_y" : 10,
           "size_height" : 345,
           "size_width" : 516,
           "z" : 1
@@ -58,7 +58,7 @@
         {
           "document_id" : "15da7de98ce8897d64a5a691748bd749",
           "position_x" : 636,
-          "position_y" : 80,
+          "position_y" : 10,
           "size_height" : 240,
           "size_width" : 640,
           "z" : 2
@@ -66,7 +66,7 @@
         {
           "document_id" : "8b79681d038ede856c0ed07f9b8596bf",
           "position_x" : 636,
-          "position_y" : 360,
+          "position_y" : 290,
           "size_height" : 56,
           "size_width" : 300,
           "z" : 3

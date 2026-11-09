@@ -23,6 +23,9 @@ const PAN_MARGIN = 120;
 const MAX_BOUNCE = 80;
 const SPRING = 0.8;
 const FOCUS_PADDING = 80;
+// A board card's title sits above the card, 25 px tall with its margin, so a
+// framed board leaves room for it above the canvas's origin.
+const FIT_TOP_PADDING = 32;
 
 /** The camera in the value, if it has a finite x, y and scale. */
 export function parseCamera(value: unknown): Camera | null {
@@ -36,7 +39,8 @@ export function parseCamera(value: unknown): Camera | null {
 
 /**
  * The scale that frames the board the way its card previews it: from the
- * canvas's origin, with everything in view, at most 100%.
+ * canvas's origin, with room above it for titles, everything in view, at most
+ * 100%.
  */
 export function fitScale({
   viewport,
@@ -48,7 +52,7 @@ export function fitScale({
   return Math.min(
     1,
     viewport.width / (maxX(contentBounds) + contentBounds.x),
-    viewport.height / (maxY(contentBounds) + contentBounds.y)
+    viewport.height / (FIT_TOP_PADDING + maxY(contentBounds) + contentBounds.y)
   );
 }
 
@@ -66,7 +70,10 @@ export function clampScale({
   return clamp(scale, Math.min(MIN_SCALE, fit), MAX_SCALE);
 }
 
-/** The camera that shows the whole board, from the canvas's origin. */
+/**
+ * The camera that shows the whole board, from the canvas's origin, with room
+ * above it for titles.
+ */
 export function fit({
   viewport,
   contentBounds,
@@ -74,7 +81,8 @@ export function fit({
   viewport: Size;
   contentBounds: Rect;
 }): Camera {
-  return { x: 0, y: 0, scale: fitScale({ viewport, contentBounds }) };
+  const scale = fitScale({ viewport, contentBounds });
+  return { x: 0, y: FIT_TOP_PADDING * scale, scale };
 }
 
 /**
