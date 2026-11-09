@@ -6,6 +6,7 @@ import {
   enterBoard,
   expectCardCentered,
   scrollBoard,
+  viewport,
 } from '../shared/helpers';
 import { expectFullyInView, expectZoomLevel } from './helpers';
 
@@ -14,7 +15,7 @@ test.describe('starting view', () => {
     // Haskell is too wide to fit at 100%.
     await page.goto(haskell.url);
 
-    const cards = await page.getByRole('main').locator('[id^="card-"]').all();
+    const cards = await viewport({ page }).locator('[id^="card-"]').all();
     expect(cards).toHaveLength(5);
     for (const card of cards) {
       await expectFullyInView({ card });

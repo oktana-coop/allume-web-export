@@ -1,10 +1,11 @@
 import AllumeWebModels
 
-/// A board's breadcrumbs and zoom controls above its canvas.
+/// A board's view, as one element: the icons it draws, then its breadcrumbs and zoom controls
+/// above its canvas.
 func drawBoardView(
   _ board: Document.Board, contents: Contents, layouts: [Document.ID: BoardLayout],
   favicons: [String: Asset]
-) -> [HTML] {
+) -> HTML {
   let bounds = (layouts[board.id] ?? layout(of: board)).contentBounds
   let world = HTML.element(
     "div",
@@ -20,12 +21,14 @@ func drawBoardView(
       drawBoardContents(
         board, depth: 0, contents: contents, layouts: layouts, favicons: favicons)))
 
-  return [
-    .element(
-      "header", ["class": "bar"],
-      onLinesOfTheirOwn([drawBreadcrumbs(of: board, contents: contents), zoomControls])),
-    .element("main", ["class": "viewport"], onLinesOfTheirOwn([world])),
-  ]
+  let bar = HTML.element(
+    "header", ["class": "bar"],
+    onLinesOfTheirOwn([drawBreadcrumbs(of: board, contents: contents), zoomControls]))
+  let viewport = HTML.element("div", ["class": "viewport"], onLinesOfTheirOwn([world]))
+
+  return .element(
+    "div", ["class": "allume", "data-board": .text(board.id.rawValue)],
+    onLinesOfTheirOwn([Icon.sprite, bar, viewport]))
 }
 
 /// Room beyond the contents' far edges, so that the canvas scrolls past them without JavaScript.

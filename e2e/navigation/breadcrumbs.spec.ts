@@ -10,7 +10,7 @@ import {
   monoids,
   paradigms,
 } from '../shared/boards';
-import { openLinkedCardMenu } from '../shared/helpers';
+import { openLinkedCardMenu, viewport } from '../shared/helpers';
 import { enterBoardsInPath, expectBoard, jumpToLinkedCard } from './helpers';
 
 test.describe('breadcrumbs', () => {
@@ -118,8 +118,7 @@ test.describe('breadcrumbs', () => {
 
     const [tab] = await Promise.all([
       page.context().waitForEvent('page'),
-      page
-        .getByRole('main')
+      viewport({ page })
         .getByRole('link', { name: haskell.label, exact: true })
         .click({ modifiers: ['ControlOrMeta'] }),
     ]);

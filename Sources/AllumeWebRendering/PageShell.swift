@@ -1,7 +1,8 @@
 import AllumeWebModels
 
-/// A standalone page around a board's view, with the viewer's style sheet and script.
-func drawPageShell(title: String, view: [HTML]) -> [HTML] {
+/// A standalone page around a board's view, as its main content, with the viewer's style sheet
+/// and script.
+func drawPageShell(title: String, view: HTML) -> [HTML] {
   let head = HTML.element(
     "head", [:],
     onLinesOfTheirOwn([
@@ -12,7 +13,10 @@ func drawPageShell(title: String, view: [HTML]) -> [HTML] {
     ]))
   let body = HTML.element(
     "body", [:],
-    onLinesOfTheirOwn([Icon.sprite] + view + [.element("script", ["src": "viewer.js"], [])]))
+    onLinesOfTheirOwn([
+      .element("main", [:], onLinesOfTheirOwn([view])),
+      .element("script", ["src": "viewer.js"], []),
+    ]))
 
   return [
     .doctype, .text("\n"), .element("html", ["lang": "en"], onLinesOfTheirOwn([head, body])),

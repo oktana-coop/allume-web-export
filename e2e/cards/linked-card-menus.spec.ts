@@ -9,6 +9,7 @@ import {
   openLinkedCardMenu,
   openMenu,
   scrollBoard,
+  viewport,
 } from '../shared/helpers';
 
 // Haskell's card on Functional is also on ML family.
@@ -73,7 +74,7 @@ test.describe('linked card menus', () => {
   test('a menu without room below opens above its button', async ({ page }) => {
     await page.goto(functional.url);
     // Pans the button down to 60 pixels above the bottom of the window.
-    const view = await boundingBox({ of: page.getByRole('main') });
+    const view = await boundingBox({ of: viewport({ page }) });
     const before = await boundingBox({
       of: linkedCardButton({ page, card: haskell }),
     });

@@ -4,6 +4,9 @@ import { type Board } from './boards';
 
 export type Point = { x: number; y: number };
 
+/** The part of the page that shows the board's canvas, below the bar. */
+export const viewport = ({ page }: { page: Page }) => page.locator('.viewport');
+
 /**
  * The board's card on the current page's board. Other cards' previews also
  * show it, but without the `card-` id that only the board's own cards have.
@@ -22,8 +25,7 @@ export const enterBoard = async ({
   page: Page;
   board: Board;
 }) => {
-  await page
-    .getByRole('main')
+  await viewport({ page })
     .getByRole('link', { name: board.label, exact: true })
     .click();
   await expect(page).toHaveURL(board.url);
@@ -111,9 +113,9 @@ export const cardCenter = async ({
   board: Board;
 }) => center({ of: boardCard({ page, board }) });
 
-/** The center of the view that shows the board, below the header. */
+/** The center of the viewport. */
 export const viewCenter = async ({ page }: { page: Page }) =>
-  center({ of: page.getByRole('main') });
+  center({ of: viewport({ page }) });
 
 export const expectCardCentered = async ({
   page,

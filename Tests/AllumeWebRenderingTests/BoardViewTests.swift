@@ -4,7 +4,7 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct BoardViewTests {
-  @Test func isTheBreadcrumbsAndZoomControlsAboveTheCanvas() throws {
+  @Test func holdsItsIconsThenItsBreadcrumbsAndZoomControlsAboveItsCanvas() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -17,6 +17,7 @@ import Testing
       users: [:]
     )
     let root = try #require(contents.board(Document.ID(rawValue: "root")))
+    let sprite = Icon.sprite.rendered(resolving: describe)
     let ink = markup(
       #"""
       <img class="ink" src="file:root_ink.svg" alt="" draggable="false"
@@ -27,6 +28,8 @@ import Testing
 
     #expect(
       html == #"""
+        <div class="allume" data-board="root">
+        \#(sprite)
         <header class="bar">
         <nav class="breadcrumbs" aria-label="Breadcrumbs"><h1><span>Languages</span></h1></nav>
         <div class="zoom" role="toolbar" aria-label="Zoom">
@@ -36,11 +39,12 @@ import Testing
         <button type="button" data-zoom="home">Fit</button>
         </div>
         </header>
-        <main class="viewport">
+        <div class="viewport">
         <div class="world" data-bounds="0,0,200,100" style="width:600px;height:500px">
         \#(ink)
         </div>
-        </main>
+        </div>
+        </div>
         """#)
   }
 
@@ -71,8 +75,6 @@ import Testing
 }
 
 private func drawnView(of board: Document.Board, in contents: Contents) -> String {
-  separatedByLineBreaks(
-    drawBoardView(board, contents: contents, layouts: layouts(in: contents), favicons: [:])
-  )
-  .map { node in node.rendered(resolving: describe) }.joined()
+  drawBoardView(board, contents: contents, layouts: layouts(in: contents), favicons: [:])
+    .rendered(resolving: describe)
 }

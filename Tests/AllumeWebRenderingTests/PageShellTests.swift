@@ -4,10 +4,10 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct PageShellTests {
-  @Test func wrapsTheViewWithTheIconsAndTheViewersStyleSheetAndScript() {
-    let sprite = Icon.sprite.rendered(resolving: describe)
+  @Test func makesTheViewItsMainContentWithTheViewersStyleSheetAndScript() {
+    let view = HTML.element("div", ["class": "allume"], [])
 
-    let html = drawPageShell(title: "Functional | Languages", view: [.element("main", [:], [])])
+    let html = drawPageShell(title: "Functional | Languages", view: view)
       .map { node in node.rendered(resolving: describe) }.joined()
 
     #expect(
@@ -21,8 +21,9 @@ import Testing
         <link rel="stylesheet" href="viewer.css">
         </head>
         <body>
-        \#(sprite)
-        <main></main>
+        <main>
+        <div class="allume"></div>
+        </main>
         <script src="viewer.js"></script>
         </body>
         </html>

@@ -1,6 +1,6 @@
 /// Icons from Font Awesome Free 7.3.1, by @fontawesome (https://fontawesome.com), under the
-/// CC BY 4.0 license (https://fontawesome.com/license/free). A page holds each one once, in its
-/// sprite, which draws them in the color of the text around them.
+/// CC BY 4.0 license (https://fontawesome.com/license/free). A board's view holds each one once, in
+/// its sprite, which draws them in the color of the text around them.
 enum Icon: String, CaseIterable {
   case copy
   case copied
@@ -8,7 +8,7 @@ enum Icon: String, CaseIterable {
   case url
   case pdf
 
-  /// The icon, drawn from the page's sprite.
+  /// The icon, drawn from the view's sprite.
   func html(class className: String? = nil) -> HTML {
     .element(
       "svg",
@@ -19,7 +19,7 @@ enum Icon: String, CaseIterable {
       [.element("use", ["href": "#icon-\(rawValue)"], [])])
   }
 
-  /// Every icon once, with Font Awesome's attribution, for the page's icons to be drawn from.
+  /// Every icon once, with Font Awesome's attribution, for the view's icons to be drawn from.
   static var sprite: HTML {
     let attribution =
       "Icons: Font Awesome Free by @fontawesome - https://fontawesome.com License - "
