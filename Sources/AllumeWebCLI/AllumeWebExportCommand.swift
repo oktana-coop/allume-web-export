@@ -21,8 +21,28 @@ struct SiteCommand: AsyncParsableCommand {
 
   @OptionGroup var options: PublishingOptions
 
+  @Option(help: "Whether the site is light, dark, or follows each reader's system.")
+  var theme: Theme = .light
+
+  enum Theme: String, CaseIterable, ExpressibleByArgument {
+    case light, dark, system
+
+    var siteTheme: SiteTheme {
+      switch self {
+      case .light: .light
+      case .dark: .dark
+      case .system: .system
+      }
+    }
+  }
+
   func run() async throws {
-    try await publish(with: options, publishSite(_:to:replacingContents:faviconCache:))
+    try await publish(with: options) {
+      contents, folder, replacing, cache async throws(UnwritableFolderError) in
+      try await publishSite(
+        contents, to: folder, replacingContents: replacing, faviconCache: cache,
+        theme: theme.siteTheme)
+    }
   }
 }
 

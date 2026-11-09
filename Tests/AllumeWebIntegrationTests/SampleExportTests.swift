@@ -7,7 +7,7 @@ import Testing
   @Test func rendersTheExpectedPagesAndFiles() throws {
     let boards = try renderedSample()
 
-    let siteFiles = siteFiles(from: boards)
+    let siteFiles = siteFiles(from: boards, theme: .light)
 
     try compareWithExpectedFiles(
       comparableOutput(of: siteFiles), in: expectedURL.appending(path: "SampleExport"))
@@ -49,7 +49,7 @@ import Testing
       .split(separator: "\n").map { path in "files/\(path)" }
 
     let (_, warnings) = try await publishSite(
-      contents, to: folder, replacingContents: false, faviconCache: nil)
+      contents, to: folder, replacingContents: false, faviconCache: nil, theme: .light)
 
     #expect(warnings.isEmpty)
     #expect(Set(try filePaths(in: folder)) == Set(pages + files + ["allume.css", "allume.js"]))

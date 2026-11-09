@@ -42,6 +42,9 @@ The site's folder then holds:
   smaller copies of the images, which the previews of boards inside boards show;
 - `allume.css` and `allume.js`, the viewer.
 
+The site is light, unless `--theme dark` makes it dark, or `--theme system` has it follow each
+reader's system.
+
 #### Embed
 
 ```sh

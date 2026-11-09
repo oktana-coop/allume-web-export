@@ -6,7 +6,7 @@ import Testing
 @Suite struct StandalonePageTests {
   @Test func makesTheViewItsMainContentWithTheViewersStyleSheetAndScript() {
     let page = standalonePage(
-      title: "Functional | Languages", view: #"<div class="allume"></div>"#)
+      title: "Functional | Languages", view: #"<div class="allume"></div>"#, theme: .light)
 
     #expect(
       page == #"""
@@ -18,6 +18,7 @@ import Testing
         <title>Functional | Languages</title>
         <link rel="stylesheet" href="allume.css">
         <style>
+        :root { color-scheme: light; }
         body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
         main { height: 100dvh; }
         </style>
@@ -34,9 +35,16 @@ import Testing
   }
 
   @Test func escapesTheTitle() {
-    let page = standalonePage(title: "Tom & Jerry", view: "")
+    let page = standalonePage(title: "Tom & Jerry", view: "", theme: .light)
 
     #expect(page.contains("<title>Tom &amp; Jerry</title>"))
+  }
+
+  @Test(arguments: [(SiteTheme.dark, "dark"), (.system, "light dark")])
+  func setTheColorSchemeTheViewFollows(theme: SiteTheme, colorScheme: String) {
+    let page = standalonePage(title: "Languages", view: "", theme: theme)
+
+    #expect(page.contains(":root { color-scheme: \(colorScheme); }"))
   }
 
   @Test func titlesThePageWithTheBoardsLabelThenTheRoots() throws {
