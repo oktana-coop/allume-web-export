@@ -50,7 +50,7 @@ func displayedSize(of source: CGImageSource) -> (width: Int, height: Int)? {
 }
 
 /// The image as JPEG, or as PNG when any of its pixels is transparent.
-func encoded(_ image: CGImage) -> WebImage? {
+package func encoded(_ image: CGImage) -> WebImage? {
   let format: WebImage.Format = hasTransparentPixel(image) ? .png : .jpeg
   return encoded(image, as: format).map { data in WebImage(data: data, format: format) }
 }
