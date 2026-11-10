@@ -188,6 +188,9 @@
   position: relative;
   transform-origin: 0 0;
 }
+.allume-js .allume-canvas {
+  will-change: transform;
+}
 .allume-canvas a,
 .allume-canvas img {
   -webkit-user-drag: none;
@@ -314,6 +317,14 @@
   position: relative;
   overflow: hidden;
   background: var(--allume-panel);
+}
+.allume-preview .allume-preview * {
+  color: transparent;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--allume-text) 30%, transparent);
+  text-decoration-thickness: 0.6em;
+  text-underline-offset: -0.7em;
+  text-decoration-skip-ink: none;
 }
 
 /* viewer/styles/card-colors.css */

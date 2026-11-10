@@ -23,6 +23,12 @@
   transform-origin: 0 0;
 }
 
+/* The camera moves the canvas as a layer of its own, so that panning doesn't
+   draw the board again on every frame. */
+.allume-js .allume-canvas {
+  will-change: transform;
+}
+
 .allume-canvas a,
 .allume-canvas img {
   -webkit-user-drag: none;
