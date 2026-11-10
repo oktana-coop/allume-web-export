@@ -1,6 +1,7 @@
 import AllumeWeb
 import AllumeWebBundleReader
 import Foundation
+import ImageIO
 import Testing
 
 @Suite struct SampleExportTests {
@@ -16,7 +17,7 @@ import Testing
   @Test func rendersTheExpectedFolderToEmbed() throws {
     let boards = try renderedSample()
 
-    let embedFiles = embedFiles(from: boards, urlPatterns: URLPatterns())
+    let embedFiles = embedFiles(from: boards, urlPatterns: URLPatterns(), previewImages: nil)
 
     try compareWithExpectedFiles(
       comparableOutput(of: embedFiles), in: expectedURL.appending(path: "SampleEmbed"))
@@ -26,7 +27,7 @@ import Testing
     let boards = try renderedSample()
     let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
 
-    let embedFiles = embedFiles(from: boards, urlPatterns: urlPatterns)
+    let embedFiles = embedFiles(from: boards, urlPatterns: urlPatterns, previewImages: nil)
 
     let withReferences = embedFiles.filter { file in
       guard case .text(let text) = file.source else { return false }
@@ -59,6 +60,31 @@ import Testing
           == Data(contentsOf: expected.appending(path: page))
       })
   }
+  @Test func publishesTheBoardsPreviewAsImagesToEmbed() async throws {
+    let (contents, _) = try readBundle(at: fixtureURL)
+    let folder = FileManager.default.temporaryDirectory.appending(
+      path: "SampleExportTests-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: folder) }
+
+    let (_, warnings) = try await publishEmbed(
+      contents, to: folder, replacingContents: false, faviconCache: nil, boardURL: nil,
+      filesURL: nil)
+
+    #expect(warnings.isEmpty)
+    let index = try String(contentsOf: folder.appending(path: "boards.json"), encoding: .utf8)
+    #expect(index.contains(#""light" : "preview-light.jpg""#))
+    #expect(
+      try ["preview-light.jpg", "preview-dark.jpg"].allSatisfy { name in
+        try imageWidth(of: folder.appending(path: name)) == 1600
+      })
+  }
+}
+
+/// How many pixels wide the image in the file is.
+private func imageWidth(of file: URL) throws -> Int? {
+  let source = try #require(CGImageSourceCreateWithURL(file as CFURL, nil))
+  let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+  return properties?[kCGImagePropertyPixelWidth] as? Int
 }
 
 /// The sample's boards, rendered as publishing renders them, with its images' files but no favicons,

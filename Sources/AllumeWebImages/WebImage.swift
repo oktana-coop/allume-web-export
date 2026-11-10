@@ -8,6 +8,11 @@ package struct WebImage: Equatable, Sendable {
   package let data: Data
   package let format: Format
 
+  package init(data: Data, format: Format) {
+    self.data = data
+    self.format = format
+  }
+
   package enum Format: Equatable, Sendable {
     case jpeg
     /// For an image with transparent pixels, which JPEG can't keep.

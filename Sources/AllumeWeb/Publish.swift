@@ -8,8 +8,9 @@ import Foundation
 /// favicons when there's a cache to keep them in. A folder with anything in it is only written to
 /// when its contents are to be replaced, and a failed run leaves it as it was.
 func publish(
-  _ contents: Contents, files: (RenderedBoards) -> [OutputFile], to folder: URL,
-  replacingContents: Bool, faviconCache: URL?
+  _ contents: Contents,
+  files: (RenderedBoards) async -> (files: [OutputFile], warnings: [PublishingWarning]),
+  to folder: URL, replacingContents: Bool, faviconCache: URL?
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   let (favicons, faviconWarnings) = await favicons(of: contents, cache: faviconCache)
 
@@ -19,11 +20,12 @@ func publish(
 
   let images = makeImageFiles(of: contents, in: imageFolder)
 
+  let (outputFiles, fileWarnings) = await files(
+    renderedBoards(for: contents, favicons: favicons, images: images))
   let writingWarnings = try writeFolder(
-    files(renderedBoards(for: contents, favicons: favicons, images: images)), to: folder,
-    replacingContents: replacingContents)
+    outputFiles, to: folder, replacingContents: replacingContents)
 
-  return (favicons.count, faviconWarnings + writingWarnings)
+  return (favicons.count, faviconWarnings + fileWarnings + writingWarnings)
 }
 
 /// Previews show images at most about 120 px wide at 100%, so twice that stays sharp on

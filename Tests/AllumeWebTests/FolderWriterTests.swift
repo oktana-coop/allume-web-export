@@ -22,6 +22,17 @@ import Testing
     #expect(try text(of: "files/image.png", in: folder) == "PNG")
   }
 
+  @Test func writesBytesMadeWhilePublishing() throws {
+    let root = try makeTemporaryFolder()
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    _ = try writeFolder(
+      [OutputFile(path: "preview-light.jpg", source: .data(Data("JPEG".utf8)))], to: root,
+      replacingContents: false)
+
+    #expect(try text(of: "preview-light.jpg", in: root) == "JPEG")
+  }
+
   @Test func writesIntoAnEmptyFolderWithoutBeingAsked() throws {
     let root = try makeTemporaryFolder()
     defer { try? FileManager.default.removeItem(at: root) }

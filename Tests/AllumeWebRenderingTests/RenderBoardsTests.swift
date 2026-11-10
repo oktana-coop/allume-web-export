@@ -77,22 +77,25 @@ import Testing
     #expect(files.map(\.path) == ["image.png", "root_ink.svg"])
   }
 
-  @Test func previewTheRootWithThumbnailsListingItsFilesOnce() throws {
+  @Test func previewTheRootsOwnImagesWholeAndNestedOnesAsThumbnails() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
-        makeBoard("root", cards: ["image", "child"]), makeBoard("child", cards: ["image"]),
-        makeImage("image"),
+        makeBoard("root", cards: ["photo", "child", "photo"]),
+        makeBoard("child", cards: ["nested"]),
+        makeImage("photo"), makeImage("nested"),
       ],
       users: [:]
     )
     let images = [
-      "image.png": ImageFiles(image: makeAsset("image.png"), thumbnail: makeAsset("image.jpg"))
+      "photo.png": ImageFiles(image: makeAsset("photo.png"), thumbnail: makeAsset("photo.jpg")),
+      "nested.png": ImageFiles(image: makeAsset("nested.png"), thumbnail: makeAsset("nested.jpg")),
     ]
 
     let preview = renderRootPreview(contents, favicons: [:], images: images)
 
-    #expect(preview.html.contains(#"src="allume:file/thumbs/image.jpg""#))
-    #expect(preview.files.map(\.path) == ["thumbs/image.jpg"])
+    #expect(preview.html.contains(#"src="allume:file/photo.png""#))
+    #expect(preview.html.contains(#"src="allume:file/thumbs/nested.jpg""#))
+    #expect(preview.files.map(\.path) == ["photo.png", "thumbs/nested.jpg"])
   }
 }

@@ -40,7 +40,7 @@ import Testing
           """#))
   }
 
-  @Test func showABoardOnAPageWholeAtItsProportions() throws {
+  @Test func showABoardOnAPageWholeAtItsSize() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -64,22 +64,18 @@ import Testing
     // and the margin.
     #expect(
       html.hasPrefix(
-        #"<div class="allume allume-board-preview" aria-hidden="true" style="aspect-ratio:400/232">"#
-      ))
-    let style =
-      "width:400px;height:232px;"
-      + "transform:scale(var(--allume-preview-scale, 1)) translateY(32px)"
+        #"<div class="allume allume-board-preview" style="width:400px;height:232px">"#))
     #expect(
       html.contains(
-        #"<div class="allume-preview" style="\#(style)">"#
-          + markup(
-            #"""
+        markup(
+          #"""
+          <div class="allume-preview" style="transform:translateY(32px)">
             <div class="allume-card allume-note-card" data-allume-doc="note"
               style="left:100px;top:50px;width:200px;height:100px;z-index:0">
               <div class="allume-body">A note</div>
             </div>
-            </div>
-            """#)))
+          </div>
+          """#)))
   }
 
   @Test func leaveOutWhateverCanBeClicked() throws {

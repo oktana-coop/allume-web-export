@@ -10,5 +10,7 @@ public struct OutputFile: Equatable, Sendable {
     case text(String)
     /// A file whose bytes are copied as they are.
     case copy(URL)
+    /// Bytes made while publishing, such as an image.
+    case data(Data)
   }
 }

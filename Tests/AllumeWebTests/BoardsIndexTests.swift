@@ -60,10 +60,26 @@ import Testing
               "view" : "boards/root.html"
             }
           },
-          "preview" : "preview.html",
           "root" : "root",
           "version" : 1
         }
         """)
+  }
+
+  @Test func listThePreviewsImagesWhenThereAreAny() throws {
+    let index = BoardsIndex(
+      root: Document.ID(rawValue: "root"), boards: [:],
+      preview: BoardsIndex.Preview(light: "preview-light.jpg", dark: "preview-dark.jpg"))
+
+    let json = boardsJSON(index)
+
+    #expect(
+      json.contains(
+        """
+          "preview" : {
+            "dark" : "preview-dark.jpg",
+            "light" : "preview-light.jpg"
+          },
+        """))
   }
 }

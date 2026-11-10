@@ -23,7 +23,7 @@ import Testing
         BoardView(boardID: root, html: #"<a href="allume:board/functional">Functional</a>"#),
         BoardView(boardID: functional, html: #"<a href="allume:board/root">Languages</a>"#),
       ],
-      files: [], preview: BoardPreview(html: "", files: []))
+      files: [], preview: BoardPreview(html: "", files: [], size: Size(width: 0, height: 0)))
 
     let files = siteFiles(from: boards, theme: .light)
 

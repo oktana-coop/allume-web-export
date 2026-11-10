@@ -6,10 +6,12 @@ package struct BoardView: Equatable, Sendable {
   package let html: String
 }
 
-/// The root board's preview, whose images are references, and the files it refers to.
+/// The root board's preview, whose images are references, the files it refers to, and its size at
+/// the board's size, in CSS pixels.
 package struct BoardPreview: Equatable, Sendable {
   package let html: String
   package let files: [PublishedFile]
+  package let size: Size
 }
 
 /// Each board's view, in breadth-first order from the root, and the files the views refer to,
@@ -40,7 +42,8 @@ package func renderBoards(
   return (views, files)
 }
 
-/// The root board's preview, as an element for a page to show. Its images are those of the views.
+/// The root board's preview, to be drawn as an image. Its images are those of the views, but for
+/// the root's own, which show at nearly their size, larger than their thumbnails.
 package func renderRootPreview(
   _ contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
 ) -> BoardPreview {
@@ -48,9 +51,22 @@ package func renderRootPreview(
     preconditionFailure("The contents' root is always a board.")
   }
 
+  let rootImageNames = Set(
+    root.cards.compactMap { card -> String? in
+      guard case .image(let image)? = contents.document(card.documentID) else {
+        return nil
+      }
+      return image.file.name
+    })
+  let previewImages = Dictionary(
+    uniqueKeysWithValues: images.map { name, files in
+      (name, rootImageNames.contains(name) ? ImageFiles(image: files.image, thumbnail: nil) : files)
+    })
+
+  let layouts = layouts(in: contents)
   let preview = drawBoardPreview(
-    of: root, contents: contents, layouts: layouts(in: contents), favicons: favicons,
-    images: images)
+    of: root, contents: contents, layouts: layouts, favicons: favicons, images: previewImages)
   return BoardPreview(
-    html: preview.rendered(resolving: \.text), files: preview.files.uniqued(on: \.path))
+    html: preview.rendered(resolving: \.text), files: preview.files.uniqued(on: \.path),
+    size: previewSize(of: (layouts[root.id] ?? layout(of: root)).contentBounds))
 }

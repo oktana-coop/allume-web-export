@@ -7,6 +7,6 @@ public func publishSite(
   theme: SiteTheme
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   try await publish(
-    contents, files: { boards in siteFiles(from: boards, theme: theme) }, to: folder,
+    contents, files: { boards in (siteFiles(from: boards, theme: theme), []) }, to: folder,
     replacingContents: replacingContents, faviconCache: faviconCache)
 }

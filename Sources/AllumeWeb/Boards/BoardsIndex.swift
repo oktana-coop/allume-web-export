@@ -7,6 +7,19 @@ package struct BoardsIndex: Equatable, Sendable {
   /// The exported board.
   package let root: Document.ID
   package let boards: [Document.ID: Board]
+  /// The paths of the exported board's preview images, when the folder has them.
+  package let preview: Preview?
+
+  package struct Preview: Equatable, Sendable {
+    package let light: String
+    package let dark: String
+  }
+
+  package init(root: Document.ID, boards: [Document.ID: Board], preview: Preview? = nil) {
+    self.root = root
+    self.boards = boards
+    self.preview = preview
+  }
 
   package struct Board: Equatable, Sendable {
     package let label: String
@@ -41,9 +54,6 @@ func viewPath(of boardID: Document.ID) -> String {
   "boards/\(boardID.rawValue).html"
 }
 
-/// Where the root board's preview is in the folder.
-let previewPath = "preview.html"
-
 /// The index as `boards.json`, its keys sorted, so the same boards give the same file.
 package func boardsJSON(_ index: BoardsIndex) -> String {
   let encoder = JSONEncoder()
@@ -65,7 +75,7 @@ extension BoardsIndex: Encodable {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(1, forKey: .version)
     try container.encode(root.rawValue, forKey: .root)
-    try container.encode(previewPath, forKey: .preview)
+    try container.encodeIfPresent(preview, forKey: .preview)
     try container.encode(
       Dictionary(uniqueKeysWithValues: boards.map { boardID, board in (boardID.rawValue, board) }),
       forKey: .boards)
@@ -85,3 +95,5 @@ extension BoardsIndex.Board: Encodable {
     try container.encode(view, forKey: .view)
   }
 }
+
+extension BoardsIndex.Preview: Encodable {}

@@ -1,3 +1,4 @@
+import AllumeWebImages
 import AllumeWebModels
 import AllumeWebRendering
 import Foundation
@@ -6,32 +7,45 @@ import Testing
 @testable import AllumeWeb
 
 @Suite struct EmbedFilesTests {
-  @Test func areTheIndexThenTheViewsThenThePreviewThenTheFilesThenTheViewer() throws {
+  @Test func areTheIndexThenTheViewsThenThePreviewImagesThenTheFilesThenTheViewer() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
       from: renderedBoards(for: contents, favicons: [:], images: [:]),
-      urlPatterns: URLPatterns())
+      urlPatterns: URLPatterns(), previewImages: previewImages)
 
     #expect(
       files.map(\.path) == [
-        "boards.json", "boards/root.html", "preview.html", "files/image.png", "allume.css",
-        "allume.js",
+        "boards.json", "boards/root.html", "preview-light.jpg", "preview-dark.jpg",
+        "files/image.png", "allume.css", "allume.js",
       ])
   }
 
-  @Test func resolveThePreviewsReferencesAndCopyItsFiles() throws {
+  @Test func writeThePreviewImagesAndListThemInTheIndex() throws {
     let contents = try makeContents(with: [makeImage("image.png")])
-    let urlPatterns = URLPatterns(files: "/allume/files")
+
+    let files = embedFiles(
+      from: renderedBoards(for: contents, favicons: [:], images: [:]),
+      urlPatterns: URLPatterns(), previewImages: previewImages)
+
+    #expect(
+      files.contains(OutputFile(path: "preview-light.jpg", source: .data(Data("light".utf8)))))
+    #expect(files.contains(OutputFile(path: "preview-dark.jpg", source: .data(Data("dark".utf8)))))
+    let index = try #require(text(of: "boards.json", in: files))
+    #expect(index.contains(#""dark" : "preview-dark.jpg""#))
+    #expect(index.contains(#""light" : "preview-light.jpg""#))
+  }
+
+  @Test func leaveThePreviewOutWithoutItsImages() throws {
+    let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
       from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage),
-      urlPatterns: urlPatterns)
+      urlPatterns: URLPatterns(), previewImages: nil)
 
-    let preview = try #require(text(of: "preview.html", in: files))
-    #expect(preview.hasPrefix(#"<div class="allume allume-board-preview""#))
-    #expect(preview.contains(#"src="/allume/files/thumbs/image.jpg""#))
-    #expect(files.map(\.path).contains("files/thumbs/image.jpg"))
+    #expect(!files.map(\.path).contains { path in path.hasPrefix("preview") })
+    #expect(!files.map(\.path).contains("files/thumbs/image.jpg"))
+    #expect(try #require(text(of: "boards.json", in: files)).contains("preview") == false)
   }
 
   @Test func keepTheViewsReferencesWithoutPatterns() throws {
@@ -39,7 +53,7 @@ import Testing
 
     let files = embedFiles(
       from: renderedBoards(for: contents, favicons: [:], images: [:]),
-      urlPatterns: URLPatterns())
+      urlPatterns: URLPatterns(), previewImages: nil)
 
     let html = try #require(rootView(in: files))
     #expect(html.hasPrefix(#"<div class="allume""#))
@@ -54,7 +68,8 @@ import Testing
     let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns)
+      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns,
+      previewImages: nil)
 
     let html = try #require(rootView(in: files))
     #expect(html.contains(#"href="/boards/\#(slug)/""#))
@@ -69,7 +84,8 @@ import Testing
     let urlPatterns = URLPatterns(files: "/allume/files/")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns)
+      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns,
+      previewImages: nil)
 
     let html = try #require(rootView(in: files))
     #expect(html.contains(#"href="allume:board/functional""#))
@@ -89,3 +105,8 @@ private func text(of path: String, in files: [OutputFile]) -> String? {
     return text
   }.first
 }
+
+/// Stand-ins for the preview's images, which only WebKit draws.
+private let previewImages = PreviewImages(
+  light: WebImage(data: Data("light".utf8), format: .jpeg),
+  dark: WebImage(data: Data("dark".utf8), format: .jpeg))

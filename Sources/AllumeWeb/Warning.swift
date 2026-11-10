@@ -6,4 +6,6 @@ public enum PublishingWarning: Equatable, Sendable {
   case missingFile(path: String, source: URL)
   /// What wasn't written to the favicon cache is fetched again next time.
   case faviconCacheUnwritable(URL, reason: String)
+  /// WebKit couldn't draw the exported board's preview, so the folder goes without its images.
+  case previewNotDrawn
 }

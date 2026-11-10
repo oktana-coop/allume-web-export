@@ -280,8 +280,7 @@
 }
 
 /* viewer/styles/board-cards.css */
-.allume-board-card > .allume-panel,
-.allume-board-preview {
+.allume-board-card > .allume-panel {
   border-radius: 14px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
@@ -312,10 +311,9 @@
   pointer-events: none;
 }
 .allume-board-preview {
-  display: block;
   position: relative;
-  height: auto;
   overflow: hidden;
+  background: var(--allume-panel);
 }
 
 /* viewer/styles/card-colors.css */

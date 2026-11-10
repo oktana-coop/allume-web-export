@@ -59,7 +59,7 @@ private func checkCanWrite(to folder: URL, replacingContents: Bool)
 }
 
 /// Paths come from the bundle's data, so none may climb out of the folder or start from the root.
-private func leavesFolder(_ path: String) -> Bool {
+func leavesFolder(_ path: String) -> Bool {
   path.hasPrefix("/") || path.split(separator: "/").contains("..")
 }
 
@@ -74,6 +74,13 @@ private func write(_ file: OutputFile, into folder: URL)
     try attempt(at: destination) {
       try createParent(of: destination)
       try Data(text.utf8).write(to: destination)
+    }
+    return nil
+
+  case .data(let data):
+    try attempt(at: destination) {
+      try createParent(of: destination)
+      try data.write(to: destination)
     }
     return nil
 

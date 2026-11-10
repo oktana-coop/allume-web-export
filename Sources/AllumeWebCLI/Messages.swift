@@ -60,6 +60,8 @@ func warningMessage(for warning: PublishingWarning) -> String {
   case .faviconCacheUnwritable(let cache, let reason):
     "Couldn't keep favicons in \(shownPath(of: cache)), so they'll be fetched again next time. "
       + reason
+  case .previewNotDrawn:
+    "Couldn't draw the board's preview, so it's left out."
   }
 }
 

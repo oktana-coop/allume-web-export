@@ -37,7 +37,7 @@ func viewerFiles() -> [OutputFile] {
   }
 }
 
-private func viewerFile(_ name: String) -> URL {
+func viewerFile(_ name: String) -> URL {
   guard let url = Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Viewer")
   else {
     preconditionFailure("The package's resources have no Viewer/\(name).")

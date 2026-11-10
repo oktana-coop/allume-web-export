@@ -1,8 +1,6 @@
-/* Board cards: the title sits above a panel previewing the board. A board's
-   preview on a page of its own looks like the panel. */
+/* Board cards: the title sits above a panel previewing the board. */
 
-.allume-board-card > .allume-panel,
-.allume-board-preview {
+.allume-board-card > .allume-panel {
   border-radius: 14px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
@@ -36,10 +34,10 @@
   pointer-events: none;
 }
 
-/* As wide as its box, and as high as the board's proportions make it. */
+/* A board's preview on a page of its own, to be drawn as an image: the
+   board's contents on a panel. */
 .allume-board-preview {
-  display: block;
   position: relative;
-  height: auto;
   overflow: hidden;
+  background: var(--allume-panel);
 }
