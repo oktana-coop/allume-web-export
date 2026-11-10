@@ -9,3 +9,18 @@
   display: flex;
   flex-direction: column;
 }
+
+/* The theme probe: a color that follows the page's color-scheme, white in a
+   light theme and black in a dark one, for the viewer to read the theme from.
+   Its transition, too short to see, has the browser fire transitionend
+   whenever the theme changes, which nothing else tells scripts. */
+@property --allume-theme-probe {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: white;
+}
+
+.allume {
+  --allume-theme-probe: light-dark(white, black);
+  transition: --allume-theme-probe 1ms;
+}

@@ -1,32 +1,33 @@
-/* A card's color, by what the card shows. */
-.allume-card[data-allume-color='purple'] {
+/* A card's color, by what the card shows. A board's preview, drawn as an image
+   on its own page, takes the color of the cards that show it. */
+:is(.allume-card, .allume-board-preview)[data-allume-color='purple'] {
   --allume-note-color: var(--allume-purple-note);
   --allume-board-color: var(--allume-purple-board);
   --allume-border-color: var(--allume-purple-border);
 }
-.allume-card[data-allume-color='red'] {
+:is(.allume-card, .allume-board-preview)[data-allume-color='red'] {
   --allume-note-color: var(--allume-red-note);
   --allume-board-color: var(--allume-red-board);
   --allume-border-color: var(--allume-red-border);
 }
-.allume-card[data-allume-color='green'] {
+:is(.allume-card, .allume-board-preview)[data-allume-color='green'] {
   --allume-note-color: var(--allume-green-note);
   --allume-board-color: var(--allume-green-board);
   --allume-border-color: var(--allume-green-border);
 }
-.allume-card[data-allume-color='yellow'] {
+:is(.allume-card, .allume-board-preview)[data-allume-color='yellow'] {
   --allume-note-color: var(--allume-yellow-note);
   --allume-board-color: var(--allume-yellow-board);
   --allume-border-color: var(--allume-yellow-border);
 }
-.allume-card[data-allume-color='blue'] {
+:is(.allume-card, .allume-board-preview)[data-allume-color='blue'] {
   --allume-note-color: var(--allume-blue-note);
   --allume-board-color: var(--allume-blue-board);
   --allume-border-color: var(--allume-blue-border);
 }
 /* Unset, so that gray falls back to a card's own color rather than taking a
    colored board's from around its preview. */
-.allume-card[data-allume-color='gray'] {
+:is(.allume-card, .allume-board-preview)[data-allume-color='gray'] {
   --allume-note-color: initial;
   --allume-board-color: initial;
   --allume-border-color: var(--allume-gray-border);
@@ -35,7 +36,8 @@
 .allume-note-card[data-allume-color] > .allume-body {
   background: var(--allume-note-color, var(--allume-card-muted));
 }
-.allume-board-card[data-allume-color] > .allume-panel {
+.allume-board-card[data-allume-color] > .allume-panel,
+.allume-board-preview[data-allume-color] {
   background: var(--allume-board-color, var(--allume-panel));
 }
 .allume-image-card[data-allume-color] > .allume-body {

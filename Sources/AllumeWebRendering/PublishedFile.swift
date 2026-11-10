@@ -23,3 +23,25 @@ package struct ImageFiles: Hashable, Sendable {
     self.thumbnail = thumbnail
   }
 }
+
+/// A board's preview as its cards show it: on their color, when they have one.
+package struct CardPreview: Hashable, Sendable {
+  package let boardID: Document.ID
+  package let color: CardColor?
+
+  package init(boardID: Document.ID, color: CardColor?) {
+    self.boardID = boardID
+    self.color = color
+  }
+}
+
+/// A board's preview drawn as an image in each appearance, which its cards show.
+package struct PreviewImageFiles: Hashable, Sendable {
+  package let light: Asset
+  package let dark: Asset
+
+  package init(light: Asset, dark: Asset) {
+    self.light = light
+    self.dark = dark
+  }
+}

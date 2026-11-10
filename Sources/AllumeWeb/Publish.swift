@@ -5,12 +5,13 @@ import AllumeWebRendering
 import Foundation
 
 /// Writes the files made from the export's rendered boards into the folder, with its links'
-/// favicons when there's a cache to keep them in. A folder with anything in it is only written to
-/// when its contents are to be replaced, and a failed run leaves it as it was.
+/// favicons when there's a cache to keep them in, and its board cards' previews drawn as images
+/// with WebKit, the preview width in pixels. A folder with anything in it is only written to when
+/// its contents are to be replaced, and a failed run leaves it as it was.
 func publish(
   _ contents: Contents,
   files: (RenderedBoards) async -> (files: [OutputFile], warnings: [PublishingWarning]),
-  to folder: URL, replacingContents: Bool, faviconCache: URL?
+  to folder: URL, replacingContents: Bool, faviconCache: URL?, previewWidth: Int
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   let (favicons, faviconWarnings) = await favicons(of: contents, cache: faviconCache)
 
@@ -19,13 +20,18 @@ func publish(
   defer { try? FileManager.default.removeItem(at: imageFolder) }
 
   let images = makeImageFiles(of: contents, in: imageFolder)
+  let (previews, previewWarnings) = await makePreviewImageFiles(
+    of: renderBoardPreviews(contents, favicons: favicons, images: images),
+    index: boardsIndex(for: contents), width: previewWidth, in: imageFolder)
 
   let (outputFiles, fileWarnings) = await files(
-    renderedBoards(for: contents, favicons: favicons, images: images))
+    renderedBoards(for: contents, favicons: favicons, images: images, previews: previews))
   let writingWarnings = try writeFolder(
     outputFiles, to: folder, replacingContents: replacingContents)
 
-  return (favicons.count, faviconWarnings + fileWarnings + writingWarnings)
+  return (
+    favicons.count, faviconWarnings + previewWarnings + fileWarnings + writingWarnings
+  )
 }
 
 /// Previews show images at most about 120 px wide at 100%, so twice that stays sharp on

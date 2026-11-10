@@ -1,22 +1,118 @@
 import AllumeWebImages
+import AllumeWebModels
 import AllumeWebRendering
 import AllumeWebSnapshots
 import Foundation
 
-/// The exported board's preview, drawn as an image in each appearance.
+/// A board's preview, drawn as an image in each appearance.
 package struct PreviewImages: Sendable {
   package let light: WebImage
   package let dark: WebImage
 }
 
-/// Twice the width of a page's widest column, which stays sharp on high-density screens.
-private let imageWidth = 1600
+/// For the exported board's preview: twice the width of a page's widest column, which stays sharp
+/// on high-density screens.
+let rootPreviewWidth = 1600
 
-/// The root board's preview drawn as images in light and dark, from a page made for it in a
-/// temporary folder, with the viewer's style sheet and the files the preview shows. It's drawn at
-/// the board's size, then scaled, as text drawn smaller than browsers' minimum font size would
-/// overflow. Nil when WebKit can't draw it, or the board is empty.
-func previewImages(of preview: BoardPreview, index: BoardsIndex) async -> PreviewImages? {
+/// How wide board cards' preview images are by default, in pixels. Board cards are mostly 400 to
+/// 800 px wide, so at 100% it's sharp on standard screens, and on high-density ones for cards up to
+/// 512 px wide.
+public let defaultPreviewWidth = 1024
+
+/// Board previews drawn at once, each in a web view of its own.
+private let previewBatchSize = 8
+
+/// Each board's preview drawn as images for its cards, the width in pixels, written into the
+/// folder's `previews/`. An empty board has none, and a board WebKit can't draw has none and a
+/// warning.
+package func makePreviewImageFiles(
+  of previews: [CardPreview: BoardPreview], index: BoardsIndex, width: Int, in folder: URL
+) async -> (files: [CardPreview: PreviewImageFiles], warnings: [PublishingWarning]) {
+  let previewFolder = folder.appending(path: "previews")
+  guard
+    (try? FileManager.default.createDirectory(
+      at: previewFolder, withIntermediateDirectories: true)) != nil
+  else {
+    return ([:], previews.keys.map { preview in .boardPreviewNotDrawn(boardID: preview.boardID) })
+  }
+
+  let drawable = previews.filter { _, preview in !preview.isEmpty }
+    .sorted { a, b in a.key.fileName < b.key.fileName }
+  let drawn = await previewImages(ofEach: drawable, index: index, width: width)
+  let files = Dictionary(
+    uniqueKeysWithValues: drawn.compactMap {
+      preview, images -> (CardPreview, PreviewImageFiles)? in
+      images.flatMap { images in written(images, of: preview, into: previewFolder) }
+        .map { files in (preview, files) }
+    })
+  let warnings = drawable.map(\.key).filter { preview in files[preview] == nil }
+    .map { preview in PublishingWarning.boardPreviewNotDrawn(boardID: preview.boardID) }
+
+  return (files, warnings)
+}
+
+/// Each preview drawn as images, or nil when WebKit can't draw it, a batch of previews at a time.
+private func previewImages(
+  ofEach previews: some Collection<(key: CardPreview, value: BoardPreview)>, index: BoardsIndex,
+  width: Int
+) async -> [CardPreview: PreviewImages?] {
+  guard !previews.isEmpty else {
+    return [:]
+  }
+
+  let batch = await withTaskGroup(of: (preview: CardPreview, images: PreviewImages?).self) {
+    group in
+    for (cardPreview, preview) in previews.prefix(previewBatchSize) {
+      group.addTask {
+        (cardPreview, await previewImages(of: preview, index: index, width: width))
+      }
+    }
+    return await group.reduce(into: [CardPreview: PreviewImages?]()) { drawn, result in
+      drawn.updateValue(result.images, forKey: result.preview)
+    }
+  }
+  let rest = await previewImages(
+    ofEach: previews.dropFirst(previewBatchSize), index: index, width: width)
+  return batch.merging(rest) { first, _ in first }
+}
+
+/// The images written into the folder, named after the preview, followed by `-light` and `-dark`
+/// and their format's extension, e.g. `<board-id>-light.jpg`. Nil if either can't be.
+private func written(_ images: PreviewImages, of preview: CardPreview, into folder: URL)
+  -> PreviewImageFiles?
+{
+  let asset = { (image: WebImage, appearance: String) -> Asset? in
+    let name = "\(preview.fileName)-\(appearance).\(image.format.fileExtension)"
+    let file = folder.appending(path: name)
+    return (try? image.data.write(to: file)).map { Asset(name: name, url: file) }
+  }
+  guard let light = asset(images.light, "light"), let dark = asset(images.dark, "dark") else {
+    return nil
+  }
+
+  return PreviewImageFiles(light: light, dark: dark)
+}
+
+extension CardPreview {
+  /// The board's ID, followed by the color, if any, e.g. `<board-id>-purple`.
+  fileprivate var fileName: String {
+    color.map { color in "\(boardID.rawValue)-\(color.rawValue)" } ?? boardID.rawValue
+  }
+}
+
+extension BoardPreview {
+  fileprivate var isEmpty: Bool {
+    size.width <= 0 || size.height <= 0
+  }
+}
+
+/// The board's preview drawn as images in light and dark, the width in pixels, from a page made for
+/// it in a temporary folder, with the viewer's style sheet and the files the preview shows. It's
+/// drawn at the board's size, then scaled, as text drawn smaller than browsers' minimum font size
+/// would overflow. Nil when WebKit can't draw it, or the board is empty.
+func previewImages(of preview: BoardPreview, index: BoardsIndex, width: Int) async
+  -> PreviewImages?
+{
   guard preview.size.width > 0 && preview.size.height > 0 else {
     return nil
   }
@@ -30,8 +126,8 @@ func previewImages(of preview: BoardPreview, index: BoardsIndex) async -> Previe
 
   let window = CGSize(width: preview.size.width, height: preview.size.height)
   guard
-    let light = await snapshot(of: page, size: window, appearance: .light, width: imageWidth),
-    let dark = await snapshot(of: page, size: window, appearance: .dark, width: imageWidth)
+    let light = await snapshot(of: page, size: window, appearance: .light, width: width),
+    let dark = await snapshot(of: page, size: window, appearance: .dark, width: width)
   else {
     return nil
   }

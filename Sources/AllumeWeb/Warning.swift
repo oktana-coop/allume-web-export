@@ -1,3 +1,4 @@
+import AllumeWebModels
 import Foundation
 
 /// Something publishing left out, which doesn't stop it.
@@ -8,4 +9,6 @@ public enum PublishingWarning: Equatable, Sendable {
   case faviconCacheUnwritable(URL, reason: String)
   /// WebKit couldn't draw the exported board's preview, so the folder goes without its images.
   case previewNotDrawn
+  /// WebKit couldn't draw the board's preview, so its cards show an empty panel.
+  case boardPreviewNotDrawn(boardID: Document.ID)
 }

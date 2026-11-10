@@ -936,6 +936,23 @@
     moveCamera({ canvas, camera: { ...saved, scale } });
   }
 
+  // viewer/theme.ts
+  function followTheme(root) {
+    const mark = () => {
+      root.dataset.allumeTheme = theme(root);
+    };
+    mark();
+    root.addEventListener("transitionend", (event) => {
+      if (event.target === root && event.propertyName === "--allume-theme-probe") {
+        mark();
+      }
+    });
+  }
+  function theme(root) {
+    const probe = getComputedStyle(root).getPropertyValue("--allume-theme-probe").trim();
+    return probe === "rgb(0, 0, 0)" ? "dark" : "light";
+  }
+
   // viewer/zoom-controls.ts
   var ZOOM_IN = 1.25;
   var ZOOM_OUT = 0.8;
@@ -994,6 +1011,7 @@
       throw new Error("The board's view has no viewport with a canvas in it.");
     }
     root.classList.add("allume-js");
+    followTheme(root);
     setUpScrolling(canvas);
     setUpGestures(canvas);
     setUpZoomControls({ root, canvas });

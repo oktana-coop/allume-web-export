@@ -43,7 +43,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]), theme: .light)
 
     #expect(files.map(\.path) == ["index.html", "files/image.png", "allume.css", "allume.js"])
   }
@@ -52,7 +52,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]), theme: .light)
 
     let sources = files.map(\.source)
     guard case .text(let page) = sources.first else {
@@ -68,7 +68,8 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage, previews: [:]),
+      theme: .light)
 
     #expect(files.map(\.path).contains("files/image.png"))
     #expect(!files.map(\.path).contains("files/thumbs/image.jpg"))
@@ -81,7 +82,7 @@ import Testing
     let files = siteFiles(
       from: renderedBoards(
         for: contents, favicons: ["ocaml.org": Asset(name: "ocaml.org.png", url: icon)],
-        images: [:]), theme: .light)
+        images: [:], previews: [:]), theme: .light)
 
     #expect(files.contains(OutputFile(path: "files/favicons/ocaml.org.png", source: .copy(icon))))
   }
@@ -90,7 +91,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = siteFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), theme: .light)
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]), theme: .light)
 
     let viewerURLs = files.suffix(2).compactMap { file -> URL? in
       guard case .copy(let url) = file.source else {

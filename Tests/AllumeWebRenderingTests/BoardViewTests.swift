@@ -76,7 +76,8 @@ import Testing
 
 private func drawnView(of board: Document.Board, in contents: Contents) -> String {
   drawBoardView(
-    board, contents: contents, layouts: layouts(in: contents), favicons: [:], images: [:]
+    board, contents: contents, layouts: layouts(in: contents), favicons: [:], images: [:],
+    previews: [:]
   )
   .rendered(resolving: describe)
 }

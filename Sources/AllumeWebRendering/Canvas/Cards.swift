@@ -2,11 +2,13 @@ import AllumeWebModels
 import Foundation
 
 /// A card on the board, at the board's depth: 0 on the board's own page, more inside previews,
-/// which leave out whatever can be clicked.
+/// which leave out whatever can be clicked. On the board's own page, a board card shows its
+/// board's preview images, and inside a preview, which is drawn as such images, the board's
+/// contents.
 func drawCard(
   _ card: Card, on board: Document.Board, depth: Int, contents: Contents,
   layouts: [Document.ID: BoardLayout], favicons: [String: Asset],
-  images: [String: ImageFiles]
+  images: [String: ImageFiles], previews: [CardPreview: PreviewImageFiles]
 ) -> HTML? {
   let interactive = depth == 0
   let menu =
@@ -19,11 +21,17 @@ func drawCard(
 
   switch contents.document(card.documentID) {
   case .board(let child)?:
-    let preview = drawPreview(
-      of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
-      favicons: favicons, images: images)
+    let preview =
+      interactive
+      ? previews[CardPreview(boardID: child.id, color: card.color)].map { files in
+        drawPreviewImages(files, of: child, in: card.frame, layouts: layouts)
+      }
+      : drawPreview(
+        of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
+        favicons: favicons, images: images
+      ).map { preview in [preview] }
     return drawBoardCard(
-      card, showing: child, preview: preview, menu: menu, interactive: interactive,
+      card, showing: child, preview: preview ?? [], menu: menu, interactive: interactive,
       contents: contents)
 
   case .note(let note)?:
@@ -93,14 +101,13 @@ private func cardElement(
 }
 
 private func drawBoardCard(
-  _ card: Card, showing child: Document.Board, preview: HTML?, menu: [HTML], interactive: Bool,
+  _ card: Card, showing child: Document.Board, preview: [HTML], menu: [HTML], interactive: Bool,
   contents: Contents
 ) -> HTML {
   let title = HTML.element(
     "div", ["class": "allume-board-title"],
     linkedIcon(of: child, menu: menu, contents: contents)
       + [.element("span", [:], [.text(child.displayLabel)])])
-  let panelContents = preview.map { preview in [preview] } ?? []
   let panel: HTML =
     interactive
     ? .element(
@@ -108,8 +115,8 @@ private func drawBoardCard(
       [
         "class": "allume-body allume-panel", "href": .board(child.id),
         "aria-label": .text(child.displayLabel),
-      ], panelContents)
-    : .element("div", ["class": "allume-body allume-panel"], panelContents)
+      ], preview)
+    : .element("div", ["class": "allume-body allume-panel"], preview)
 
   return cardElement(
     card, kind: "board", style: boxStyle(card.frame), interactive: interactive,

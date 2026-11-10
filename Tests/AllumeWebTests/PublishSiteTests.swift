@@ -25,7 +25,8 @@ import Testing
     defer { try? FileManager.default.removeItem(at: folder) }
 
     let (faviconCount, warnings) = try await publishSite(
-      contents, to: folder, replacingContents: false, faviconCache: nil, theme: .light)
+      contents, to: folder, replacingContents: false, faviconCache: nil,
+      previewWidth: defaultPreviewWidth, theme: .light)
 
     #expect(faviconCount == 0)
     #expect(warnings.isEmpty)

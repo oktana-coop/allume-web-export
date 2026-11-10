@@ -53,7 +53,7 @@ func warningMessage(for warning: BundleWarning, in contents: Contents) -> String
   }
 }
 
-func warningMessage(for warning: PublishingWarning) -> String {
+func warningMessage(for warning: PublishingWarning, in contents: Contents) -> String {
   switch warning {
   case .missingFile(_, let source):
     "Couldn't copy \(source.lastPathComponent), which is missing, so the site goes without it."
@@ -62,6 +62,9 @@ func warningMessage(for warning: PublishingWarning) -> String {
       + reason
   case .previewNotDrawn:
     "Couldn't draw the board's preview, so it's left out."
+  case .boardPreviewNotDrawn(let boardID):
+    "Couldn't draw the preview of \(board(boardID, in: contents)), so its cards show an empty "
+      + "panel."
   }
 }
 

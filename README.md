@@ -38,10 +38,12 @@ The site's folder then holds:
 - `index.html`, the exported board's page;
 - a page for every board inside it, named after its label with a short code, such as
   `functional-q5tbqj.html`;
-- `files/`, with the images, handwriting, avatars and favicons the pages show, and in `thumbs/`,
-  smaller copies of the images, which the previews of boards inside boards show. Images in a
-  format browsers can't show, such as HEIC, are published as JPEG instead, or as PNG when they
-  have transparent pixels;
+- `files/`, with the images, handwriting, avatars and favicons the pages show. Images in a format
+  browsers can't show, such as HEIC, are published as JPEG instead, or as PNG when they have
+  transparent pixels. In `previews/`, it has the previews board cards show, as images in the light
+  and dark palettes, such as `<board-id>-light.jpg`, and for a colored card on its color, such as
+  `<board-id>-purple-light.jpg`. WebKit draws them, and when it can't, the board's cards show an
+  empty panel, with a warning;
 - `allume.css` and `allume.js`, the viewer.
 
 The site is light, unless `--theme dark` makes it dark, or `--theme system` has it follow each
@@ -89,6 +91,10 @@ Link cards show their site's icon, fetched the first time a site is linked to an
 
 `--root-label` labels the exported board otherwise, e.g. `--root-label Home`, wherever its label
 shows: its breadcrumb, heading and page title, and its slug.
+
+`--preview-width` sets how many pixels wide board cards' previews are drawn, 1024 by default. Wider
+ones stay sharp when zoomed in further, but take more room: the images grow with the square of
+their width.
 
 ### View the Site
 

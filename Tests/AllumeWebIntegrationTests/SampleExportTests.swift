@@ -1,12 +1,13 @@
 import AllumeWeb
 import AllumeWebBundleReader
+import AllumeWebRendering
 import Foundation
 import ImageIO
 import Testing
 
 @Suite struct SampleExportTests {
-  @Test func rendersTheExpectedPagesAndFiles() throws {
-    let boards = try renderedSample()
+  @Test func rendersTheExpectedPagesAndFiles() async throws {
+    let boards = try await renderedSample()
 
     let siteFiles = siteFiles(from: boards, theme: .light)
 
@@ -14,8 +15,8 @@ import Testing
       comparableOutput(of: siteFiles), in: expectedURL.appending(path: "SampleExport"))
   }
 
-  @Test func rendersTheExpectedFolderToEmbed() throws {
-    let boards = try renderedSample()
+  @Test func rendersTheExpectedFolderToEmbed() async throws {
+    let boards = try await renderedSample()
 
     let embedFiles = embedFiles(from: boards, urlPatterns: URLPatterns(), previewImages: nil)
 
@@ -23,8 +24,8 @@ import Testing
       comparableOutput(of: embedFiles), in: expectedURL.appending(path: "SampleEmbed"))
   }
 
-  @Test func resolvesEveryReferenceToEmbedFromThePatterns() throws {
-    let boards = try renderedSample()
+  @Test func resolvesEveryReferenceToEmbedFromThePatterns() async throws {
+    let boards = try await renderedSample()
     let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
 
     let embedFiles = embedFiles(from: boards, urlPatterns: urlPatterns, previewImages: nil)
@@ -50,7 +51,8 @@ import Testing
       .split(separator: "\n").map { path in "files/\(path)" }
 
     let (_, warnings) = try await publishSite(
-      contents, to: folder, replacingContents: false, faviconCache: nil, theme: .light)
+      contents, to: folder, replacingContents: false, faviconCache: nil,
+      previewWidth: defaultPreviewWidth, theme: .light)
 
     #expect(warnings.isEmpty)
     #expect(Set(try filePaths(in: folder)) == Set(pages + files + ["allume.css", "allume.js"]))
@@ -67,8 +69,8 @@ import Testing
     defer { try? FileManager.default.removeItem(at: folder) }
 
     let (_, warnings) = try await publishEmbed(
-      contents, to: folder, replacingContents: false, faviconCache: nil, boardURL: nil,
-      filesURL: nil)
+      contents, to: folder, replacingContents: false, faviconCache: nil,
+      previewWidth: defaultPreviewWidth, boardURL: nil, filesURL: nil)
 
     #expect(warnings.isEmpty)
     let index = try String(contentsOf: folder.appending(path: "boards.json"), encoding: .utf8)
@@ -87,17 +89,21 @@ private func imageWidth(of file: URL) throws -> Int? {
   return properties?[kCGImagePropertyPixelWidth] as? Int
 }
 
-/// The sample's boards, rendered as publishing renders them, with its images' files but no favicons,
-/// which would need the network. The images' files are gone once it returns, which the tests that
-/// compare only text and paths don't read.
-private func renderedSample() throws -> RenderedBoards {
+/// The sample's boards, rendered as publishing renders them, with its images' files and its board
+/// cards' preview images, but no favicons, which would need the network. The files are gone once it
+/// returns, which the tests that compare only text and paths don't read.
+private func renderedSample() async throws -> RenderedBoards {
   let (contents, _) = try readBundle(at: fixtureURL)
-  let imageFolder = FileManager.default.temporaryDirectory.appending(
+  let folder = FileManager.default.temporaryDirectory.appending(
     path: "SampleExportTests-\(UUID())")
-  defer { try? FileManager.default.removeItem(at: imageFolder) }
+  defer { try? FileManager.default.removeItem(at: folder) }
 
-  return renderedBoards(
-    for: contents, favicons: [:], images: makeImageFiles(of: contents, in: imageFolder))
+  let images = makeImageFiles(of: contents, in: folder)
+  let (previews, _) = await makePreviewImageFiles(
+    of: renderBoardPreviews(contents, favicons: [:], images: images),
+    index: boardsIndex(for: contents), width: defaultPreviewWidth, in: folder)
+
+  return renderedBoards(for: contents, favicons: [:], images: images, previews: previews)
 }
 
 /// The files written as text, by path, and `files.txt`, listing the paths of those copied under

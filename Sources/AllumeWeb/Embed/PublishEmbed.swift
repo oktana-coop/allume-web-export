@@ -7,15 +7,17 @@ import Foundation
 /// exported board's preview is drawn as images with WebKit.
 public func publishEmbed(
   _ contents: Contents, to folder: URL, replacingContents: Bool, faviconCache: URL?,
-  boardURL: String?, filesURL: String?
+  previewWidth: Int, boardURL: String?, filesURL: String?
 ) async throws(UnwritableFolderError) -> (faviconCount: Int, warnings: [PublishingWarning]) {
   let urlPatterns = URLPatterns(board: boardURL, files: filesURL)
 
   return try await publish(
     contents,
     files: { boards in
-      let images = await previewImages(of: boards.preview, index: boards.index)
+      let images = await previewImages(
+        of: boards.preview, index: boards.index, width: rootPreviewWidth)
       let warnings: [PublishingWarning] = images == nil ? [.previewNotDrawn] : []
       return (embedFiles(from: boards, urlPatterns: urlPatterns, previewImages: images), warnings)
-    }, to: folder, replacingContents: replacingContents, faviconCache: faviconCache)
+    }, to: folder, replacingContents: replacingContents, faviconCache: faviconCache,
+    previewWidth: previewWidth)
 }

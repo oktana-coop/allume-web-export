@@ -41,7 +41,7 @@ struct SiteCommand: AsyncParsableCommand {
       contents, folder, replacing, cache async throws(UnwritableFolderError) in
       try await publishSite(
         contents, to: folder, replacingContents: replacing, faviconCache: cache,
-        theme: theme.siteTheme)
+        previewWidth: options.previewWidth, theme: theme.siteTheme)
     }
   }
 }
@@ -89,7 +89,7 @@ struct EmbedCommand: AsyncParsableCommand {
       contents, folder, replacing, cache async throws(UnwritableFolderError) in
       try await publishEmbed(
         contents, to: folder, replacingContents: replacing, faviconCache: cache,
-        boardURL: boardURL, filesURL: filesURL)
+        previewWidth: options.previewWidth, boardURL: boardURL, filesURL: filesURL)
     }
   }
 }
@@ -121,10 +121,24 @@ struct PublishingOptions: ParsableArguments {
 
   @Option(
     help: ArgumentHelp(
+      "How many pixels wide board cards' previews are drawn as images. Wider ones stay sharp when "
+        + "zoomed in further, but take more room.",
+      valueName: "pixels")
+  )
+  var previewWidth = defaultPreviewWidth
+
+  @Option(
+    help: ArgumentHelp(
       "A label for the exported board in place of its own, e.g. Home, wherever it shows: its "
         + "breadcrumb, heading and page title, and its slug.")
   )
   var rootLabel: String?
+
+  func validate() throws {
+    guard previewWidth > 0 else {
+      throw ValidationError("--preview-width needs a number of pixels above 0, e.g. 1024.")
+    }
+  }
 }
 
 /// Reads the export, publishes it into the --out folder with the function, and reports what was
@@ -161,7 +175,7 @@ private func publish(
     Data("\(name): \(boardCount) boards, \(faviconCount) favicons → \(options.out)\n".utf8))
   let warnings =
     readingWarnings.map { warning in warningMessage(for: warning, in: contents) }
-    + publishingWarnings.map { warning in warningMessage(for: warning) }
+    + publishingWarnings.map { warning in warningMessage(for: warning, in: contents) }
   FileHandle.standardError.write(
     Data(warnings.map { warning in "  warning: \(warning)\n" }.joined().utf8))
 }

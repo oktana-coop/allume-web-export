@@ -11,7 +11,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]),
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]),
       urlPatterns: URLPatterns(), previewImages: previewImages)
 
     #expect(
@@ -25,7 +25,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]),
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]),
       urlPatterns: URLPatterns(), previewImages: previewImages)
 
     #expect(
@@ -40,7 +40,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage),
+      from: renderedBoards(for: contents, favicons: [:], images: thumbnailedImage, previews: [:]),
       urlPatterns: URLPatterns(), previewImages: nil)
 
     #expect(!files.map(\.path).contains { path in path.hasPrefix("preview") })
@@ -52,7 +52,7 @@ import Testing
     let contents = try makeContents(with: [makeImage("image.png")])
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]),
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]),
       urlPatterns: URLPatterns(), previewImages: nil)
 
     let html = try #require(rootView(in: files))
@@ -68,7 +68,8 @@ import Testing
     let urlPatterns = URLPatterns(board: "/boards/{slug}/", files: "/allume/files")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns,
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]),
+      urlPatterns: urlPatterns,
       previewImages: nil)
 
     let html = try #require(rootView(in: files))
@@ -84,7 +85,8 @@ import Testing
     let urlPatterns = URLPatterns(files: "/allume/files/")
 
     let files = embedFiles(
-      from: renderedBoards(for: contents, favicons: [:], images: [:]), urlPatterns: urlPatterns,
+      from: renderedBoards(for: contents, favicons: [:], images: [:], previews: [:]),
+      urlPatterns: urlPatterns,
       previewImages: nil)
 
     let html = try #require(rootView(in: files))

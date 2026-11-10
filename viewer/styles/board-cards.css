@@ -42,18 +42,25 @@
   background: var(--allume-panel);
 }
 
-/* From the second level of previews down, text is too small to read, about a
-   pixel tall at 100%, yet costs the most to draw, so each line of it is drawn
-   as a bar instead of its letters. */
-.allume-preview .allume-preview * {
-  color: transparent;
-  text-decoration-line: underline;
-  text-decoration-color: color-mix(
-    in srgb,
-    var(--allume-text) 30%,
-    transparent
-  );
-  text-decoration-thickness: 0.6em;
-  text-underline-offset: -0.7em;
-  text-decoration-skip-ink: none;
+/* A board card's preview is an image in each theme. The card shows the page's,
+   once the viewer has marked it, or the light one without scripts. */
+.allume-preview-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.allume-preview-dark,
+.allume[data-allume-theme='dark'] .allume-preview-light {
+  display: none;
+}
+
+.allume[data-allume-theme='dark'] .allume-preview-dark {
+  display: block;
+}
+
+@media (scripting: enabled) {
+  .allume:not([data-allume-theme]) .allume-preview-light {
+    display: none;
+  }
 }

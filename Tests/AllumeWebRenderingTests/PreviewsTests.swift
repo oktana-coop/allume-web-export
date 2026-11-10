@@ -56,7 +56,8 @@ import Testing
     let root = try #require(contents.board(Document.ID(rawValue: "root")))
 
     let html = drawBoardPreview(
-      of: root, contents: contents, layouts: layouts(in: contents), favicons: [:], images: [:]
+      of: root, color: nil, contents: contents, layouts: layouts(in: contents), favicons: [:],
+      images: [:]
     )
     .rendered(resolving: describe)
 
@@ -76,6 +77,23 @@ import Testing
             </div>
           </div>
           """#)))
+  }
+
+  @Test func showABoardOnAPageInTheColorOfItsCards() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [makeBoard("root", cards: ["note"]), makeNote("note")],
+      users: [:]
+    )
+    let root = try #require(contents.board(Document.ID(rawValue: "root")))
+
+    let html = drawBoardPreview(
+      of: root, color: .purple, contents: contents, layouts: layouts(in: contents), favicons: [:],
+      images: [:]
+    )
+    .rendered(resolving: describe)
+
+    #expect(html.hasPrefix(#"<div class="allume allume-board-preview" data-allume-color="purple""#))
   }
 
   @Test func leaveOutWhateverCanBeClicked() throws {
@@ -114,8 +132,14 @@ import Testing
       ],
       users: [:]
     )
+    let a = try #require(contents.board(Document.ID(rawValue: "a")))
 
-    let html = try #require(drawnContents(of: "root", in: contents)).joined()
+    // As the image of a's preview draws it, which root's card for a shows.
+    let html = drawBoardPreview(
+      of: a, color: nil, contents: contents, layouts: layouts(in: contents), favicons: [:],
+      images: [:]
+    )
+    .rendered(resolving: describe)
 
     #expect(html.components(separatedBy: #"<div class="allume-preview""#).count - 1 == 3)
     #expect(html.contains(#"<div class="allume-body allume-panel"></div>"#))
