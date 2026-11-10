@@ -26,6 +26,23 @@ import Testing
     #expect(contents.board(Document.ID(rawValue: "b")) == nil)
   }
 
+  @Test func renameTheRootAloneKeepingEverythingElse() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [makeBoard("root", cards: ["a"]), makeBoard("a")],
+      users: [:]
+    )
+
+    let renamed = contents.renamingRoot(to: "Home")
+
+    #expect(renamed.board(Document.ID(rawValue: "root"))?.label == "Home")
+    #expect(renamed.board(Document.ID(rawValue: "a")) == contents.board(Document.ID(rawValue: "a")))
+    #expect(
+      renamed.board(Document.ID(rawValue: "root"))?.cards
+        == contents.board(Document.ID(rawValue: "root"))?.cards)
+    #expect(renamed.hierarchy == contents.hierarchy)
+  }
+
   @Test func rejectsAMissingRoot() {
     #expect(throws: InvalidContentsError.missingRoot(Document.ID(rawValue: "root"))) {
       try Contents(

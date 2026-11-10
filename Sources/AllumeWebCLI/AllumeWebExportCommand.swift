@@ -118,6 +118,13 @@ struct PublishingOptions: ParsableArguments {
         + "build offline.")
   )
   var favicons = true
+
+  @Option(
+    help: ArgumentHelp(
+      "A label for the exported board in place of its own, e.g. Home, wherever it shows: its "
+        + "breadcrumb, heading and page title, and its slug.")
+  )
+  var rootLabel: String?
 }
 
 /// Reads the export, publishes it into the --out folder with the function, and reports what was
@@ -132,12 +139,13 @@ private func publish(
   let outFolder = URL(filePath: options.out, directoryHint: .isDirectory).absoluteURL
   let faviconCache = URL.cachesDirectory.appending(path: "allume-web-export/favicons")
 
-  let (contents, readingWarnings) = try await failingWithMessage {
+  let (exported, readingWarnings) = try await failingWithMessage {
     () throws(UnreadableBundleError) in
     try readBundle(at: exportFolder)
   } message: { error in
     errorMessage(for: error)
   }
+  let contents = options.rootLabel.map { label in exported.renamingRoot(to: label) } ?? exported
   let (faviconCount, publishingWarnings) = try await failingWithMessage {
     () async throws(UnwritableFolderError) in
     try await publishing(

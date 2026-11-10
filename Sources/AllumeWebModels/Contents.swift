@@ -59,6 +59,34 @@ public struct Contents: Equatable, Sendable {
     return board
   }
 
+  /// The contents with the root board labeled otherwise, everything else kept.
+  public func renamingRoot(to label: String) -> Contents {
+    Contents(
+      rootID: rootID,
+      documents: documents.map { document in
+        guard case .board(let board) = document, board.id == rootID else {
+          return document
+        }
+        return .board(
+          Document.Board(
+            id: board.id, label: label, cards: board.cards, chains: board.chains,
+            connections: board.connections, ink: board.ink))
+      },
+      users: users, hierarchy: hierarchy, omissions: omissions, documentIndices: documentIndices)
+  }
+
+  private init(
+    rootID: Document.ID, documents: [Document], users: [User.ID: User], hierarchy: Hierarchy,
+    omissions: Omissions, documentIndices: [Document.ID: Int]
+  ) {
+    self.rootID = rootID
+    self.documents = documents
+    self.users = users
+    self.hierarchy = hierarchy
+    self.omissions = omissions
+    self.documentIndices = documentIndices
+  }
+
   /// Each step can leave something for the next to remove: removing a card can leave its document
   /// outside the root, and a document outside the root can be an excerpt's source. Repeats are removed
   /// after invalid cards, so a valid card is never dropped for repeating an invalid one.

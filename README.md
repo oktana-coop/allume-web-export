@@ -87,6 +87,9 @@ Link cards show their site's icon, fetched the first time a site is linked to an
 `~/Library/Caches/allume-web-export/favicons/`; delete that folder to fetch them again.
 `--no-favicons` leaves link cards with a generic link icon instead, e.g. to build offline.
 
+`--root-label` labels the exported board otherwise, e.g. `--root-label Home`, wherever its label
+shows: its breadcrumb, heading and page title, and its slug.
+
 ### View the Site
 
 Serve the folder with any static file server, e.g.:
