@@ -188,6 +188,17 @@
   position: relative;
   transform-origin: 0 0;
 }
+@media (scripting: enabled) {
+  .allume:not(.allume-js) .allume-canvas {
+    visibility: hidden;
+    animation: allume-show-canvas 0s 3s forwards;
+  }
+}
+@keyframes allume-show-canvas {
+  to {
+    visibility: visible;
+  }
+}
 .allume-js .allume-canvas {
   will-change: transform;
 }

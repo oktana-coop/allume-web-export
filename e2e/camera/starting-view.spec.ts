@@ -41,6 +41,18 @@ test.describe('starting view', () => {
     });
   });
 
+  test("shows the board even when the viewer doesn't run", async ({ page }) => {
+    await page.route('**/allume.js', (route) => route.abort());
+
+    await page.goto(haskell.url);
+
+    // Hidden at first, waiting for the viewer to set the camera.
+    await expect(boardCard({ page, board: haskellNotes })).toBeHidden();
+    await expect(boardCard({ page, board: haskellNotes })).toBeVisible({
+      timeout: 5_000,
+    });
+  });
+
   test('a board reopens where it was left in the session', async ({ page }) => {
     await page.goto(haskell.url);
     await page.keyboard.press('+');

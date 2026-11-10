@@ -23,6 +23,22 @@
   transform-origin: 0 0;
 }
 
+/* Where scripts run, the canvas waits for the viewer to set the camera, rather
+   than showing the board at its natural size first. It shows after a few
+   seconds anyway, should the viewer not run. */
+@media (scripting: enabled) {
+  .allume:not(.allume-js) .allume-canvas {
+    visibility: hidden;
+    animation: allume-show-canvas 0s 3s forwards;
+  }
+}
+
+@keyframes allume-show-canvas {
+  to {
+    visibility: visible;
+  }
+}
+
 /* The camera moves the canvas as a layer of its own, so that panning doesn't
    draw the board again on every frame. */
 .allume-js .allume-canvas {
