@@ -21,8 +21,7 @@ func publish(
 
   let images = makeImageFiles(of: contents, in: imageFolder)
   let (previews, previewWarnings) = await makePreviewImageFiles(
-    of: renderBoardPreviews(contents, favicons: favicons, images: images),
-    index: boardsIndex(for: contents), width: previewWidth, in: imageFolder)
+    of: contents, favicons: favicons, images: images, width: previewWidth, in: imageFolder)
 
   let (outputFiles, fileWarnings) = await files(
     renderedBoards(for: contents, favicons: favicons, images: images, previews: previews))

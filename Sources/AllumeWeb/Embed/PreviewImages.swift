@@ -23,32 +23,68 @@ public let defaultPreviewWidth = 1024
 private let previewBatchSize = 8
 
 /// Each board's preview drawn as images for its cards, the width in pixels, written into the
-/// folder's `previews/`. An empty board has none, and a board WebKit can't draw has none and a
-/// warning.
+/// folder's `previews/`. A preview's page shows the previews of its board's own board cards, so
+/// they're drawn a nesting level of their boards at a time, from the lowest. A board WebKit can't
+/// draw has none, and a warning.
 package func makePreviewImageFiles(
-  of previews: [CardPreview: BoardPreview], index: BoardsIndex, width: Int, in folder: URL
+  of contents: Contents, favicons: [String: Asset], images: [String: ImageFiles], width: Int,
+  in folder: URL
 ) async -> (files: [CardPreview: PreviewImageFiles], warnings: [PublishingWarning]) {
+  let sizes = cardPreviewSizes(contents)
   let previewFolder = folder.appending(path: "previews")
   guard
     (try? FileManager.default.createDirectory(
       at: previewFolder, withIntermediateDirectories: true)) != nil
   else {
-    return ([:], previews.keys.map { preview in .boardPreviewNotDrawn(boardID: preview.boardID) })
+    return ([:], sizes.keys.map { preview in .boardPreviewNotDrawn(boardID: preview.boardID) })
   }
 
-  let drawable = previews.filter { _, preview in !preview.isEmpty }
-    .sorted { a, b in a.key.fileName < b.key.fileName }
-  let drawn = await previewImages(ofEach: drawable, index: index, width: width)
-  let files = Dictionary(
-    uniqueKeysWithValues: drawn.compactMap {
-      preview, images -> (CardPreview, PreviewImageFiles)? in
-      images.flatMap { images in written(images, of: preview, into: previewFolder) }
-        .map { files in (preview, files) }
-    })
-  let warnings = drawable.map(\.key).filter { preview in files[preview] == nil }
+  let page = { (preview: CardPreview, drawn: [CardPreview: PreviewImageFiles]) in
+    sizes[preview].flatMap { size in
+      renderCardPreview(
+        preview, size: size, contents: contents, favicons: favicons, images: images,
+        previews: drawn)
+    }
+  }
+  let levels = Dictionary(grouping: sizes.keys) { preview in
+    contents.hierarchy.nestingLevel(of: preview.boardID)
+  }
+  .sorted { a, b in a.key < b.key }.map(\.value)
+
+  let files = await drawn(
+    levels[...], page: page, index: boardsIndex(for: contents), width: width,
+    into: previewFolder, drawnSoFar: [:])
+  let warnings = sizes.keys.sorted { a, b in a.fileName < b.fileName }
+    .filter { preview in files[preview] == nil }
     .map { preview in PublishingWarning.boardPreviewNotDrawn(boardID: preview.boardID) }
 
   return (files, warnings)
+}
+
+/// The previews drawn into the folder a level at a time, each level's pages showing the previews
+/// drawn by then.
+private func drawn(
+  _ levels: ArraySlice<[CardPreview]>,
+  page: (CardPreview, [CardPreview: PreviewImageFiles]) -> BoardPreview?, index: BoardsIndex,
+  width: Int, into folder: URL, drawnSoFar: [CardPreview: PreviewImageFiles]
+) async -> [CardPreview: PreviewImageFiles] {
+  guard let level = levels.first else {
+    return drawnSoFar
+  }
+
+  let pages = level.compactMap { preview -> (key: CardPreview, value: BoardPreview)? in
+    page(preview, drawnSoFar).map { page in (preview, page) }
+  }
+  let images = await previewImages(ofEach: pages, index: index, width: width)
+  let files = pages.compactMap { preview, page -> (CardPreview, PreviewImageFiles)? in
+    (images[preview] ?? nil)
+      .flatMap { images in written(images, of: preview, size: page.size, into: folder) }
+      .map { files in (preview, files) }
+  }
+
+  return await drawn(
+    levels.dropFirst(), page: page, index: index, width: width, into: folder,
+    drawnSoFar: drawnSoFar.merging(files) { first, _ in first })
 }
 
 /// Each preview drawn as images, or nil when WebKit can't draw it, a batch of previews at a time.
@@ -76,11 +112,12 @@ private func previewImages(
   return batch.merging(rest) { first, _ in first }
 }
 
-/// The images written into the folder, named after the preview, followed by `-light` and `-dark`
-/// and their format's extension, e.g. `<board-id>-light.jpg`. Nil if either can't be.
-private func written(_ images: PreviewImages, of preview: CardPreview, into folder: URL)
-  -> PreviewImageFiles?
-{
+/// The images of the part of the board of the size, written into the folder, named after the
+/// preview, followed by `-light` and `-dark` and their format's extension, e.g.
+/// `<board-id>-light.jpg`. Nil if either can't be.
+private func written(
+  _ images: PreviewImages, of preview: CardPreview, size: Size, into folder: URL
+) -> PreviewImageFiles? {
   let asset = { (image: WebImage, appearance: String) -> Asset? in
     let name = "\(preview.fileName)-\(appearance).\(image.format.fileExtension)"
     let file = folder.appending(path: name)
@@ -90,19 +127,13 @@ private func written(_ images: PreviewImages, of preview: CardPreview, into fold
     return nil
   }
 
-  return PreviewImageFiles(light: light, dark: dark)
+  return PreviewImageFiles(light: light, dark: dark, size: size)
 }
 
 extension CardPreview {
   /// The board's ID, followed by the color, if any, e.g. `<board-id>-purple`.
   fileprivate var fileName: String {
     color.map { color in "\(boardID.rawValue)-\(color.rawValue)" } ?? boardID.rawValue
-  }
-}
-
-extension BoardPreview {
-  fileprivate var isEmpty: Bool {
-    size.width <= 0 || size.height <= 0
   }
 }
 
@@ -157,7 +188,8 @@ private func writePreviewPage(of preview: BoardPreview, index: BoardsIndex, into
   return page
 }
 
-/// A page showing the preview alone, in the system's appearance.
+/// A page showing the preview alone, in the system's appearance. It never scrolls: a preview sized
+/// in fractions of a pixel overflows the window a little, and its scrollbars would be drawn too.
 private func previewPage(showing preview: String) -> String {
   """
   <!doctype html>
@@ -166,7 +198,7 @@ private func previewPage(showing preview: String) -> String {
   <meta charset="utf-8">
   <link rel="stylesheet" href="allume.css">
   <style>
-  :root { color-scheme: light dark; }
+  :root { color-scheme: light dark; overflow: hidden; }
   body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
   </style>
   </head>

@@ -60,7 +60,20 @@
 }
 
 @media (scripting: enabled) {
-  .allume:not([data-allume-theme]) .allume-preview-light {
+  .allume:not([data-allume-theme], .allume-board-preview)
+    .allume-preview-light {
     display: none;
+  }
+}
+
+/* A preview's own page, which publishing draws in each appearance without
+   scripts, shows its board cards' images in the system's. */
+@media (prefers-color-scheme: dark) {
+  .allume-board-preview .allume-preview-light {
+    display: none;
+  }
+
+  .allume-board-preview .allume-preview-dark {
+    display: block;
   }
 }

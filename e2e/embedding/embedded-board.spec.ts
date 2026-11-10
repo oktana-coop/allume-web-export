@@ -48,12 +48,11 @@ test.describe("a board's view in a site's page", () => {
     });
   });
 
-  test('frames the whole board in its box on a first visit', async ({
-    page,
-  }) => {
+  test('frames the whole board in its box', async ({ page }) => {
     const sitePage = await embedBoard({ page, board: languages });
-
     await page.goto(sitePage);
+
+    await page.getByRole('button', { name: 'Fit' }).click();
 
     const box = await boundingBox({ of: siteBox({ page }) });
     for (const card of await viewport({ page })

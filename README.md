@@ -40,8 +40,10 @@ The site's folder then holds:
   `functional-q5tbqj.html`;
 - `files/`, with the images, handwriting, avatars and favicons the pages show. Images in a format
   browsers can't show, such as HEIC, are published as JPEG instead, or as PNG when they have
-  transparent pixels. In `previews/`, it has the previews board cards show, as images in the light
-  and dark palettes, such as `<board-id>-light.jpg`, and for a colored card on its color, such as
+  transparent pixels. In `previews/`, it has the previews board cards show: each board as a first
+  visit opens it, from its top left at 100% in a window 1440 px wide, its own board cards showing
+  their previews, scaled down to the card. They're images in the light and dark palettes, such as
+  `<board-id>-light.jpg`, and for a colored card on its color, such as
   `<board-id>-purple-light.jpg`. WebKit draws them, and when it can't, the board's cards show an
   empty panel, with a warning;
 - `allume.css` and `allume.js`, the viewer.
@@ -62,8 +64,8 @@ Its folder holds:
 - `boards/`, each board's view, an element for a page to include, whose links and images are
   `allume:` references for the site to replace with its own URLs, as
   [References](docs/References.md) explains;
-- `preview-light.jpg` and `preview-dark.jpg`, pictures of the exported board as its card on
-  another board shows it, 1600 px wide, in the light and dark palettes. WebKit draws them, and when
+- `preview-light.jpg` and `preview-dark.jpg`, pictures of the whole exported board, 1600 px wide,
+  in the light and dark palettes. WebKit draws them, and when
   it can't, they're left out with a warning;
 - `files/`, as for a site;
 - `allume.css` and `allume.js`, the viewer, for the site's pages to include.

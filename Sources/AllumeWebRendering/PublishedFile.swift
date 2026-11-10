@@ -35,13 +35,16 @@ package struct CardPreview: Hashable, Sendable {
   }
 }
 
-/// A board's preview drawn as an image in each appearance, which its cards show.
-package struct PreviewImageFiles: Hashable, Sendable {
+/// A board's preview drawn as an image in each appearance, which its cards show, and the part of the
+/// board they show from its top left, at its size.
+package struct PreviewImageFiles: Equatable, Sendable {
   package let light: Asset
   package let dark: Asset
+  package let size: Size
 
-  package init(light: Asset, dark: Asset) {
+  package init(light: Asset, dark: Asset, size: Size) {
     self.light = light
     self.dark = dark
+    self.size = size
   }
 }

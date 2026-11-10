@@ -26,20 +26,17 @@ func layout(of board: Document.Board) -> BoardLayout {
 }
 
 /// A board card's title sits above the card, 25 px tall with its margin, so a board's preview
-/// leaves room for it above the board's origin, as the viewer does when it fits a board.
+/// leaves room for it above the board's origin, as the viewer does when it opens a board.
 let fitTopPadding = 32.0
 
-/// A board's preview is scaled so that its contents, the room above them for titles, and the empty
-/// margin between the board's origin and its nearest card, fit the card. It's capped at 0.8, so
-/// that it never exceeds the board's actual size.
-func previewScale(of contentBounds: Rect, in frame: Rect) -> Double {
-  guard contentBounds.maxX > 0 && contentBounds.maxY > 0 else {
-    return 0.8
-  }
+/// A board card previews its board as a first visit opens it, at 100% from the top left, in a
+/// window this wide, scaled down to the card.
+let previewWindowWidth = 1440.0
 
-  return min(
-    0.8, frame.width / (contentBounds.maxX + contentBounds.x),
-    frame.height / (fitTopPadding + contentBounds.maxY + contentBounds.y))
+/// The scale a board card in the frame previews its board at: a window's width of the board, or
+/// for a card wider than 1152 px, Allume's largest scale for previews.
+func previewScale(in frame: Rect) -> Double {
+  min(0.8, frame.width / previewWindowWidth)
 }
 
 extension TextBlock {

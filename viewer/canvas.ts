@@ -42,8 +42,9 @@ export function setUpCanvas(root: ParentNode): Canvas | null {
   const element = viewport?.querySelector<HTMLElement>('.allume-canvas');
   if (!viewport || !element) return null;
 
-  // The camera is a transform, so undo any native scrolling, such as the
-  // browser scrolling to the #card- target.
+  // The camera moves the canvas with a transform, so the viewport's scroll
+  // offset is kept at 0, though the browser still sets it to bring something
+  // into view.
   viewport.addEventListener('scroll', () => {
     viewport.scrollTop = 0;
     viewport.scrollLeft = 0;
@@ -191,6 +192,13 @@ export function focusCard({ canvas, id }: { canvas: Canvas; id: string }) {
     height: card.offsetHeight,
   };
 
+  // Going to a #card- link, the browser scrolls each box around the card to
+  // bring it into view:
+  // 1. The viewport, which the camera positions instead: undone here, a frame
+  //    sooner than the scroll event would.
+  // 2. The site's page, if it scrolls, bringing the board into view: kept.
+  // Nothing cancels only the first, so both happen, and the first is undone.
+  canvas.viewport.scrollTo(0, 0);
   moveCamera({ canvas, camera: focus({ frame, ...measure(canvas) }) });
   return true;
 }

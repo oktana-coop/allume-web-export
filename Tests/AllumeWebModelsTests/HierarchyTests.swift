@@ -187,4 +187,52 @@ import Testing
       #expect(contents.hierarchy.primaryAncestors(of: Document.ID(rawValue: "missing")).isEmpty)
     }
   }
+
+  @Suite struct NestingLevels {
+    @Test func countTheLevelsOfBoardsABoardHolds() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [
+          makeBoard("root", cards: ["a", "b"]), makeBoard("a", cards: ["c"]), makeBoard("b"),
+          makeBoard("c", cards: ["note"]), makeNote("note"),
+        ],
+        users: [:]
+      )
+
+      let levels = ["root", "a", "b", "c"].map { id in
+        contents.hierarchy.nestingLevel(of: Document.ID(rawValue: id))
+      }
+
+      // The root holds a, which holds c: the highest of its boards' levels, plus one.
+      #expect(levels == [2, 1, 0, 0])
+    }
+
+    @Test func countACycleOfLinkedBoardsUpToWhereItCloses() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [
+          makeBoard("root", cards: ["a"]), makeBoard("a", cards: ["b"]),
+          makeBoard("b", cards: ["a"]),
+        ],
+        users: [:]
+      )
+
+      let levels = ["root", "a", "b"].map { id in
+        contents.hierarchy.nestingLevel(of: Document.ID(rawValue: id))
+      }
+
+      #expect(levels == [2, 1, 1])
+    }
+
+    @Test func areZeroForOtherDocumentsAndUnknownIDs() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["note"]), makeNote("note")],
+        users: [:]
+      )
+
+      #expect(contents.hierarchy.nestingLevel(of: Document.ID(rawValue: "note")) == 0)
+      #expect(contents.hierarchy.nestingLevel(of: Document.ID(rawValue: "unknown")) == 0)
+    }
+  }
 }

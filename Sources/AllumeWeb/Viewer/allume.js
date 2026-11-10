@@ -51,6 +51,9 @@
     const fit2 = fitScale({ viewport, contentBounds });
     return clamp(scale, Math.min(MIN_SCALE, fit2), MAX_SCALE);
   }
+  function topLeft() {
+    return { x: 0, y: FIT_TOP_PADDING, scale: 1 };
+  }
   function fit({
     viewport,
     contentBounds
@@ -284,6 +287,7 @@
       width: card.offsetWidth,
       height: card.offsetHeight
     };
+    canvas.viewport.scrollTo(0, 0);
     moveCamera({ canvas, camera: focus({ frame, ...measure(canvas) }) });
     return true;
   }
@@ -929,7 +933,7 @@
     if (focusCard({ canvas, id: location.hash.slice(1) })) return;
     const saved = readSession({ key, parse: parseCamera });
     if (!saved) {
-      fitBoard(canvas);
+      moveCamera({ canvas, camera: topLeft() });
       return;
     }
     const scale = clampScale({ scale: saved.scale, ...measure(canvas) });

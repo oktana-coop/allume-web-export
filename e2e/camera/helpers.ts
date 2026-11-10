@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-import { type Point } from '../shared/helpers';
+import { viewport, type Point } from '../shared/helpers';
 
 /** Checks the zoom level the toolbar shows, such as `125%`. */
 export const expectZoomLevel = async ({
@@ -22,6 +22,15 @@ export const expectZoomLevel = async ({
  */
 export const expectFullyInView = async ({ card }: { card: Locator }) =>
   expect(card).toBeInViewport({ ratio: 0.999 });
+
+/** Checks every card on the board is in view, as when it's framed whole. */
+export const expectWholeBoardInView = async ({ page }: { page: Page }) => {
+  const cards = await viewport({ page }).locator('[id^="card-"]').all();
+  expect(cards.length).toBeGreaterThan(0);
+  for (const card of cards) {
+    await expectFullyInView({ card });
+  }
+};
 
 /** Drags the mouse from the point on the screen, by the distances. */
 export const drag = async ({

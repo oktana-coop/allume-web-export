@@ -1,14 +1,13 @@
 import AllumeWebModels
 import Foundation
 
-/// A card on the board, at the board's depth: 0 on the board's own page, more inside previews,
-/// which leave out whatever can be clicked. On the board's own page, a board card shows its
-/// board's preview images, and inside a preview, which is drawn as such images, the board's
-/// contents.
+/// A card on the board, at the board's depth: 0 on the board's own page, 1 on a preview's page,
+/// which leaves out whatever can be clicked. A board card shows its board's preview images, if
+/// publishing drew them, in its color.
 func drawCard(
   _ card: Card, on board: Document.Board, depth: Int, contents: Contents,
-  layouts: [Document.ID: BoardLayout], favicons: [String: Asset],
-  images: [String: ImageFiles], previews: [CardPreview: PreviewImageFiles]
+  favicons: [String: Asset], images: [String: ImageFiles],
+  previews: [CardPreview: PreviewImageFiles]
 ) -> HTML? {
   let interactive = depth == 0
   let menu =
@@ -21,15 +20,9 @@ func drawCard(
 
   switch contents.document(card.documentID) {
   case .board(let child)?:
-    let preview =
-      interactive
-      ? previews[CardPreview(boardID: child.id, color: card.color)].map { files in
-        drawPreviewImages(files, of: child, in: card.frame, layouts: layouts)
-      }
-      : drawPreview(
-        of: child, in: card.frame, depth: depth + 1, contents: contents, layouts: layouts,
-        favicons: favicons, images: images
-      ).map { preview in [preview] }
+    let preview = previews[CardPreview(boardID: child.id, color: card.color)].map { files in
+      drawPreviewImages(files, in: card.frame)
+    }
     return drawBoardCard(
       card, showing: child, preview: preview ?? [], menu: menu, interactive: interactive,
       contents: contents)

@@ -77,25 +77,111 @@ import Testing
     #expect(files.map(\.path) == ["image.png", "root_ink.svg"])
   }
 
-  @Test func previewTheRootsOwnImagesWholeAndNestedOnesAsThumbnails() throws {
+  @Test func previewTheRootWithItsImagesWholeAndItsBoardCardsShowingTheirImages() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
-        makeBoard("root", cards: ["photo", "child", "photo"]),
-        makeBoard("child", cards: ["nested"]),
-        makeImage("photo"), makeImage("nested"),
+        makeBoard("root", cards: ["photo", "child"]), makeBoard("child", cards: ["photo"]),
+        makeImage("photo"),
       ],
       users: [:]
     )
     let images = [
-      "photo.png": ImageFiles(image: makeAsset("photo.png"), thumbnail: makeAsset("photo.jpg")),
-      "nested.png": ImageFiles(image: makeAsset("nested.png"), thumbnail: makeAsset("nested.jpg")),
+      "photo.png": ImageFiles(image: makeAsset("photo.png"), thumbnail: makeAsset("photo.jpg"))
+    ]
+    let previews = [
+      CardPreview(boardID: Document.ID(rawValue: "child"), color: nil): PreviewImageFiles(
+        light: makeAsset("child-light.jpg"), dark: makeAsset("child-dark.jpg"),
+        size: Size(width: 1440, height: 1440))
     ]
 
-    let preview = renderRootPreview(contents, favicons: [:], images: images)
+    let preview = renderRootPreview(contents, favicons: [:], images: images, previews: previews)
 
-    #expect(preview.html.contains(#"src="allume:file/photo.png""#))
-    #expect(preview.html.contains(#"src="allume:file/thumbs/nested.jpg""#))
-    #expect(preview.files.map(\.path) == ["photo.png", "thumbs/nested.jpg"])
+    #expect(
+      preview.files.map(\.path) == [
+        "photo.png", "previews/child-light.jpg", "previews/child-dark.jpg",
+      ])
+  }
+
+  @Test func previewTheRootWhole() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "root"), label: nil,
+            cards: [makeCard("note", frame: Rect(x: 100, y: 50, width: 200, height: 100))],
+            chains: [], connections: [], ink: [])),
+        makeNote("note"),
+      ],
+      users: [:]
+    )
+
+    let preview = renderRootPreview(contents, favicons: [:], images: [:], previews: [:])
+
+    // 100 + 200 wide, with the margin at the origin repeated; room for titles, then 50 + 100,
+    // and the margin.
+    #expect(preview.size == Size(width: 400, height: 232))
+  }
+
+  @Test func sizeEachBoardsPreviewAsAWindowOfItForItsLargestCard() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "root"), label: nil,
+            cards: [
+              makeCard("child", frame: Rect(x: 0, y: 0, width: 360, height: 90)),
+              makeCard("other"),
+            ], chains: [], connections: [], ink: [])),
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "other"), label: nil,
+            cards: [makeCard("child", frame: Rect(x: 0, y: 0, width: 180, height: 180))],
+            chains: [], connections: [], ink: [])),
+        makeBoard("child", cards: ["note"]), makeNote("note"),
+      ],
+      users: [:]
+    )
+
+    let sizes = cardPreviewSizes(contents)
+
+    let child = CardPreview(boardID: Document.ID(rawValue: "child"), color: nil)
+    // Each card shows a window 1440 px wide: the first at 0.25, 360 tall, the second at 0.125,
+    // 1440 tall.
+    #expect(sizes[child] == Size(width: 1440, height: 1440))
+  }
+
+  @Test func sizeAWideCardsPreviewAt08() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "root"), label: nil,
+            cards: [makeCard("child", frame: Rect(x: 0, y: 0, width: 1600, height: 400))],
+            chains: [], connections: [], ink: [])),
+        makeBoard("child", cards: ["note"]), makeNote("note"),
+      ],
+      users: [:]
+    )
+
+    let sizes = cardPreviewSizes(contents)
+
+    let child = CardPreview(boardID: Document.ID(rawValue: "child"), color: nil)
+    #expect(sizes[child] == Size(width: 2000, height: 500))
+  }
+
+  @Test func sizeNoPreviewForAnEmptyBoard() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [makeBoard("root", cards: ["child"]), makeBoard("child")],
+      users: [:]
+    )
+
+    let sizes = cardPreviewSizes(contents)
+
+    #expect(sizes.isEmpty)
   }
 }

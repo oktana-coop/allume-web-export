@@ -1,6 +1,6 @@
 import AllumeWebModels
 
-/// What's on a board, at its depth: 0 in its own view, more inside previews. In drawing order: the
+/// What's on a board, at its depth: 0 in its own view, 1 on a preview's page. In drawing order: the
 /// connection lines, the cards by z-index, the chains, the ink.
 func drawBoardContents(
   _ board: Document.Board, depth: Int, contents: Contents, layouts: [Document.ID: BoardLayout],
@@ -14,8 +14,8 @@ func drawBoardContents(
     .sorted { a, b in (a.element.zIndex, a.offset) < (b.element.zIndex, b.offset) }
     .compactMap { _, card in
       drawCard(
-        card, on: board, depth: depth, contents: contents, layouts: layouts, favicons: favicons,
-        images: images, previews: previews)
+        card, on: board, depth: depth, contents: contents, favicons: favicons, images: images,
+        previews: previews)
     }
   let chains = board.chains.flatMap { chain in
     drawChain(chain, contents: contents, interactive: interactive)

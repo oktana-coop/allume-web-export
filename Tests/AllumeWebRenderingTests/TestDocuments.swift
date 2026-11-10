@@ -72,8 +72,8 @@ func drawn(
   return board.flatMap { board in
     card.flatMap { card in
       drawCard(
-        card, on: board, depth: depth, contents: contents, layouts: layouts(in: contents),
-        favicons: favicons, images: images, previews: previews
+        card, on: board, depth: depth, contents: contents, favicons: favicons, images: images,
+        previews: previews
       )?
       .rendered(resolving: describe)
     }

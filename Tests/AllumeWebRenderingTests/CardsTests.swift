@@ -201,8 +201,7 @@ import Testing
       let board = try #require(contents.board(Document.ID(rawValue: "root")))
 
       let html = drawCard(
-        wide, on: board, depth: 1, contents: contents, layouts: [:], favicons: [:], images: [:],
-        previews: [:]
+        wide, on: board, depth: 1, contents: contents, favicons: [:], images: [:], previews: [:]
       )?
       .rendered(resolving: describe)
 
@@ -230,38 +229,34 @@ import Testing
           .board(
             Document.Board(
               id: Document.ID(rawValue: "root"), label: nil,
-              cards: [makeCard("child", frame: Rect(x: 0, y: 0, width: 200, height: 116))],
+              cards: [makeCard("child", frame: Rect(x: 0, y: 0, width: 360, height: 90))],
               chains: [], connections: [], ink: [])),
-          .board(
-            Document.Board(
-              id: Document.ID(rawValue: "child"), label: nil,
-              cards: [makeCard("note", frame: Rect(x: 100, y: 50, width: 200, height: 100))],
-              chains: [], connections: [], ink: [])),
-          makeNote("note"),
+          makeBoard("child", cards: ["note"]), makeNote("note"),
         ],
         users: [:]
       )
       let previews = [
         CardPreview(boardID: Document.ID(rawValue: "child"), color: nil): PreviewImageFiles(
-          light: makeAsset("child-light.jpg"), dark: makeAsset("child-dark.jpg"))
+          light: makeAsset("child-light.jpg"), dark: makeAsset("child-dark.jpg"),
+          size: Size(width: 1440, height: 360))
       ]
 
       let html = drawn("child", on: "root", in: contents, previews: previews)
 
-      // Scaled as the preview would be: 400 by 232 at its size, at 0.5.
+      // The images show a window 1440 px wide of the board, at the card's 0.25.
       #expect(
         html
           == markup(
             #"""
             <div class="allume-card allume-board-card" data-allume-doc="child" id="card-child"
-              style="left:0px;top:0px;width:200px;height:116px;z-index:0">
+              style="left:0px;top:0px;width:360px;height:90px;z-index:0">
               <div class="allume-board-title"><span>Untitled board</span></div>
               <a class="allume-body allume-panel" href="board:child" aria-label="Untitled board">
                 <img class="allume-preview-image allume-preview-light"
-                  src="file:previews/child-light.jpg" alt="" style="width:200px;height:116px"
+                  src="file:previews/child-light.jpg" alt="" style="width:360px;height:90px"
                   loading="lazy" decoding="async" draggable="false">
                 <img class="allume-preview-image allume-preview-dark"
-                  src="file:previews/child-dark.jpg" alt="" style="width:200px;height:116px"
+                  src="file:previews/child-dark.jpg" alt="" style="width:360px;height:90px"
                   loading="lazy" decoding="async" draggable="false">
               </a>
             </div>
@@ -283,9 +278,11 @@ import Testing
       let child = Document.ID(rawValue: "child")
       let previews = [
         CardPreview(boardID: child, color: nil): PreviewImageFiles(
-          light: makeAsset("child-light.jpg"), dark: makeAsset("child-dark.jpg")),
+          light: makeAsset("child-light.jpg"), dark: makeAsset("child-dark.jpg"),
+          size: Size(width: 125, height: 125)),
         CardPreview(boardID: child, color: .purple): PreviewImageFiles(
-          light: makeAsset("child-purple-light.jpg"), dark: makeAsset("child-purple-dark.jpg")),
+          light: makeAsset("child-purple-light.jpg"), dark: makeAsset("child-purple-dark.jpg"),
+          size: Size(width: 125, height: 125)),
       ]
 
       let html = try #require(drawn("child", on: "root", in: contents, previews: previews))
@@ -330,10 +327,7 @@ import Testing
               <span class="allume-linked">\#(iconMarkup("linked"))</span>
               <span>Monoids</span>
             </div>
-            <div class="allume-body allume-panel">
-              <div class="allume-preview"
-                  style="width:125px;height:125px;transform:scale(0.8) translateY(32px)"></div>
-            </div>
+            <div class="allume-body allume-panel"></div>
             """#)) == true)
     }
   }

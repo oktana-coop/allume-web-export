@@ -43,69 +43,80 @@ package func renderBoards(
   return (views, files)
 }
 
-/// Each board's preview as the cards that show it do, on their color, to be drawn as images for
-/// them.
-package func renderBoardPreviews(
-  _ contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
-) -> [CardPreview: BoardPreview] {
+/// The size of each board's preview as the cards that show it do, on their color: the part of the
+/// board the largest of them shows, from its top left. An empty board has none.
+package func cardPreviewSizes(_ contents: Contents) -> [CardPreview: Size] {
   let layouts = layouts(in: contents)
-  let shown = contents.hierarchy.boardIDs.compactMap { boardID in contents.board(boardID) }
+  let cards = contents.hierarchy.boardIDs.compactMap { boardID in contents.board(boardID) }
     .flatMap { board in
-      board.cards.compactMap { card -> (preview: CardPreview, board: Document.Board)? in
-        guard case .board(let child)? = contents.document(card.documentID) else {
+      board.cards.compactMap { card -> (preview: CardPreview, frame: Rect)? in
+        guard case .board(let child)? = contents.document(card.documentID),
+          hasContents((layouts[child.id] ?? layout(of: child)).contentBounds)
+        else {
           return nil
         }
-        return (CardPreview(boardID: child.id, color: card.color), child)
+        return (CardPreview(boardID: child.id, color: card.color), card.frame)
       }
     }
-    .uniqued(on: \.preview)
 
-  return Dictionary(
-    uniqueKeysWithValues: shown.map { preview, board in
-      (
-        preview,
-        renderPreview(
-          of: board, color: preview.color, contents: contents, layouts: layouts,
-          favicons: favicons, images: images)
-      )
-    })
+  return Dictionary(grouping: cards, by: \.preview).mapValues { cards in
+    let shown = cards.map { card in
+      Size(
+        width: card.frame.width / previewScale(in: card.frame),
+        height: card.frame.height / previewScale(in: card.frame))
+    }
+    return Size(
+      width: shown.map(\.width).reduce(0, max), height: shown.map(\.height).reduce(0, max))
+  }
 }
 
-/// The root board's preview, to be drawn as an image. Its images are those of the views, but for
-/// the root's own, which show at nearly their size, larger than their thumbnails.
+private func hasContents(_ contentBounds: Rect) -> Bool {
+  contentBounds.maxX > 0 && contentBounds.maxY > 0
+}
+
+/// The board's preview as its cards show it, the part of the size, to be drawn as an image, with
+/// its board cards showing the previews' images drawn so far.
+package func renderCardPreview(
+  _ preview: CardPreview, size: Size, contents: Contents, favicons: [String: Asset],
+  images: [String: ImageFiles], previews: [CardPreview: PreviewImageFiles]
+) -> BoardPreview? {
+  contents.board(preview.boardID).map { board in
+    renderPreview(
+      of: board, color: preview.color, size: size, contents: contents,
+      layouts: layouts(in: contents), favicons: favicons, images: images, previews: previews)
+  }
+}
+
+/// The root board's whole preview, to be drawn as an image, with its board cards showing their
+/// previews' images.
 package func renderRootPreview(
-  _ contents: Contents, favicons: [String: Asset], images: [String: ImageFiles]
+  _ contents: Contents, favicons: [String: Asset], images: [String: ImageFiles],
+  previews: [CardPreview: PreviewImageFiles]
 ) -> BoardPreview {
   guard let root = contents.board(contents.rootID) else {
     preconditionFailure("The contents' root is always a board.")
   }
 
-  let rootImageNames = Set(
-    root.cards.compactMap { card -> String? in
-      guard case .image(let image)? = contents.document(card.documentID) else {
-        return nil
-      }
-      return image.file.name
-    })
-  let previewImages = Dictionary(
-    uniqueKeysWithValues: images.map { name, files in
-      (name, rootImageNames.contains(name) ? ImageFiles(image: files.image, thumbnail: nil) : files)
-    })
-
+  let layouts = layouts(in: contents)
   return renderPreview(
-    of: root, color: nil, contents: contents, layouts: layouts(in: contents), favicons: favicons,
-    images: previewImages)
+    of: root, color: nil,
+    size: previewSize(of: (layouts[root.id] ?? layout(of: root)).contentBounds),
+    contents: contents, layouts: layouts, favicons: favicons, images: images, previews: previews)
 }
 
+/// A preview's page shows its board at its full size, so its images are the originals rather than
+/// their thumbnails.
 private func renderPreview(
-  of board: Document.Board, color: CardColor?, contents: Contents,
-  layouts: [Document.ID: BoardLayout], favicons: [String: Asset], images: [String: ImageFiles]
+  of board: Document.Board, color: CardColor?, size: Size, contents: Contents,
+  layouts: [Document.ID: BoardLayout], favicons: [String: Asset], images: [String: ImageFiles],
+  previews: [CardPreview: PreviewImageFiles]
 ) -> BoardPreview {
+  let originals = images.mapValues { files in ImageFiles(image: files.image, thumbnail: nil) }
   let preview = drawBoardPreview(
-    of: board, color: color, contents: contents, layouts: layouts, favicons: favicons,
-    images: images)
+    of: board, color: color, size: size, contents: contents, layouts: layouts,
+    favicons: favicons, images: originals, previews: previews)
 
   return BoardPreview(
     html: preview.rendered(resolving: \.text), files: preview.files.uniqued(on: \.path),
-    size: previewSize(of: (layouts[board.id] ?? layout(of: board)).contentBounds))
+    size: size)
 }

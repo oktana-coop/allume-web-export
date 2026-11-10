@@ -1,16 +1,11 @@
-import { clampScale, parseCamera } from './camera';
-import {
-  fitBoard,
-  focusCard,
-  measure,
-  moveCamera,
-  type Canvas,
-} from './canvas';
+import { clampScale, parseCamera, topLeft } from './camera';
+import { focusCard, measure, moveCamera, type Canvas } from './canvas';
 import { readSession, writeSession } from './session';
 
 /**
  * A link to a card centers it. Otherwise a board opens where it was last left
- * in this session, like in Allume, or framed whole on a first visit.
+ * in this session, like in Allume, or on a first visit at 100% from its top
+ * left, as Allume opens boards.
  */
 export function setUpStartingView(canvas: Canvas) {
   const key = `allume:camera:${location.pathname}`;
@@ -26,7 +21,7 @@ export function setUpStartingView(canvas: Canvas) {
 
   const saved = readSession({ key, parse: parseCamera });
   if (!saved) {
-    fitBoard(canvas);
+    moveCamera({ canvas, camera: topLeft() });
     return;
   }
 

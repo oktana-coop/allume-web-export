@@ -100,8 +100,7 @@ private func renderedSample() async throws -> RenderedBoards {
 
   let images = makeImageFiles(of: contents, in: folder)
   let (previews, _) = await makePreviewImageFiles(
-    of: renderBoardPreviews(contents, favicons: [:], images: images),
-    index: boardsIndex(for: contents), width: defaultPreviewWidth, in: folder)
+    of: contents, favicons: [:], images: images, width: defaultPreviewWidth, in: folder)
 
   return renderedBoards(for: contents, favicons: [:], images: images, previews: previews)
 }

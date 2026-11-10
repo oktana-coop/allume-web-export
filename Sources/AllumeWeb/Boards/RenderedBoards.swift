@@ -22,7 +22,8 @@ package func renderedBoards(
 ) -> RenderedBoards {
   let (views, files) = renderBoards(
     contents, favicons: favicons, images: images, previews: previews)
-  let preview = renderRootPreview(contents, favicons: favicons, images: images)
+  let preview = renderRootPreview(
+    contents, favicons: favicons, images: images, previews: previews)
 
   return RenderedBoards(
     index: boardsIndex(for: contents), views: views, files: files, preview: preview)

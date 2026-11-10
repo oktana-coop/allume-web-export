@@ -24,7 +24,7 @@ const MAX_BOUNCE = 80;
 const SPRING = 0.8;
 const FOCUS_PADDING = 80;
 // A board card's title sits above the card, 25 px tall with its margin, so a
-// framed board leaves room for it above the canvas's origin.
+// board, framed or opened, leaves room for it above the canvas's origin.
 const FIT_TOP_PADDING = 32;
 
 /** The camera in the value, if it has a finite x, y and scale. */
@@ -68,6 +68,13 @@ export function clampScale({
 }) {
   const fit = fitScale({ viewport, contentBounds });
   return clamp(scale, Math.min(MIN_SCALE, fit), MAX_SCALE);
+}
+
+/**
+ * The camera at 100%, from the canvas's origin, with room above it for titles.
+ */
+export function topLeft(): Camera {
+  return { x: 0, y: FIT_TOP_PADDING, scale: 1 };
 }
 
 /**

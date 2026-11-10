@@ -4,43 +4,7 @@ import Testing
 @testable import AllumeWebRendering
 
 @Suite struct PreviewsTests {
-  @Test func fillTheCardAtTheirScale() throws {
-    let contents = try Contents(
-      rootID: Document.ID(rawValue: "root"),
-      documents: [
-        makeBoard("root", cards: ["child"]),
-        .board(
-          Document.Board(
-            id: Document.ID(rawValue: "child"), label: nil,
-            cards: [makeCard("note", frame: Rect(x: 100, y: 50, width: 200, height: 100))],
-            chains: [], connections: [], ink: [])),
-        makeNote("note"),
-      ],
-      users: [:]
-    )
-    let child = try #require(contents.board(Document.ID(rawValue: "child")))
-
-    let html = drawPreview(
-      of: child, in: Rect(x: 0, y: 0, width: 200, height: 116), depth: 1, contents: contents,
-      layouts: layouts(in: contents), favicons: [:], images: [:]
-    )?
-    .rendered(resolving: describe)
-
-    #expect(
-      html
-        == markup(
-          #"""
-          <div class="allume-preview"
-            style="width:400px;height:232px;transform:scale(0.5) translateY(32px)">
-            <div class="allume-card allume-note-card" data-allume-doc="note"
-              style="left:100px;top:50px;width:200px;height:100px;z-index:0">
-              <div class="allume-body">A note</div>
-            </div>
-          </div>
-          """#))
-  }
-
-  @Test func showABoardOnAPageWholeAtItsSize() throws {
+  @Test func showTheBoardOnAPageOfTheSizeAtItsOwnSize() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [
@@ -53,19 +17,12 @@ import Testing
       ],
       users: [:]
     )
-    let root = try #require(contents.board(Document.ID(rawValue: "root")))
 
-    let html = drawBoardPreview(
-      of: root, color: nil, contents: contents, layouts: layouts(in: contents), favicons: [:],
-      images: [:]
-    )
-    .rendered(resolving: describe)
+    let html = try drawnPreviewPage(of: "root", in: contents)
 
-    // 100 + 200 wide, with the margin at the origin repeated; room for titles, then 50 + 100,
-    // and the margin.
     #expect(
       html.hasPrefix(
-        #"<div class="allume allume-board-preview" style="width:400px;height:232px">"#))
+        #"<div class="allume allume-board-preview" style="width:250px;height:145px">"#))
     #expect(
       html.contains(
         markup(
@@ -79,21 +36,37 @@ import Testing
           """#)))
   }
 
-  @Test func showABoardOnAPageInTheColorOfItsCards() throws {
+  @Test func showTheBoardOnAPageInTheColorOfItsCards() throws {
     let contents = try Contents(
       rootID: Document.ID(rawValue: "root"),
       documents: [makeBoard("root", cards: ["note"]), makeNote("note")],
       users: [:]
     )
-    let root = try #require(contents.board(Document.ID(rawValue: "root")))
 
-    let html = drawBoardPreview(
-      of: root, color: .purple, contents: contents, layouts: layouts(in: contents), favicons: [:],
-      images: [:]
-    )
-    .rendered(resolving: describe)
+    let html = try drawnPreviewPage(of: "root", in: contents, color: .purple)
 
     #expect(html.hasPrefix(#"<div class="allume allume-board-preview" data-allume-color="purple""#))
+  }
+
+  @Test func showTheBoardCardsOnThePageWithTheirPreviewsImages() throws {
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        makeBoard("root", cards: ["child"]), makeBoard("child", cards: ["grandchild"]),
+        makeBoard("grandchild", cards: ["note"]), makeNote("note"),
+      ],
+      users: [:]
+    )
+    let previews = [
+      CardPreview(boardID: Document.ID(rawValue: "grandchild"), color: nil): PreviewImageFiles(
+        light: makeAsset("grandchild-light.jpg"), dark: makeAsset("grandchild-dark.jpg"),
+        size: Size(width: 1440, height: 1440))
+    ]
+
+    let html = try drawnPreviewPage(of: "child", in: contents, previews: previews)
+
+    #expect(html.contains(#"src="file:previews/grandchild-light.jpg""#))
+    #expect(html.contains(#"src="file:previews/grandchild-dark.jpg""#))
   }
 
   @Test func leaveOutWhateverCanBeClicked() throws {
@@ -107,42 +80,14 @@ import Testing
       ],
       users: [:]
     )
-    let child = try #require(contents.board(Document.ID(rawValue: "child")))
 
-    let html = try #require(
-      drawPreview(
-        of: child, in: Rect(x: 0, y: 0, width: 200, height: 100), depth: 1, contents: contents,
-        layouts: layouts(in: contents), favicons: [:], images: [:]
-      )?
-      .rendered(resolving: describe))
+    let html = try drawnPreviewPage(of: "child", in: contents)
 
     #expect(
       html.contains(#"data-allume-doc="link""#) && html.contains(#"<div class="allume-comment""#))
     #expect(!html.contains("<button"))
-    #expect(!html.contains(" id="))
+    #expect(!html.contains(#" id="card-"#))
     #expect(!html.contains("<a "))
-  }
-
-  @Test func nestUpToThreeLevels() throws {
-    let contents = try Contents(
-      rootID: Document.ID(rawValue: "root"),
-      documents: [
-        makeBoard("root", cards: ["a"]), makeBoard("a", cards: ["b"]),
-        makeBoard("b", cards: ["c"]), makeBoard("c", cards: ["d"]), makeBoard("d"),
-      ],
-      users: [:]
-    )
-    let a = try #require(contents.board(Document.ID(rawValue: "a")))
-
-    // As the image of a's preview draws it, which root's card for a shows.
-    let html = drawBoardPreview(
-      of: a, color: nil, contents: contents, layouts: layouts(in: contents), favicons: [:],
-      images: [:]
-    )
-    .rendered(resolving: describe)
-
-    #expect(html.components(separatedBy: #"<div class="allume-preview""#).count - 1 == 3)
-    #expect(html.contains(#"<div class="allume-body allume-panel"></div>"#))
   }
 
   @Test func putEachPieceOnALineOfItsOwn() throws {
@@ -154,18 +99,26 @@ import Testing
       ],
       users: [:]
     )
-    let child = try #require(contents.board(Document.ID(rawValue: "child")))
 
-    let html = drawPreview(
-      of: child, in: Rect(x: 0, y: 0, width: 100, height: 100), depth: 1, contents: contents,
-      layouts: layouts(in: contents), favicons: [:], images: [:]
-    )?
-    .rendered(resolving: describe)
+    let html = try drawnPreviewPage(of: "child", in: contents)
 
     #expect(
-      html?.contains(
-        #"</div>"# + "\n" + #"<div class="allume-card allume-note-card" data-allume-doc="b""#)
-        == true)
-    #expect(html?.hasSuffix("</div></div>") == true)
+      html.contains(
+        #"</div>"# + "\n" + #"<div class="allume-card allume-note-card" data-allume-doc="b""#))
+    #expect(html.hasSuffix("</div>\n</div>"))
   }
+}
+
+/// The board's preview page, 250 by 145, with references described.
+private func drawnPreviewPage(
+  of boardID: String, in contents: Contents, color: CardColor? = nil,
+  previews: [CardPreview: PreviewImageFiles] = [:]
+) throws -> String {
+  let board = try #require(contents.board(Document.ID(rawValue: boardID)))
+
+  return drawBoardPreview(
+    of: board, color: color, size: Size(width: 250, height: 145), contents: contents,
+    layouts: layouts(in: contents), favicons: [:], images: [:], previews: previews
+  )
+  .rendered(resolving: describe)
 }

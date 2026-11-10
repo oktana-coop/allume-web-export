@@ -1,13 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { haskell, haskellNotes, ocaml, ocamlNotes } from '../shared/boards';
-import {
-  boardCard,
-  cardCenter,
-  scrollBoard,
-  viewportCenter,
-} from '../shared/helpers';
-import { expectZoomLevel } from './helpers';
+import { haskell, ocaml, ocamlNotes } from '../shared/boards';
+import { cardCenter, scrollBoard, viewportCenter } from '../shared/helpers';
+import { expectWholeBoardInView, expectZoomLevel } from './helpers';
 
 // OCaml opens at 100%, so its zoom levels are round numbers. Haskell is too
 // wide to fit at 100%, so fitting it differs from 100%.
@@ -45,18 +40,13 @@ test.describe('zoom', () => {
     await expectZoomLevel({ page, level: '100%' });
   });
 
-  test('Shift+1 frames the whole board, as on a first visit', async ({
-    page,
-  }) => {
+  test('Shift+1 frames the whole board', async ({ page }) => {
     await page.goto(haskell.url);
-    const card = boardCard({ page, board: haskellNotes });
-    const firstVisit = await card.boundingBox();
-    await page.keyboard.press('+');
     await scrollBoard({ page, x: 100, y: 50 });
 
     await page.keyboard.press('Shift+Digit1');
 
-    expect(await card.boundingBox()).toEqual(firstVisit);
+    await expectWholeBoardInView({ page });
   });
 
   test('the toolbar zooms in and out like + and -', async ({ page }) => {
@@ -68,18 +58,13 @@ test.describe('zoom', () => {
     await expectZoomLevel({ page, level: '100%' });
   });
 
-  test("the toolbar's Fit frames the whole board, as on a first visit", async ({
-    page,
-  }) => {
+  test("the toolbar's Fit frames the whole board", async ({ page }) => {
     await page.goto(haskell.url);
-    const card = boardCard({ page, board: haskellNotes });
-    const firstVisit = await card.boundingBox();
-    await page.keyboard.press('+');
     await scrollBoard({ page, x: 100, y: 50 });
 
     await zoomButton({ page, name: 'Fit' }).click();
 
-    expect(await card.boundingBox()).toEqual(firstVisit);
+    await expectWholeBoardInView({ page });
   });
 
   test("zooming keeps the viewport's center in place", async ({ page }) => {

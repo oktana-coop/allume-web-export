@@ -12,20 +12,18 @@ import {
   enterBoard,
   expectCardCentered,
   scrollBoard,
-  viewport,
 } from '../shared/helpers';
 import { expectFullyInView, expectZoomLevel } from './helpers';
 
 test.describe('starting view', () => {
-  test('a first visit frames the whole board', async ({ page }) => {
-    // Haskell is too wide to fit at 100%.
+  test('a first visit opens the board at 100% from its top left', async ({
+    page,
+  }) => {
+    // Haskell is too wide to fit at 100%, and Notes is its top left card.
     await page.goto(haskell.url);
 
-    const cards = await viewport({ page }).locator('[id^="card-"]').all();
-    expect(cards).toHaveLength(5);
-    for (const card of cards) {
-      await expectFullyInView({ card });
-    }
+    await expectZoomLevel({ page, level: '100%' });
+    await expectFullyInView({ card: boardCard({ page, board: haskellNotes }) });
   });
 
   test("a first visit frames the titles of the board's top cards", async ({
