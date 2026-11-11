@@ -30,9 +30,11 @@ enum BundleDocument: Decodable {
 }
 
 struct BundleText: Decodable {
+  let label: String?
   let originalFile: String
 
   enum CodingKeys: String, CodingKey {
+    case label
     case originalFile = "original_file"
   }
 }
@@ -134,7 +136,7 @@ extension Document.Note {
     let text = bundle.text(ofFile: json.originalFile)
 
     return (
-      Document.Note(id: id, text: text ?? ""),
+      Document.Note(id: id, label: json.label.nonEmpty, text: text ?? ""),
       text == nil ? [.missingFile(name: json.originalFile)] : []
     )
   }

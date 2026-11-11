@@ -1,29 +1,9 @@
-/* Board cards: the title sits above a panel previewing the board. */
+/* Board cards: a panel previewing the board, below its title. */
 
 .allume-board-card > .allume-panel {
   border-radius: 14px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
-}
-
-.allume-board-title {
-  position: absolute;
-  bottom: 100%;
-  left: 2px;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 7px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 18px;
-}
-
-.allume-board-title span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .allume-preview {

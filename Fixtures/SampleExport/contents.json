@@ -135,7 +135,7 @@
     },
     "cd0c2ef09e02306757bf005d280c1928" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "OCaml is strict, unlike Haskell, and allows mutation where it helps.",
+      "label" : "",
       "original_file" : "cd0c2ef09e02306757bf005d280c1928_original.txt",
       "type" : "text"
     },
@@ -602,13 +602,13 @@
     },
     "ba900a8e25556d8b4d63f90052a0e6fd" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "ML brought type inference to a wide audience. OCaml and Haskell both inherit it.",
+      "label" : "",
       "original_file" : "ba900a8e25556d8b4d63f90052a0e6fd_original.txt",
       "type" : "text"
     },
     "04b8149e0f92653e1ed65282a4f10171" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "A paradigm is a style of programming. Most languages mix several: Haskell is functional, OCaml adds ",
+      "label" : "",
       "original_file" : "04b8149e0f92653e1ed65282a4f10171_original.txt",
       "type" : "text"
     },
@@ -766,7 +766,7 @@
     },
     "603bd947ed1b5a02b87dec03264fb238" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "The Prelude is the module every Haskell program imports by default. It defines map, foldr and the ba",
+      "label" : "",
       "original_file" : "603bd947ed1b5a02b87dec03264fb238_original.txt",
       "type" : "text"
     },
@@ -831,13 +831,13 @@
     },
     "9208c3c6d6b8f5ca311e548a78dc0a88" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "These boards collect notes on programming languages: how they relate, which ideas they share, and wh",
+      "label" : "",
       "original_file" : "9208c3c6d6b8f5ca311e548a78dc0a88_original.txt",
       "type" : "text"
     },
     "3cc94d1368cb29fcccab4ac1645c3be6" : {
       "created_at" : "2026-10-30T18:42:07Z",
-      "label" : "In logic programming, a program is a set of facts and rules, and running it means asking questions, ",
+      "label" : "",
       "original_file" : "3cc94d1368cb29fcccab4ac1645c3be6_original.txt",
       "type" : "text"
     },

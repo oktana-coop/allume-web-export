@@ -957,6 +957,73 @@
     return probe === "rgb(0, 0, 0)" ? "dark" : "light";
   }
 
+  // viewer/title-tooltips.ts
+  var MIN_WIDTH = 240;
+  var WINDOW_MARGIN2 = 16;
+  var TITLES = ".allume-canvas > .allume-card > .allume-card-title > span";
+  function setUpTitleTooltips({
+    root,
+    canvas
+  }) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "allume-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+    tooltip.popover = "manual";
+    root.append(tooltip);
+    const hide = () => {
+      if (tooltip.matches(":popover-open")) tooltip.hidePopover();
+    };
+    canvas.element.addEventListener("pointerover", (event) => {
+      const title = event.target.closest(TITLES);
+      if (!title || title.scrollWidth <= title.clientWidth || canvas.gesture) {
+        return;
+      }
+      const windowSize = { width: innerWidth, height: innerHeight };
+      const card = title.closest(".allume-card").getBoundingClientRect();
+      const { y, height } = title.getBoundingClientRect();
+      tooltip.textContent = title.textContent;
+      tooltip.style.width = `${tooltipWidth({ card, windowSize })}px`;
+      if (!tooltip.matches(":popover-open")) tooltip.showPopover();
+      const to = tooltipPosition({
+        title: { x: card.x, y, width: card.width, height },
+        tooltip: tooltip.getBoundingClientRect(),
+        windowSize
+      });
+      tooltip.style.left = `${to.x}px`;
+      tooltip.style.top = `${to.y}px`;
+    });
+    canvas.element.addEventListener("pointerout", (event) => {
+      if (event.relatedTarget !== tooltip) hide();
+    });
+    tooltip.addEventListener("pointerleave", (event) => {
+      const onTitle = event.relatedTarget?.closest(TITLES);
+      if (!onTitle && event.buttons === 0) hide();
+    });
+    canvas.viewport.addEventListener("wheel", hide, { passive: true });
+    canvas.viewport.addEventListener("pointerdown", hide);
+  }
+  function tooltipWidth({
+    card,
+    windowSize
+  }) {
+    return Math.min(
+      Math.max(card.width, MIN_WIDTH),
+      windowSize.width - WINDOW_MARGIN2 * 2
+    );
+  }
+  function tooltipPosition({
+    title,
+    tooltip,
+    windowSize
+  }) {
+    const x = Math.max(
+      WINDOW_MARGIN2,
+      Math.min(title.x, windowSize.width - tooltip.width - WINDOW_MARGIN2)
+    );
+    const above = title.y - tooltip.height;
+    return { x, y: above >= WINDOW_MARGIN2 ? above : maxY(title) };
+  }
+
   // viewer/zoom-controls.ts
   var ZOOM_IN = 1.25;
   var ZOOM_OUT = 0.8;
@@ -1022,6 +1089,7 @@
     makeCommentDatesRelative(root);
     setUpCopyButtons(canvas);
     setUpLinkedCardMenus({ root, canvas });
+    setUpTitleTooltips({ root, canvas });
     setUpNavigation(root);
     setUpStartingView(canvas);
   }

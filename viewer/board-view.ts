@@ -7,6 +7,7 @@ import { setUpNavigation } from './navigation';
 import { setUpScrolling } from './scrolling';
 import { setUpStartingView } from './starting-view';
 import { followTheme } from './theme';
+import { setUpTitleTooltips } from './title-tooltips';
 import { setUpZoomControls } from './zoom-controls';
 
 /** Sets up the board's view whose element is the root. */
@@ -27,6 +28,7 @@ export function setUpBoardView(root: HTMLElement) {
   makeCommentDatesRelative(root);
   setUpCopyButtons(canvas);
   setUpLinkedCardMenus({ root, canvas });
+  setUpTitleTooltips({ root, canvas });
 
   setUpNavigation(root);
   setUpStartingView(canvas);

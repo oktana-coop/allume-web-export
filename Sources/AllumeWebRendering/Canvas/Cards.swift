@@ -31,12 +31,12 @@ func drawCard(
     let body = HTML.element("div", ["class": "allume-body"], [.text(note.text)])
     return cardElement(
       card, kind: "note", style: boxStyle(card.frame), interactive: interactive,
-      children: [body] + (interactive ? [copyButton] : []) + menu)
+      children: drawTitle(note.label) + [body] + (interactive ? [copyButton] : []) + menu)
 
   case .image(let image)?:
     return cardElement(
       card, kind: "image", style: boxStyle(card.frame), interactive: interactive,
-      children: [
+      children: drawTitle(image.label) + [
         drawImage(
           image, files: images[image.file.name], inPreview: !interactive, contents: contents)
       ] + menu)
@@ -97,10 +97,8 @@ private func drawBoardCard(
   _ card: Card, showing child: Document.Board, preview: [HTML], menu: [HTML], interactive: Bool,
   contents: Contents
 ) -> HTML {
-  let title = HTML.element(
-    "div", ["class": "allume-board-title"],
-    linkedIcon(of: child, menu: menu, contents: contents)
-      + [.element("span", [:], [.text(child.displayLabel)])])
+  let title = drawTitle(
+    child.displayLabel, after: linkedIcon(of: child, menu: menu, contents: contents))
   let panel: HTML =
     interactive
     ? .element(
@@ -114,6 +112,17 @@ private func drawBoardCard(
   return cardElement(
     card, kind: "board", style: boxStyle(card.frame), interactive: interactive,
     children: [title, panel])
+}
+
+/// The label above a card, after its icons, such as a linked board's, as Allume shows the labels
+/// of boards, notes and images.
+private func drawTitle(_ label: String, after icons: [HTML] = []) -> HTML {
+  .element("div", ["class": "allume-card-title"], icons + [.element("span", [:], [.text(label)])])
+}
+
+/// The title above the card if it has a label, and nothing otherwise.
+private func drawTitle(_ label: String?) -> [HTML] {
+  label.map { label in [drawTitle(label)] } ?? []
 }
 
 /// The menu of the boards a linked board is a card on, or only its icon in a preview, which has no

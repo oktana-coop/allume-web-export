@@ -137,7 +137,7 @@ import Testing
                 documentID: Document.ID(rawValue: "note"),
                 frame: Rect(x: 0, y: 0, width: 1440, height: 1000), zIndex: 0, color: .purple)
             ], chains: [], connections: [], ink: [])),
-        .note(Document.Note(id: Document.ID(rawValue: "note"), text: "")),
+        .note(Document.Note(id: Document.ID(rawValue: "note"), label: nil, text: "")),
       ],
       users: [:])
     let folder = FileManager.default.temporaryDirectory.appending(path: "Previews \(UUID())")

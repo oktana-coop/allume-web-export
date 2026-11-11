@@ -25,8 +25,8 @@ func makeCard(
   Card(documentID: Document.ID(rawValue: documentID), frame: frame, zIndex: zIndex, color: color)
 }
 
-func makeNote(_ id: String, text: String = "A note") -> Document {
-  .note(Document.Note(id: Document.ID(rawValue: id), text: text))
+func makeNote(_ id: String, label: String? = nil, text: String = "A note") -> Document {
+  .note(Document.Note(id: Document.ID(rawValue: id), label: label, text: text))
 }
 
 func makeImage(_ id: String, label: String? = nil, excerptOf sourceID: String? = nil) -> Document {

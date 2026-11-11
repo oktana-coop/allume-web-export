@@ -10,6 +10,26 @@
   overflow: hidden;
 }
 
+/* A card's label sits above the card. */
+.allume-card-title {
+  position: absolute;
+  bottom: 100%;
+  left: 2px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.allume-card-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .allume-note-card > .allume-body {
   padding: 10px 12px;
   border-radius: 8px;

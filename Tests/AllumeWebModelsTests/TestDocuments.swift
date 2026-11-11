@@ -20,7 +20,7 @@ func makeBoard(
 }
 
 func makeNote(_ id: String) -> Document {
-  .note(Document.Note(id: Document.ID(rawValue: id), text: "A note"))
+  .note(Document.Note(id: Document.ID(rawValue: id), label: nil, text: "A note"))
 }
 
 func makeImage(_ id: String, excerptOf sourceID: String? = nil) -> Document {

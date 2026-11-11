@@ -225,6 +225,24 @@
   inset: 0;
   overflow: hidden;
 }
+.allume-card-title {
+  position: absolute;
+  bottom: 100%;
+  left: 2px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.allume-card-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .allume-note-card > .allume-body {
   padding: 10px 12px;
   border-radius: 8px;
@@ -303,24 +321,6 @@
   border-radius: 14px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
-}
-.allume-board-title {
-  position: absolute;
-  bottom: 100%;
-  left: 2px;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 7px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 18px;
-}
-.allume-board-title span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .allume-preview {
   position: absolute;
@@ -633,6 +633,24 @@ button.allume-linked {
   position: absolute;
   left: 11px;
   font-weight: 600;
+}
+
+/* viewer/styles/title-tooltips.css */
+.allume-tooltip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: light-dark(var(--allume-card-muted), var(--allume-card));
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+  color: var(--allume-text);
+  font-size: 13px;
+  line-height: 18px;
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
 }
 
 /* viewer/styles/main.css */

@@ -5,6 +5,36 @@ import Testing
 
 @Suite struct CardsTests {
   @Suite struct Notes {
+    @Test func showTheirLabelAboveThem() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [
+          makeBoard("root", cards: ["note"]),
+          makeNote("note", label: "Laziness", text: "Haskell is lazy."),
+        ],
+        users: [:]
+      )
+
+      let html = drawn("note", on: "root", in: contents)
+
+      #expect(
+        html?.contains(
+          #"<div class="allume-card-title"><span>Laziness</span></div>"#
+            + #"<div class="allume-body">Haskell is lazy.</div>"#) == true)
+    }
+
+    @Test func haveNoTitleWithoutALabel() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["note"]), makeNote("note")],
+        users: [:]
+      )
+
+      let html = drawn("note", on: "root", in: contents)
+
+      #expect(html?.contains("allume-card-title") == false)
+    }
+
     @Test func haveTheirIDAndCopyButtonOnTheBoardsOwnPage() throws {
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
@@ -48,6 +78,19 @@ import Testing
   }
 
   @Suite struct Images {
+    @Test func showTheirLabelAboveThem() throws {
+      let contents = try Contents(
+        rootID: Document.ID(rawValue: "root"),
+        documents: [makeBoard("root", cards: ["image"]), makeImage("image", label: "Timeline")],
+        users: [:]
+      )
+
+      let html = drawn("image", on: "root", in: contents)
+
+      #expect(
+        html?.contains(#"<div class="allume-card-title"><span>Timeline</span></div><img"#) == true)
+    }
+
     @Test func sayWhichDocumentAnExcerptIsFrom() throws {
       let contents = try Contents(
         rootID: Document.ID(rawValue: "root"),
@@ -250,7 +293,7 @@ import Testing
             #"""
             <div class="allume-card allume-board-card" data-allume-doc="child" id="card-child"
               style="left:0px;top:0px;width:360px;height:90px;z-index:0">
-              <div class="allume-board-title"><span>Untitled board</span></div>
+              <div class="allume-card-title"><span>Untitled board</span></div>
               <a class="allume-body allume-panel" href="board:child" aria-label="Untitled board">
                 <img class="allume-preview-image allume-preview-light"
                   src="file:previews/child-light.jpg" alt="" style="width:360px;height:90px"
@@ -323,7 +366,7 @@ import Testing
         html?.contains(
           markup(
             #"""
-            <div class="allume-board-title">
+            <div class="allume-card-title">
               <span class="allume-linked">\#(iconMarkup("linked"))</span>
               <span>Monoids</span>
             </div>

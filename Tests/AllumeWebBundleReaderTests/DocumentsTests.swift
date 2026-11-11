@@ -38,7 +38,10 @@ import Testing
       bundle in readDocuments(in: bundle)
     }
 
-    #expect(documents == [.note(Document.Note(id: Document.ID(rawValue: "n"), text: "One\n\nTwo"))])
+    #expect(
+      documents == [
+        .note(Document.Note(id: Document.ID(rawValue: "n"), label: nil, text: "One\n\nTwo"))
+      ])
     #expect(warnings.isEmpty)
   }
 
@@ -49,18 +52,36 @@ import Testing
       readDocuments(in: bundle)
     }
 
-    #expect(documents == [.note(Document.Note(id: Document.ID(rawValue: "n"), text: ""))])
+    #expect(
+      documents == [.note(Document.Note(id: Document.ID(rawValue: "n"), label: nil, text: ""))])
     #expect(warnings == [.missingFile(name: "n.txt")])
+  }
+
+  @Test func readsANotesLabel() throws {
+    let contents = makeContents(
+      documents: #""n" : {"type" : "text", "label" : "Laziness", "original_file" : "n.txt"}"#)
+
+    let documents = try withBundle(contents: contents, files: ["n.txt": "Haskell is lazy."]) {
+      bundle in readDocuments(in: bundle).documents
+    }
+
+    #expect(
+      documents == [
+        .note(
+          Document.Note(id: Document.ID(rawValue: "n"), label: "Laziness", text: "Haskell is lazy.")
+        )
+      ])
   }
 
   @Test func turnsEmptyLabelsAndTitlesIntoNil() throws {
     let contents = makeContents(
       documents: #"""
         "l" : {"type" : "url", "url" : "example.com", "title" : "", "label" : ""},
-        "p" : {"type" : "pdf", "label" : ""}
+        "p" : {"type" : "pdf", "label" : ""},
+        "n" : {"type" : "text", "label" : "", "original_file" : "n.txt"}
         """#)
 
-    let documents = try withBundle(contents: contents) { bundle in
+    let documents = try withBundle(contents: contents, files: ["n.txt": "A note"]) { bundle in
       readDocuments(in: bundle).documents
     }
 
@@ -68,6 +89,7 @@ import Testing
       documents == [
         .link(
           Document.Link(id: Document.ID(rawValue: "l"), url: "example.com", title: nil, label: nil)),
+        .note(Document.Note(id: Document.ID(rawValue: "n"), label: nil, text: "A note")),
         .pdf(Document.PDF(id: Document.ID(rawValue: "p"), label: nil)),
       ])
   }

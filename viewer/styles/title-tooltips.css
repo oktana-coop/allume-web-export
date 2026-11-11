@@ -1,0 +1,19 @@
+/* The whole title of a card whose title is cut short, as plain text that can
+   be selected. */
+.allume-tooltip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  /* Light, the gray of notes; dark, that of menus, as notes' is too dark. */
+  background: light-dark(var(--allume-card-muted), var(--allume-card));
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+  color: var(--allume-text);
+  font-size: 13px;
+  line-height: 18px;
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
