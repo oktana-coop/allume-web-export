@@ -32,7 +32,7 @@
 }
 .allume-note-card > .allume-body {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--allume-card-muted);
   box-shadow: var(--allume-card-shadow);
   /* Allume sizes notes to fit their text; with the system font, this

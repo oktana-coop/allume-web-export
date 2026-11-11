@@ -7,7 +7,7 @@
   column-gap: 13px;
   align-content: space-between;
   padding: 10px 12px 9px 11px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--allume-card-muted);
   box-shadow: var(--allume-card-shadow);
   color: var(--allume-text);

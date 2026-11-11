@@ -1,7 +1,7 @@
 /* Board cards: a panel previewing the board, below its title. */
 
 .allume-board-card > .allume-panel {
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
 }

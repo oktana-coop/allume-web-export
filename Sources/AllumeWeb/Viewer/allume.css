@@ -245,7 +245,7 @@
 }
 .allume-note-card > .allume-body {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--allume-card-muted);
   box-shadow: var(--allume-card-shadow);
   font-size: 13.5px;
@@ -271,7 +271,7 @@
   column-gap: 13px;
   align-content: space-between;
   padding: 10px 12px 9px 11px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--allume-card-muted);
   box-shadow: var(--allume-card-shadow);
   color: var(--allume-text);
@@ -318,7 +318,7 @@
 
 /* viewer/styles/board-cards.css */
 .allume-board-card > .allume-panel {
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--allume-panel);
   box-shadow: var(--allume-board-shadow);
 }
