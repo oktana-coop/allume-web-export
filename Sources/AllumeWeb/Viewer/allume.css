@@ -391,7 +391,8 @@
   --allume-board-color: initial;
   --allume-border-color: var(--allume-gray-border);
 }
-.allume-note-card[data-allume-color] > .allume-body {
+.allume-note-card[data-allume-color] > .allume-body,
+.allume-link-card[data-allume-color] > .allume-body {
   background: var(--allume-note-color, var(--allume-card-muted));
 }
 .allume-board-card[data-allume-color] > .allume-panel,
@@ -401,7 +402,6 @@
 .allume-image-card[data-allume-color] > .allume-body {
   box-shadow: 0 0 0 3px var(--allume-border-color), var(--allume-image-shadow);
 }
-.allume-link-card[data-allume-color] > .allume-body,
 .allume-pdf-card[data-allume-color] > .allume-body {
   box-shadow: 0 0 0 3px var(--allume-border-color), var(--allume-card-shadow);
 }

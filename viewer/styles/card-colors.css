@@ -33,7 +33,10 @@
   --allume-border-color: var(--allume-gray-border);
 }
 
-.allume-note-card[data-allume-color] > .allume-body {
+/* Links are filled like notes, as Allume fills its link cards, and rings only
+   the cards of files: images and PDFs. */
+.allume-note-card[data-allume-color] > .allume-body,
+.allume-link-card[data-allume-color] > .allume-body {
   background: var(--allume-note-color, var(--allume-card-muted));
 }
 .allume-board-card[data-allume-color] > .allume-panel,
@@ -45,7 +48,6 @@
     0 0 0 3px var(--allume-border-color),
     var(--allume-image-shadow);
 }
-.allume-link-card[data-allume-color] > .allume-body,
 .allume-pdf-card[data-allume-color] > .allume-body {
   box-shadow:
     0 0 0 3px var(--allume-border-color),
