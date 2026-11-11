@@ -84,6 +84,12 @@ struct BundleChain: Decodable {
 
 struct BundleFormat: Decodable {
   let color: String?
+  let blockType: Int?
+
+  enum CodingKeys: String, CodingKey {
+    case color
+    case blockType = "block_type"
+  }
 }
 
 struct BundleInkModel: Decodable {
@@ -205,8 +211,7 @@ private func readCards(_ entries: [BundleCardEntry], boardID: Document.ID)
 }
 
 extension TextBlock {
-  /// A missing text file leaves the text empty. Paragraphs are split on `\n` only, and an unknown
-  /// highlight color is left out.
+  /// A missing text file leaves the text empty. Paragraphs are split on `\n` only.
   static func read(_ json: BundleChain, in bundle: AllumeBundle)
     -> (text: TextBlock, warnings: [BundleWarning])
   {
@@ -214,15 +219,8 @@ extension TextBlock {
     let text = json.textFile.flatMap { file in bundle.text(ofFile: file) }
 
     let paragraphs = (text ?? "").components(separatedBy: "\n").enumerated().map {
-      index, paragraph -> (paragraph: Paragraph, warnings: [BundleWarning]) in
-      let name = json.format?[String(index)]?.color
-      let highlight = name.flatMap { name in CardColor(rawValue: name.lowercased()) }
-      let warnings: [BundleWarning] =
-        switch (name, highlight) {
-        case (.some(let name), .none): [.unknownHighlightColor(id, color: name)]
-        default: []
-        }
-      return (Paragraph(text: paragraph, highlight: highlight), warnings)
+      index, paragraph in
+      Paragraph.read(paragraph, format: json.format?[String(index)], chainID: id)
     }
     let fileWarnings: [BundleWarning] =
       switch (json.textFile, text) {
@@ -236,6 +234,46 @@ extension TextBlock {
       paragraphs: paragraphs.map { result in result.paragraph })
 
     return (block, fileWarnings + paragraphs.flatMap { result in result.warnings })
+  }
+}
+
+extension TextBlock.Paragraph {
+  /// An unknown highlight color is left out, and an unknown block type reads as body text, as
+  /// Allume reads it.
+  static func read(_ text: String, format: BundleFormat?, chainID: Chain.ID)
+    -> (paragraph: TextBlock.Paragraph, warnings: [BundleWarning])
+  {
+    let color = format?.color
+    let highlight = color.flatMap { color in CardColor(rawValue: color.lowercased()) }
+    let blockType = format?.blockType
+    let role = blockType.flatMap { blockType in Role(blockType: blockType) }
+
+    let colorWarnings: [BundleWarning] =
+      switch (color, highlight) {
+      case (.some(let color), .none): [.unknownHighlightColor(chainID, color: color)]
+      default: []
+      }
+    let roleWarnings: [BundleWarning] =
+      switch (blockType, role) {
+      case (.some(let blockType), .none): [.unknownBlockType(chainID, blockType: blockType)]
+      default: []
+      }
+
+    return (
+      TextBlock.Paragraph(text: text, highlight: highlight, role: role ?? .body),
+      colorWarnings + roleWarnings
+    )
+  }
+}
+
+extension TextBlock.Paragraph.Role {
+  /// Exports number a paragraph's role as its block type.
+  fileprivate init?(blockType: Int) {
+    switch blockType {
+    case 0: self = .body
+    case 1: self = .heading
+    default: return nil
+    }
   }
 }
 

@@ -52,6 +52,19 @@ test.describe('copy buttons', () => {
     });
   });
 
+  test("a text block's button copies its heading too", async ({ page }) => {
+    await page.goto(functional.url);
+
+    await copyButton({ page, text: 'Functional programming' }).click();
+
+    await expectClipboard({
+      page,
+      text:
+        'Functional programming\n' +
+        'Functions are values, and programs are built by combining them.',
+    });
+  });
+
   test('the button reads "Copied" for a moment, then "Copy text" again', async ({
     page,
   }) => {

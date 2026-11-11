@@ -82,6 +82,29 @@ import Testing
     #expect(warnings.isEmpty)
   }
 
+  @Test func readsCanvasTextHeadings() throws {
+    let contents = makeContents(
+      documents: #"""
+        "b" : {"type" : "board", "chains" : [{
+          "chain_id" : "t", "position_x" : 5, "position_y" : 6, "line_break_width" : 600,
+          "text_file" : "t.txt", "format" : {"0" : {"block_type" : 1}, "1" : {"block_type" : 0}},
+          "ink_models" : {}
+        }]}
+        """#)
+
+    let documents = try withBundle(contents: contents, files: ["t.txt": "Value\nScarcity"]) {
+      bundle in readDocuments(in: bundle).documents
+    }
+
+    let text = TextBlock(
+      id: Chain.ID(rawValue: "t"), position: Point(x: 5, y: 6), lineBreakWidth: 600,
+      paragraphs: [
+        TextBlock.Paragraph(text: "Value", highlight: nil, role: .heading),
+        TextBlock.Paragraph(text: "Scarcity", highlight: nil),
+      ])
+    #expect(board("b", in: documents)?.chains == [.text(text)])
+  }
+
   @Test func leavesOutAnUnknownHighlightColor() throws {
     let contents = makeContents(
       documents: #"""
@@ -101,6 +124,27 @@ import Testing
     }
     #expect(text.paragraphs == [TextBlock.Paragraph(text: "Title", highlight: nil)])
     #expect(warnings == [.unknownHighlightColor(Chain.ID(rawValue: "t"), color: "Teal")])
+  }
+
+  @Test func readsAnUnknownBlockTypeAsBodyText() throws {
+    let contents = makeContents(
+      documents: #"""
+        "b" : {"type" : "board", "chains" : [{
+          "chain_id" : "t", "position_x" : 0, "position_y" : 0, "text_file" : "t.txt",
+          "format" : {"0" : {"block_type" : 7}}, "ink_models" : {}
+        }]}
+        """#)
+
+    let (documents, warnings) = try withBundle(contents: contents, files: ["t.txt": "Value"]) {
+      bundle in readDocuments(in: bundle)
+    }
+
+    guard case .text(let text) = board("b", in: documents)?.chains.first else {
+      Issue.record("Expected the text block")
+      return
+    }
+    #expect(text.paragraphs == [TextBlock.Paragraph(text: "Value", highlight: nil)])
+    #expect(warnings == [.unknownBlockType(Chain.ID(rawValue: "t"), blockType: 7)])
   }
 
   @Test func leavesCanvasTextEmptyWhenItsFileIsMissing() throws {

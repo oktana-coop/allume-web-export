@@ -655,6 +655,11 @@
           "ink_models" : {
 
           },
+          "format" : {
+            "0" : {
+              "block_type" : 1
+            }
+          },
           "line_break_width" : 600,
           "position_x" : 80,
           "position_y" : 40,

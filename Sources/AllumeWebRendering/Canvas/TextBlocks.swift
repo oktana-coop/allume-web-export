@@ -10,13 +10,19 @@ func drawTextBlock(_ block: TextBlock, interactive: Bool) -> HTML {
     block.paragraphs.map(drawParagraph) + (interactive ? [copyButton] : []))
 }
 
-/// An empty paragraph keeps its line with a break, and has nothing to highlight.
+/// A heading is an `h3`. An empty paragraph keeps its line with a break, and has nothing to
+/// highlight.
 private func drawParagraph(_ paragraph: TextBlock.Paragraph) -> HTML {
+  let element =
+    switch paragraph.role {
+    case .body: "p"
+    case .heading: "h3"
+    }
   guard !paragraph.text.isEmpty else {
-    return .element("p", [:], [.element("br", [:], [])])
+    return .element(element, [:], [.element("br", [:], [])])
   }
 
   return .element(
-    "p", ["data-allume-color": paragraph.highlight.map { color in .text(color.rawValue) }],
+    element, ["data-allume-color": paragraph.highlight.map { color in .text(color.rawValue) }],
     [.text(paragraph.text)])
 }

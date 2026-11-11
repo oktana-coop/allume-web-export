@@ -52,7 +52,7 @@ async function copyText(element: Element) {
 function textOf(element: Element) {
   if (!element.matches('.allume-text-block')) return element.textContent;
 
-  return [...element.querySelectorAll(':scope > p')]
+  return [...element.querySelectorAll(':scope > :is(p, h3)')]
     .map((paragraph) => paragraph.textContent)
     .join('\n');
 }

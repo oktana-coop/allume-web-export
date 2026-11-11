@@ -28,6 +28,9 @@ func warningMessage(for warning: BundleWarning, in contents: Contents) -> String
   case .unknownHighlightColor(let chainID, let color):
     "A paragraph in text block \(chainID.rawValue) has an unknown highlight color, \(color), so "
       + "it isn't highlighted."
+  case .unknownBlockType(let chainID, let blockType):
+    "A paragraph in text block \(chainID.rawValue) has an unknown block type, \(blockType), so "
+      + "it's shown as body text."
   case .inkOnChain(let chainID):
     "The ink on text block or comment thread \(chainID.rawValue) isn't drawn."
   case .unknownConnectionEnd(let boardID, let end):

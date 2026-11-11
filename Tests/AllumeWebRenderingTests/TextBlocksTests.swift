@@ -22,6 +22,19 @@ import Testing
           """#))
   }
 
+  @Test func drawTheirHeadingsAsH3() {
+    let block = TextBlock(
+      id: Chain.ID(rawValue: "text"), position: Point(x: 0, y: 0), lineBreakWidth: 400,
+      paragraphs: [
+        TextBlock.Paragraph(text: "Value", highlight: nil, role: .heading),
+        TextBlock.Paragraph(text: "Scarcity", highlight: nil),
+      ])
+
+    let html = drawTextBlock(block, interactive: false).rendered(resolving: describe)
+
+    #expect(html.contains("<h3>Value</h3><p>Scarcity</p>"))
+  }
+
   @Test func keepAnEmptyParagraphsLineWithoutItsHighlight() {
     let block = makeTextBlock(
       lineBreakWidth: 400, paragraphs: [("Laziness", nil), ("", .green), ("Thunks", nil)])

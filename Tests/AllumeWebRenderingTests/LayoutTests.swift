@@ -16,7 +16,8 @@ import Testing
 
       let contentBounds = layout(of: board).contentBounds
 
-      #expect(contentBounds == Rect(x: 50, y: 50, width: 450, height: 474))
+      // The text's line, 24 px, padded 5 above and below.
+      #expect(contentBounds == Rect(x: 50, y: 50, width: 450, height: 484))
     }
 
     @Test func spanCommentThreads() {
@@ -58,8 +59,23 @@ import Testing
 
       let contentBounds = layout(of: makeBoardValue(chains: [.text(text)])).contentBounds
 
-      // 100 characters wrap onto 3 lines of 400, and the empty paragraph takes a fourth.
-      #expect(contentBounds == Rect(x: 0, y: 0, width: 400, height: 96))
+      // 100 characters wrap onto 3 lines of 400, the empty paragraph takes a fourth, and each
+      // paragraph is padded 5 above and below.
+      #expect(contentBounds == Rect(x: 0, y: 0, width: 400, height: 116))
+    }
+
+    @Test func giveHeadingsTallerLines() {
+      let text = TextBlock(
+        id: Chain.ID(rawValue: "text"), position: Point(x: 0, y: 0), lineBreakWidth: 400,
+        paragraphs: [
+          TextBlock.Paragraph(text: "Capitalism", highlight: nil, role: .heading),
+          TextBlock.Paragraph(text: "Private Property", highlight: nil),
+        ])
+
+      let contentBounds = layout(of: makeBoardValue(chains: [.text(text)])).contentBounds
+
+      // A heading's line is 34 px, and body text's 24, each padded 5 above and below.
+      #expect(contentBounds.height == 78)
     }
 
     @Test func countUTF16Units() {

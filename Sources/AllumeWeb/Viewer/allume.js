@@ -371,7 +371,7 @@
   }
   function textOf(element) {
     if (!element.matches(".allume-text-block")) return element.textContent;
-    return [...element.querySelectorAll(":scope > p")].map((paragraph) => paragraph.textContent).join("\n");
+    return [...element.querySelectorAll(":scope > :is(p, h3)")].map((paragraph) => paragraph.textContent).join("\n");
   }
   function showCopied(button) {
     const mark = String(performance.now());

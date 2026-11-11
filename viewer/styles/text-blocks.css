@@ -8,14 +8,23 @@
   z-index: 8000;
 }
 
-.allume-text-block p {
+/* Each paragraph is padded as Allume pads its blocks, which also spaces them
+   out. */
+.allume-text-block :is(p, h3) {
   margin: 0;
+  padding: 5px 9px;
+}
+
+/* Allume's headings are 28 px to its body text's 20, so 25 px to ours. */
+.allume-text-block h3 {
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 34px;
 }
 
 /* Colored paragraphs are highlighted like labels, and gray ones not at all. */
 .allume-text-block [data-allume-color] {
   width: fit-content;
-  padding: 4px 9px;
   border-radius: 4px;
   background: var(--allume-highlight, none);
 }

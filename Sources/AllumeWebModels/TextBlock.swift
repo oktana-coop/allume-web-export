@@ -15,10 +15,16 @@ public struct TextBlock: Equatable, Sendable {
   public struct Paragraph: Equatable, Sendable {
     public let text: String
     public let highlight: CardColor?
+    public let role: Role
 
-    public init(text: String, highlight: CardColor?) {
+    public init(text: String, highlight: CardColor?, role: Role = .body) {
       self.text = text
       self.highlight = highlight
+      self.role = role
+    }
+
+    public enum Role: Sendable {
+      case body, heading
     }
   }
 }

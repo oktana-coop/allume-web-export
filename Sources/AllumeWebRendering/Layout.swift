@@ -79,20 +79,23 @@ private func rect(of chain: Chain) -> Rect? {
   }
 }
 
-/// Exports don't say how wide a text block is, so its width is estimated from its length.
+/// Exports don't say how wide a text block is, so its width is estimated from its length. Each
+/// paragraph is padded as Allume pads its blocks: 9 px at the sides, 5 above and below.
 private func estimatedRect(of text: TextBlock) -> Rect {
-  let fontSize = 18.0
-  let lineHeight = 24.0
-  let averageCharacterWidth = fontSize * 0.55
-
-  let naturalWidths = text.paragraphs.map { paragraph in
-    Double(paragraph.text.utf16.count) * averageCharacterWidth
+  let sizes = text.paragraphs.map { paragraph -> Size in
+    let (fontSize, lineHeight) =
+      switch paragraph.role {
+      case .body: (18.0, 24.0)
+      case .heading: (25.0, 34.0)
+      }
+    let natural = Double(paragraph.text.utf16.count) * fontSize * 0.55 + 2 * 9
+    let lines = max(1, (natural / text.maxWidth).rounded(.up))
+    return Size(width: min(natural, text.maxWidth), height: lines * lineHeight + 2 * 5)
   }
-  let width = naturalWidths.map { natural in min(natural, text.maxWidth) }.max() ?? 0
-  let lines = naturalWidths.map { natural in max(1, (natural / text.maxWidth).rounded(.up)) }
-    .reduce(0, +)
 
-  return Rect(x: text.position.x, y: text.position.y, width: width, height: lines * lineHeight)
+  return Rect(
+    x: text.position.x, y: text.position.y, width: sizes.map(\.width).max() ?? 0,
+    height: sizes.map(\.height).reduce(0, +))
 }
 
 private func union(of rects: [Rect]) -> Rect? {
