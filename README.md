@@ -22,10 +22,14 @@ The command is then `.build/release/allume-web-export`.
 
 ### Run
 
-Point it at an export folder, the one with `contents.json`, `metadata.json` and `files/` in it.
-Its two commands publish the boards in two ways: `site` as a website of their own, and `embed` for
-an existing site to show in its own pages. Either way, PDFs are never published: their cards show
-only their title.
+1. In Allume, export the board to publish with **Export Board As › Allume Bundle…**. The boards
+   inside it are exported with it.
+2. Decompress the bundle, a compressed archive, with a tool like
+   [The Unarchiver](https://theunarchiver.com). This gives the export folder, with
+   `contents.json`, `metadata.json` and `files/` in it.
+3. Run the tool on the export folder, with one of its two commands, which publish the boards in two
+   ways: `site` as a website of their own, and `embed` for an existing site to show in its own
+   pages. Either way, PDFs are never published: their cards show only their title.
 
 #### Site
 
@@ -47,9 +51,6 @@ The site's folder then holds:
   `<board-id>-purple-light.jpg`. WebKit draws them, and when it can't, the board's cards show an
   empty panel, with a warning;
 - `allume.css` and `allume.js`, the viewer.
-
-The site is light, unless `--theme dark` makes it dark, or `--theme system` has it follow each
-reader's system.
 
 #### Embed
 
@@ -82,21 +83,28 @@ Either can be given alone, leaving the other kind of reference in.
 
 #### Options
 
-For both commands, `--out` defaults to `out`. The folder must be missing or empty, so that a
-mistyped path can't wipe a folder. To publish again over an earlier run, pass `--replace`, which
-replaces the folder's contents. If anything fails while writing, the earlier run's files are left
-as they were.
+| Option | Commands | What it does |
+| :-- | :-- | :-- |
+| `--out <folder>` | both | Where to write, `out` by default. The folder must be missing or empty. |
+| `--replace` | both | Replaces the folder's contents, to publish again over an earlier run. |
+| `--no-favicons` | both | Gives link cards a generic link icon instead of their site's, e.g. to build offline. |
+| `--root-label <label>` | both | Labels the exported board otherwise, e.g. `Home`. |
+| `--preview-width <pixels>` | both | How wide board cards' previews are drawn, 1024 px by default. |
+| `--theme <theme>` | `site` | `light`, the default, `dark`, or `system`, which follows each reader's system. |
+| `--board-url <pattern>` | `embed` | Each board's URL on the site, with `{slug}` standing for its slug. |
+| `--files-url <url>` | `embed` | Where the site serves the folder's `files/`. |
 
-Link cards show their site's icon, fetched the first time a site is linked to and kept in
-`~/Library/Caches/allume-web-export/favicons/`; delete that folder to fetch them again.
-`--no-favicons` leaves link cards with a generic link icon instead, e.g. to build offline.
-
-`--root-label` labels the exported board otherwise, e.g. `--root-label Home`, wherever its label
-shows: its breadcrumb, heading and page title, and its slug.
-
-`--preview-width` sets how many pixels wide board cards' previews are drawn, 1024 by default. Wider
-ones stay sharp when zoomed in further, but take more room: the images grow with the square of
-their width.
+- `--out` refuses a folder with anything in it unless `--replace` is given, so that a mistyped path
+  can't wipe a folder. If anything fails while writing, the earlier run's files are left as they
+  were.
+- Link cards' icons are fetched the first time a site is linked to and kept in
+  `~/Library/Caches/allume-web-export/favicons/`; delete that folder to fetch them again.
+- `--root-label` changes the label wherever it shows: the board's breadcrumb, heading and page
+  title, and its slug.
+- Wider previews stay sharp when zoomed in further, but take more room: the images grow with the
+  square of their width.
+- Without `--board-url` or `--files-url`, that kind of link stays an `allume:` reference, for the
+  site to resolve.
 
 ### View the Site
 
