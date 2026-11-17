@@ -9,6 +9,7 @@ import {
   type Canvas,
 } from './canvas';
 import { clamp, type Point } from './geometry';
+import { isOnScrollingNote } from './note-scrolling';
 
 type Axis = 'x' | 'y';
 
@@ -31,8 +32,8 @@ const ZOOM_PER_PIXEL = 0.01;
 const MAX_ZOOM_SCROLL = 50;
 
 /**
- * Scrolling pans the board, and Ctrl/⌘+scroll, which trackpads send for a
- * pinch, zooms it at the pointer.
+ * Scrolling pans the board, except over a note that scrolls, and
+ * Ctrl/⌘+scroll, which trackpads send for a pinch, zooms it at the pointer.
  */
 export function setUpScrolling(canvas: Canvas) {
   const noPush = { start: 0, slowest: 0 };
@@ -41,10 +42,12 @@ export function setUpScrolling(canvas: Canvas) {
   canvas.viewport.addEventListener(
     'wheel',
     (event) => {
+      const zooming = event.ctrlKey || event.metaKey;
+      if (!zooming && isOnScrollingNote(event)) return;
       event.preventDefault();
 
       const delta = scrollDelta({ canvas, event });
-      if (event.ctrlKey || event.metaKey) {
+      if (zooming) {
         zoomAtPointer({ canvas, event, delta: delta.y });
       } else {
         state = pan({ canvas, delta, state });

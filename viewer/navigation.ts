@@ -95,7 +95,7 @@ export function setUpNavigation(root: HTMLElement) {
 
   addEventListener('keydown', (event) => {
     const modified = event.altKey || event.ctrlKey || event.metaKey;
-    if (event.key !== 'Escape' || modified) return;
+    if (event.key !== 'Escape' || modified || event.defaultPrevented) return;
     if (focusedArea({ root, event }) === 'other') return;
 
     // An open menu takes Escape for itself.

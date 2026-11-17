@@ -1,1 +1,9 @@
 In logic programming, a program is a set of facts and rules, and running it means asking questions, as in ?- parent(tom, X).
+
+Prolog answers by resolution: it tries to prove the question from the facts and rules, unifying variables as it goes, and backtracks to find more answers.
+
+The cut, written !, stops backtracking past the point where it appears, which can make a program faster but harder to read declaratively.
+
+Datalog leaves out compound terms, so every query terminates, which suits databases.
+
+Answer set programming keeps the facts and rules but drops the search order: a solver finds every model of the program at once.

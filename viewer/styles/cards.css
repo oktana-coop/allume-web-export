@@ -44,6 +44,14 @@
   overflow-wrap: anywhere;
 }
 
+/* A note shorter than its text, once clicked, scrolls by touch too, and
+   without scrolling the page at its ends. */
+.allume-note-card > .allume-scrolling {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
 .allume-image-card > .allume-body {
   width: 100%;
   height: 100%;

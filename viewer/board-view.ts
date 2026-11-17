@@ -4,6 +4,7 @@ import { setUpCopyButtons } from './copy-buttons';
 import { setUpGestures } from './gestures';
 import { setUpLinkedCardMenus } from './linked-card-menus';
 import { setUpNavigation } from './navigation';
+import { setUpNoteScrolling } from './note-scrolling';
 import { setUpScrolling } from './scrolling';
 import { setUpStartingView } from './starting-view';
 import { followTheme } from './theme';
@@ -23,6 +24,7 @@ export function setUpBoardView(root: HTMLElement) {
 
   setUpScrolling(canvas);
   setUpGestures(canvas);
+  setUpNoteScrolling(canvas);
   setUpZoomControls({ root, canvas });
 
   makeCommentDatesRelative(root);

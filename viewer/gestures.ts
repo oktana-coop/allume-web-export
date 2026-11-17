@@ -10,6 +10,7 @@ import {
   type Gesture,
 } from './canvas';
 import { type Point, type Rect, type Size } from './geometry';
+import { isOnScrollingNote } from './note-scrolling';
 
 declare global {
   // Safari's trackpad pinches, which TypeScript's DOM types leave out.
@@ -133,14 +134,16 @@ export function setUpGestures(canvas: Canvas) {
 
 /**
  * Whether the press starts a gesture: only a mouse's main button does, and not
- * on a button, a menu, or for a mouse, text.
+ * on a button, a menu, a note that scrolls, or for a mouse, text.
  */
 function startsGesture(event: PointerEvent) {
   const target = event.target as Element;
   const mouse = event.pointerType === 'mouse';
 
   if (mouse && event.button !== 0) return false;
-  if (target.closest('button, [popover]')) return false;
+  if (target.closest('button, [popover]') || isOnScrollingNote(event)) {
+    return false;
+  }
   return !(mouse && target.closest(SELECTABLE_TEXT));
 }
 

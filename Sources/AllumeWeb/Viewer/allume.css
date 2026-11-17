@@ -254,6 +254,11 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.allume-note-card > .allume-scrolling {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
 .allume-image-card > .allume-body {
   width: 100%;
   height: 100%;

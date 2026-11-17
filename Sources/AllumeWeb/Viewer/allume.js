@@ -384,6 +384,38 @@
     }, COPIED_FOR);
   }
 
+  // viewer/note-scrolling.ts
+  var NOTES = ".allume-canvas > .allume-note-card > .allume-body";
+  var SCROLLING = "allume-scrolling";
+  function setUpNoteScrolling(canvas) {
+    const stopScrolling = () => {
+      const note = canvas.element.querySelector(`.${SCROLLING}`);
+      if (!note) return false;
+      note.classList.remove(SCROLLING);
+      note.scrollTo({
+        top: 0,
+        behavior: canvas.reducedMotion ? "instant" : "smooth"
+      });
+      return true;
+    };
+    canvas.viewport.addEventListener("click", (event) => {
+      const note = event.target.closest(NOTES);
+      if (note && note.scrollHeight > note.clientHeight) {
+        note.classList.add(SCROLLING);
+      }
+    });
+    canvas.viewport.addEventListener("pointerdown", (event) => {
+      const card = event.target.closest(".allume-note-card");
+      if (!card?.querySelector(`:scope > .${SCROLLING}`)) stopScrolling();
+    });
+    addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && stopScrolling()) event.preventDefault();
+    });
+  }
+  function isOnScrollingNote(event) {
+    return event.target.closest(`.${SCROLLING}`) !== null;
+  }
+
   // viewer/gestures.ts
   var DRAG_THRESHOLD = 4;
   var SELECTABLE_TEXT = ".allume-canvas > .allume-note-card > .allume-body, .allume-canvas > .allume-comment > .allume-text, .allume-canvas > .allume-text-block";
@@ -468,7 +500,9 @@
     const target = event.target;
     const mouse = event.pointerType === "mouse";
     if (mouse && event.button !== 0) return false;
-    if (target.closest("button, [popover]")) return false;
+    if (target.closest("button, [popover]") || isOnScrollingNote(event)) {
+      return false;
+    }
     return !(mouse && target.closest(SELECTABLE_TEXT));
   }
   function gestureFrom({
@@ -742,7 +776,7 @@
     });
     addEventListener("keydown", (event) => {
       const modified = event.altKey || event.ctrlKey || event.metaKey;
-      if (event.key !== "Escape" || modified) return;
+      if (event.key !== "Escape" || modified || event.defaultPrevented) return;
       if (focusedArea({ root, event }) === "other") return;
       if (document.querySelector(":popover-open")) return;
       const parent = parentLink(breadcrumbsElement);
@@ -831,9 +865,11 @@
     canvas.viewport.addEventListener(
       "wheel",
       (event) => {
+        const zooming = event.ctrlKey || event.metaKey;
+        if (!zooming && isOnScrollingNote(event)) return;
         event.preventDefault();
         const delta = scrollDelta({ canvas, event });
-        if (event.ctrlKey || event.metaKey) {
+        if (zooming) {
           zoomAtPointer({ canvas, event, delta: delta.y });
         } else {
           state = pan({ canvas, delta, state });
@@ -1085,6 +1121,7 @@
     followTheme(root);
     setUpScrolling(canvas);
     setUpGestures(canvas);
+    setUpNoteScrolling(canvas);
     setUpZoomControls({ root, canvas });
     makeCommentDatesRelative(root);
     setUpCopyButtons(canvas);
