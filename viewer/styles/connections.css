@@ -9,6 +9,6 @@
 
 .allume-connections line {
   stroke: var(--allume-connection);
-  stroke-width: 2;
+  stroke-width: 2.5;
   stroke-linecap: round;
 }

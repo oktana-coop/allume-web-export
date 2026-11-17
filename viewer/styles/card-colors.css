@@ -30,11 +30,11 @@
 :is(.allume-card, .allume-board-preview)[data-allume-color='gray'] {
   --allume-note-color: initial;
   --allume-board-color: initial;
-  --allume-border-color: var(--allume-gray-border);
 }
 
-/* Links are filled like notes, as Allume fills its link cards, and rings only
-   the cards of files: images and PDFs. */
+/* Links are filled like notes, as Allume fills its link cards, and only the
+   cards of files are bordered: images and PDFs, 6px in from their edges, and in
+   dark mode without their hairline. */
 .allume-note-card[data-allume-color] > .allume-body,
 .allume-link-card[data-allume-color] > .allume-body {
   background: var(--allume-note-color, var(--allume-card-muted));
@@ -43,13 +43,15 @@
 .allume-board-preview[data-allume-color] {
   background: var(--allume-board-color, var(--allume-panel));
 }
-.allume-image-card[data-allume-color] > .allume-body {
-  box-shadow:
-    0 0 0 3px var(--allume-border-color),
-    var(--allume-image-shadow);
+.allume-image-card[data-allume-color]:not([data-allume-color='gray'])
+  > .allume-body {
+  box-sizing: border-box;
+  border: 6px solid var(--allume-border-color);
+  box-shadow: 0 0 6px light-dark(rgb(38 36 32 / 0.07), transparent);
 }
-.allume-pdf-card[data-allume-color] > .allume-body {
+.allume-pdf-card[data-allume-color]:not([data-allume-color='gray'])
+  > .allume-body {
   box-shadow:
-    0 0 0 3px var(--allume-border-color),
-    var(--allume-card-shadow);
+    inset 0 0 0 6px var(--allume-border-color),
+    0 0 6px light-dark(rgb(38 36 32 / 0.05), transparent);
 }

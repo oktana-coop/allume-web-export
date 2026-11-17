@@ -11,6 +11,12 @@
   --allume-card-muted: light-dark(#e9e8e7, #262525);
   --allume-hairline: light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.08));
   --allume-text: light-dark(#272624, #d9d3c7);
+  --allume-text-secondary: light-dark(
+    rgb(39 38 36 / 0.6),
+    rgb(217 211 199 / 0.6)
+  );
+  --allume-label: light-dark(rgb(0 0 0 / 0.75), rgb(255 255 255 / 0.75));
+  --allume-heading: light-dark(#000000, #feffff);
   --allume-muted: light-dark(#7b7b78, #8e8a84);
   --allume-connection: light-dark(#c2c0c0, #403e3e);
   /* Shadows from Allume's values, their radius doubled as CSS's blur. In dark
@@ -34,9 +40,9 @@
 
   --allume-green: light-dark(#36884a, #7bb285);
 
-  /* A user's color is a note's background, a board's, the border of an image,
-     link or PDF, or a text block's highlight. Gray is a note's or board's own
-     color, and no highlight. */
+  /* A user's color is a note's background, a board's, the border of an image
+     or PDF, or a text block's highlight. Gray is a note's or board's own
+     color, and no border or highlight. */
   --allume-purple-note: light-dark(#ebe2fd, #484157);
   --allume-purple-board: light-dark(#f0e9ff, #3e374d);
   --allume-purple-border: light-dark(#b88df8, #685177);
@@ -57,7 +63,6 @@
   --allume-blue-board: light-dark(#e5f0ff, #333e4d);
   --allume-blue-border: light-dark(#8db8f8, #475877);
   --allume-blue-highlight: light-dark(#c1d3ef, #475261);
-  --allume-gray-border: light-dark(#bebbb8, #4e4b48);
 }
 
 /* Each element of the view starts from the browser's defaults, which these

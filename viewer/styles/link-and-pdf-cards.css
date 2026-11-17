@@ -23,8 +23,11 @@
   color: var(--allume-muted);
 }
 
+/* A favicon sits on white, with a soft shadow. */
 .allume-link-card .allume-favicon {
-  border-radius: 3px;
+  border-radius: 2px;
+  background: white;
+  box-shadow: 0 0 6px light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
   object-fit: contain;
 }
 
@@ -43,7 +46,7 @@
   grid-column: 2;
   font-size: 11px;
   line-height: 14px;
-  color: var(--allume-muted);
+  color: var(--allume-text-secondary);
 }
 
 /* A PDF tile takes its height from the title, which may wrap once. */
