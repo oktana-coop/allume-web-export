@@ -102,14 +102,15 @@ private func setAppearance(_ appearance: Appearance, of webView: WKWebView) {
   }
 #endif
 
-/// The image redrawn the width wide, keeping its proportions. The snapshot is as many pixels wide
-/// as the screen's density makes it.
+/// The image redrawn the width wide, keeping its proportions, and opaque: WebKit can leave a few
+/// pixels along rounded edges just short of opaque, which would make the image a PNG. The snapshot
+/// is as many pixels wide as the screen's density makes it.
 private func scaled(_ image: CGImage, toWidth width: Int) -> CGImage? {
   let height = Int((Double(image.height) * Double(width) / Double(image.width)).rounded())
   guard let space = CGColorSpace(name: CGColorSpace.sRGB),
     let context = CGContext(
       data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: space,
-      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+      bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
   else {
     return nil
   }
