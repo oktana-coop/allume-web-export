@@ -5,8 +5,8 @@ import AllumeWebRendering
 import Foundation
 
 /// Writes the files made from the export's rendered boards into the folder, with its links'
-/// favicons when there's a cache to keep them in, and its board cards' previews drawn as images
-/// with WebKit, the preview width in pixels. A folder with anything in it is only written to when
+/// favicons when there's a cache to keep them in, its ink changed to show as in Allume, and its
+/// board cards' previews drawn as images with WebKit, the preview width in pixels. A folder with anything in it is only written to when
 /// its contents are to be replaced, and a failed run leaves it as it was.
 func publish(
   _ contents: Contents,
@@ -20,11 +20,13 @@ func publish(
   defer { try? FileManager.default.removeItem(at: imageFolder) }
 
   let images = makeImageFiles(of: contents, in: imageFolder)
+  let shown = contents.replacingInkFiles(
+    with: makeInkFiles(of: contents, in: imageFolder.appending(path: "ink")))
   let (previews, previewWarnings) = await makePreviewImageFiles(
-    of: contents, favicons: favicons, images: images, width: previewWidth, in: imageFolder)
+    of: shown, favicons: favicons, images: images, width: previewWidth, in: imageFolder)
 
   let (outputFiles, fileWarnings) = await files(
-    renderedBoards(for: contents, favicons: favicons, images: images, previews: previews))
+    renderedBoards(for: shown, favicons: favicons, images: images, previews: previews))
   let writingWarnings = try writeFolder(
     outputFiles, to: folder, replacingContents: replacingContents)
 

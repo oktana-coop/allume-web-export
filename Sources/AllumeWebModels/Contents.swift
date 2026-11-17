@@ -75,6 +75,26 @@ public struct Contents: Equatable, Sendable {
       users: users, hierarchy: hierarchy, omissions: omissions, documentIndices: documentIndices)
   }
 
+  /// The contents with each ink file that `files` has one of the same name for replaced by it,
+  /// everything else kept.
+  public func replacingInkFiles(with files: [String: Asset]) -> Contents {
+    Contents(
+      rootID: rootID,
+      documents: documents.map { document in
+        guard case .board(let board) = document else {
+          return document
+        }
+        return .board(
+          Document.Board(
+            id: board.id, label: board.label, cards: board.cards, chains: board.chains,
+            connections: board.connections,
+            ink: board.ink.map { ink in Ink(file: files[ink.file.name] ?? ink.file, size: ink.size)
+            }
+          ))
+      },
+      users: users, hierarchy: hierarchy, omissions: omissions, documentIndices: documentIndices)
+  }
+
   private init(
     rootID: Document.ID, documents: [Document], users: [User.ID: User], hierarchy: Hierarchy,
     omissions: Omissions, documentIndices: [Document.ID: Int]

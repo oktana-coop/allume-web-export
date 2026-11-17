@@ -1,4 +1,5 @@
 import AllumeWebModels
+import Foundation
 import Testing
 
 @Suite struct ContentsTests {
@@ -41,6 +42,31 @@ import Testing
       renamed.board(Document.ID(rawValue: "root"))?.cards
         == contents.board(Document.ID(rawValue: "root"))?.cards)
     #expect(renamed.hierarchy == contents.hierarchy)
+  }
+
+  @Test func replaceInkFilesByNameKeepingEverythingElse() throws {
+    let ink = ["first.svg", "second.svg"].map { name in
+      Ink(
+        file: Asset(name: name, url: URL(filePath: "/\(name)")), size: Size(width: 10, height: 20))
+    }
+    let contents = try Contents(
+      rootID: Document.ID(rawValue: "root"),
+      documents: [
+        .board(
+          Document.Board(
+            id: Document.ID(rawValue: "root"), label: "Languages", cards: [], chains: [],
+            connections: [], ink: ink))
+      ],
+      users: [:]
+    )
+    let copy = Asset(name: "first.svg", url: URL(filePath: "/made/first.svg"))
+
+    let replaced = contents.replacingInkFiles(with: ["first.svg": copy])
+
+    let root = replaced.board(Document.ID(rawValue: "root"))
+    #expect(root?.ink.map(\.file) == [copy, ink[1].file])
+    #expect(root?.ink.map(\.size) == ink.map(\.size))
+    #expect(replaced.hierarchy == contents.hierarchy)
   }
 
   @Test func rejectsAMissingRoot() {
