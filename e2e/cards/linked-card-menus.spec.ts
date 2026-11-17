@@ -1,6 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { functional, haskell, mlFamily, paradigms } from '../shared/boards';
+import {
+  functional,
+  haskell,
+  mlFamily,
+  monoids,
+  paradigms,
+} from '../shared/boards';
 import {
   boundingBox,
   enterBoard,
@@ -9,10 +15,11 @@ import {
   openLinkedCardMenu,
   openMenu,
   scrollBoard,
-  viewport,
 } from '../shared/helpers';
 
-// Haskell's card on Functional is also on ML family.
+// Haskell's card on Functional is also on ML family, and Monoids' is also on
+// Haskell and Reading. Haskell's is near Functional's top left, which the board
+// stops at, and Monoids' is far enough from it to be centered.
 test.describe('linked card menus', () => {
   test("a card's menu lists the boards it's on, marking the current one", async ({
     page,
@@ -31,13 +38,15 @@ test.describe('linked card menus', () => {
   test('choosing another board opens it centered on the card', async ({
     page,
   }) => {
-    await page.goto(functional.url);
-    const menu = await openLinkedCardMenu({ page, card: haskell });
+    await page.goto(haskell.url);
+    const menu = await openLinkedCardMenu({ page, card: monoids });
 
-    await menu.getByRole('link', { name: mlFamily.label, exact: true }).click();
+    await menu
+      .getByRole('link', { name: functional.label, exact: true })
+      .click();
 
-    await expect(page).toHaveURL(`${mlFamily.url}#card-${haskell.id}`);
-    await expectCardCentered({ page, board: haskell });
+    await expect(page).toHaveURL(`${functional.url}#card-${monoids.id}`);
+    await expectCardCentered({ page, board: monoids });
   });
 
   test('choosing the current board centers the card, without a history entry', async ({
@@ -45,15 +54,15 @@ test.describe('linked card menus', () => {
   }) => {
     await page.goto(paradigms.url);
     await enterBoard({ page, board: functional });
-    const menu = await openLinkedCardMenu({ page, card: haskell });
+    const menu = await openLinkedCardMenu({ page, card: monoids });
 
     await menu
       .getByRole('link', { name: functional.label, exact: true })
       .click();
 
     await expect(menu).toBeHidden();
-    await expect(page).toHaveURL(`${functional.url}#card-${haskell.id}`);
-    await expectCardCentered({ page, board: haskell });
+    await expect(page).toHaveURL(`${functional.url}#card-${monoids.id}`);
+    await expectCardCentered({ page, board: monoids });
     // Back leaves the board, rather than undoing the centering.
     await page.goBack();
     await expect(page).toHaveURL(paradigms.url);
@@ -73,16 +82,12 @@ test.describe('linked card menus', () => {
 
   test('a menu without room below opens above its button', async ({ page }) => {
     await page.goto(functional.url);
-    // Pans the button down to 60 pixels above the bottom of the window.
-    const viewportBox = await boundingBox({ of: viewport({ page }) });
+    // Shortens the window to end 60 pixels below the button's top.
+    const { width } = page.viewportSize()!;
     const before = await boundingBox({
       of: linkedCardButton({ page, card: haskell }),
     });
-    await scrollBoard({
-      page,
-      x: 0,
-      y: before.y - (viewportBox.y + viewportBox.height - 60),
-    });
+    await page.setViewportSize({ width, height: Math.round(before.y + 60) });
     const button = await boundingBox({
       of: linkedCardButton({ page, card: haskell }),
     });

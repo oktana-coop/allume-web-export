@@ -16,15 +16,17 @@ export type Interval = [min: number, max: number];
 // Zooming out stops at 50%, or lower when the whole board needs it to fit.
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
-// Panning stops while this much of the board's contents is still in view.
-// Pulling further bounces the board past the edge, by at most MAX_BOUNCE, and
-// it bounces back keeping SPRING of the bounce each frame (at 60 fps).
+// Panning stops at the board's top left, as Allume's does, and at its bottom
+// right while this much of its contents is still in view. Pulling further
+// bounces the board past the edge, by at most MAX_BOUNCE, and it bounces back
+// keeping SPRING of the bounce each frame (at 60 fps).
 const PAN_MARGIN = 120;
 const MAX_BOUNCE = 80;
 const SPRING = 0.8;
 const FOCUS_PADDING = 80;
 // A board card's title sits above the card, 25 px tall with its margin, so a
-// board, framed or opened, leaves room for it above the canvas's origin.
+// board leaves room for it above the canvas's origin: framed, opened, and where
+// panning stops.
 const FIT_TOP_PADDING = 32;
 
 /** The camera in the value, if it has a finite x, y and scale. */
@@ -171,8 +173,10 @@ export function pinch({
 }
 
 /**
- * The camera positions, at the scale, that keep PAN_MARGIN of the board in
- * view.
+ * The camera positions, at the scale, that stop the board at its top left,
+ * with room above it for titles, and keep PAN_MARGIN of it in view at its
+ * bottom right. Its top left is the canvas's origin, or its contents' where
+ * they reach above or left of it.
  */
 export function panLimits({
   scale,
@@ -196,11 +200,11 @@ export function panLimits({
   return {
     x: [
       marginX - maxX(contentBounds) * scale,
-      viewport.width - marginX - contentBounds.x * scale,
+      Math.max(0, -contentBounds.x) * scale,
     ],
     y: [
       marginY - maxY(contentBounds) * scale,
-      viewport.height - marginY - contentBounds.y * scale,
+      (FIT_TOP_PADDING + Math.max(0, -contentBounds.y)) * scale,
     ],
   };
 }

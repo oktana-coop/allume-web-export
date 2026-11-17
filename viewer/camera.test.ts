@@ -18,8 +18,8 @@ import {
 import { type Point } from './geometry';
 
 // A board whose contents start 20 px from the canvas's origin, and fit the
-// viewport twice over. At 100%, its pan limits are -360 to 860 across and
-// -160 to 460 down.
+// viewport twice over. At 100%, its pan limits are -360 to 0 across and -160
+// to 32 down.
 const viewport = { width: 1000, height: 600 };
 const contentBounds = { x: 20, y: 20, width: 460, height: 260 };
 
@@ -167,10 +167,19 @@ describe('pinch', () => {
 });
 
 describe('panLimits', () => {
-  it('keeps 120 px of the board in view at each edge', () => {
+  it('stops at the origin, with 32 px above it, and keeps 120 px of the board in view at its bottom right', () => {
     expect(panLimits({ scale: 1, viewport, contentBounds })).toEqual({
-      x: [-360, 860],
-      y: [-160, 460],
+      x: [-360, 0],
+      y: [-160, 32],
+    });
+  });
+
+  it('stops at contents above and left of the origin', () => {
+    const outside = { x: -40, y: -30, width: 460, height: 260 };
+
+    expect(panLimits({ scale: 1, viewport, contentBounds: outside })).toEqual({
+      x: [-300, 40],
+      y: [-110, 62],
     });
   });
 
@@ -178,23 +187,24 @@ describe('panLimits', () => {
     const narrow = { x: 20, y: 20, width: 50, height: 260 };
 
     expect(panLimits({ scale: 1, viewport, contentBounds: narrow }).x).toEqual([
-      -20, 930,
+      -20, 0,
     ]);
   });
 
   it('measures the board at the scale', () => {
     const narrow = { x: 20, y: 20, width: 50, height: 260 };
 
-    expect(
-      panLimits({ scale: 0.5, viewport, contentBounds: narrow }).x
-    ).toEqual([-10, 965]);
+    expect(panLimits({ scale: 0.5, viewport, contentBounds: narrow })).toEqual({
+      x: [-10, 0],
+      y: [-20, 16],
+    });
   });
 
   it('keeps no more than half a small viewport', () => {
     const small = { width: 200, height: 600 };
 
     expect(panLimits({ scale: 1, viewport: small, contentBounds }).x).toEqual([
-      -380, 80,
+      -380, 0,
     ]);
   });
 });
@@ -210,7 +220,7 @@ describe('withinLimits', () => {
     const camera = { x: 1000, y: -500, scale: 1 };
 
     expect(withinLimits({ camera, viewport, contentBounds })).toEqual({
-      x: 860,
+      x: 0,
       y: -160,
       scale: 1,
     });
@@ -244,24 +254,24 @@ describe('bounce', () => {
   ])(
     'draws a board pulled $pulled px past an edge $drawn px past it',
     ({ pulled, drawn }) => {
-      const camera = { x: 860 + pulled, y: 0, scale: 1 };
+      const camera = { x: -360 - pulled, y: 0, scale: 1 };
 
-      expect(bounce({ camera, viewport, contentBounds }).x).toBe(860 + drawn);
+      expect(bounce({ camera, viewport, contentBounds }).x).toBe(-360 - drawn);
     }
   );
 
   it('never draws the board 80 px past an edge', () => {
-    const camera = { x: 860 + 1_000_000, y: 0, scale: 1 };
+    const camera = { x: -360 - 1_000_000, y: 0, scale: 1 };
 
-    expect(bounce({ camera, viewport, contentBounds }).x).toBeLessThan(
-      860 + 80
+    expect(bounce({ camera, viewport, contentBounds }).x).toBeGreaterThan(
+      -360 - 80
     );
   });
 
   it('bounces the same way past the opposite edge', () => {
-    const camera = { x: -360 - 80, y: 0, scale: 1 };
+    const camera = { x: 0 + 80, y: 0, scale: 1 };
 
-    expect(bounce({ camera, viewport, contentBounds }).x).toBe(-360 - 40);
+    expect(bounce({ camera, viewport, contentBounds }).x).toBe(0 + 40);
   });
 });
 
@@ -272,24 +282,24 @@ describe('bounceBack', () => {
   ])(
     'leaves $left px of a 100 px bounce after $elapsed ms',
     ({ elapsed, left }) => {
-      const camera = { x: 860 + 100, y: 0, scale: 1 };
+      const camera = { x: -360 - 100, y: 0, scale: 1 };
 
       const back = bounceBack({ camera, elapsed, viewport, contentBounds });
 
-      expect(back.x).toBeCloseTo(860 + left);
+      expect(back.x).toBeCloseTo(-360 - left);
     }
   );
 
   it('reaches the limit once within half a pixel of it', () => {
-    const camera = { x: 860.4, y: 0, scale: 1 };
+    const camera = { x: -360.4, y: 0, scale: 1 };
 
     expect(bounceBack({ camera, elapsed: 16, viewport, contentBounds }).x).toBe(
-      860
+      -360
     );
   });
 
   it('leaves the bounce as it is for a negative elapsed time', () => {
-    const camera = { x: 860 + 100, y: 0, scale: 1 };
+    const camera = { x: -360 - 100, y: 0, scale: 1 };
 
     expect(
       bounceBack({ camera, elapsed: -16, viewport, contentBounds })

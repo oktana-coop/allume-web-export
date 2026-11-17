@@ -1,6 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { functional, haskell, ocaml, ocamlNotes } from '../shared/boards';
+import {
+  functional,
+  haskell,
+  monoids,
+  ocaml,
+  ocamlNotes,
+} from '../shared/boards';
 import {
   boardCard,
   boundingBox,
@@ -11,8 +17,8 @@ import {
 } from '../shared/helpers';
 import { drag } from './helpers';
 
-// OCaml opens at 100%, so the board moves as far as the mouse does. Its Notes
-// card is its leftmost.
+// Boards open at 100%, so the board moves as far as the mouse does. Monoids'
+// card is Functional's rightmost.
 test.describe('panning', () => {
   test('scrolling pans the board', async ({ page }) => {
     await page.goto(ocaml.url);
@@ -43,11 +49,11 @@ test.describe('panning', () => {
     await page.goto(ocaml.url);
     const before = await cardCenter({ page, board: ocamlNotes });
 
-    await drag({ page, from: before, by: { x: 150, y: 80 } });
+    await drag({ page, from: before, by: { x: -150, y: -80 } });
 
     const after = await cardCenter({ page, board: ocamlNotes });
-    expect(after.x).toBeCloseTo(before.x + 150, 0);
-    expect(after.y).toBeCloseTo(before.y + 80, 0);
+    expect(after.x).toBeCloseTo(before.x - 150, 0);
+    expect(after.y).toBeCloseTo(before.y - 80, 0);
     await expect(page).toHaveURL(ocaml.url);
   });
 
@@ -60,7 +66,7 @@ test.describe('panning', () => {
       of: linkedCardButton({ page, card: haskell }),
     });
 
-    await drag({ page, from: button, by: { x: 150, y: 80 } });
+    await drag({ page, from: button, by: { x: -150, y: -80 } });
 
     expect(await cardCenter({ page, board: haskell })).toEqual(before);
   });
@@ -91,85 +97,99 @@ test.describe('panning', () => {
     const text = page.getByText('Haskell is lazy');
     const before = await boundingBox({ of: text });
 
+    // From the end of its first line, leftward, which panning could go.
     await drag({
       page,
-      from: { x: before.x + 5, y: before.y + 10 },
-      by: { x: 200, y: 0 },
+      from: { x: before.x + before.width - 5, y: before.y + 10 },
+      by: { x: -200, y: 0 },
     });
 
     expect(await page.evaluate(() => getSelection()?.toString())).not.toBe('');
     expect(await text.boundingBox()).toEqual(before);
   });
 
-  test('panning stops at an edge, with some of the board still in view', async ({
+  test('panning stops at the top left, where the board opens', async ({
     page,
   }) => {
     await page.clock.install();
     await page.goto(ocaml.url);
+    const opened = await cardCenter({ page, board: ocamlNotes });
+
+    await scrollBoard({ page, x: -300, y: -300 });
+    await settle({ page });
+
+    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(opened);
+  });
+
+  test('panning stops at the right, with some of the board still in view', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(functional.url);
 
     await scrollToEdge({ page });
 
-    await expect(boardCard({ page, board: ocamlNotes })).toBeInViewport();
-    const atEdge = await cardCenter({ page, board: ocamlNotes });
+    await expect(boardCard({ page, board: monoids })).toBeInViewport();
+    const atEdge = await cardCenter({ page, board: monoids });
     await scrollToEdge({ page });
-    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+    expect(await cardCenter({ page, board: monoids })).toEqual(atEdge);
   });
 
   test('pushing past an edge moves the board past it, then it bounces back', async ({
     page,
   }) => {
     await page.clock.install();
-    await page.goto(ocaml.url);
+    await page.goto(functional.url);
     await scrollToEdge({ page });
-    const atEdge = await cardCenter({ page, board: ocamlNotes });
+    const atEdge = await cardCenter({ page, board: monoids });
 
-    await scrollBoard({ page, x: -40, y: 0 });
+    await scrollBoard({ page, x: 40, y: 0 });
 
-    const pastEdge = await cardCenter({ page, board: ocamlNotes });
-    expect(pastEdge.x).toBeGreaterThan(atEdge.x + 1);
+    const pastEdge = await cardCenter({ page, board: monoids });
+    expect(pastEdge.x).toBeLessThan(atEdge.x - 1);
     await settle({ page });
-    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+    expect(await cardCenter({ page, board: monoids })).toEqual(atEdge);
   });
 
   test("grabbing a bouncing board holds it until it's let go", async ({
     page,
   }) => {
     await page.clock.install();
-    await page.goto(ocaml.url);
+    await page.goto(functional.url);
     await scrollToEdge({ page });
-    const atEdge = await cardCenter({ page, board: ocamlNotes });
-    await scrollBoard({ page, x: -40, y: 0 });
-    // On the empty canvas, left of the board, which the edge keeps on the right.
-    await page.mouse.move(200, 400);
+    const atEdge = await cardCenter({ page, board: monoids });
+    await scrollBoard({ page, x: 40, y: 0 });
+    // On the empty canvas, right of the board, which the edge keeps on the left.
+    await page.mouse.move(800, 400);
     await page.mouse.down();
     // Measured once grabbed, since the clock runs on its own until settled, and
     // the bounce may already have started coming back.
-    const held = await cardCenter({ page, board: ocamlNotes });
+    const held = await cardCenter({ page, board: monoids });
 
     await settle({ page });
 
-    expect(held.x).toBeGreaterThan(atEdge.x + 1);
-    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(held);
+    expect(held.x).toBeLessThan(atEdge.x - 1);
+    expect(await cardCenter({ page, board: monoids })).toEqual(held);
     await page.mouse.up();
     await settle({ page });
-    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+    expect(await cardCenter({ page, board: monoids })).toEqual(atEdge);
   });
 
   test("trackpad momentum past an edge doesn't push, so the board bounces back", async ({
     page,
   }) => {
     await page.clock.install();
-    await page.goto(ocaml.url);
+    await page.goto(functional.url);
     await scrollToEdge({ page });
-    const atEdge = await cardCenter({ page, board: ocamlNotes });
+    const atEdge = await cardCenter({ page, board: monoids });
 
     // Momentum: scrolling that slows down over half a second, a frame apart.
     for (let speed = 40; speed >= 10; speed--) {
-      await scrollBoard({ page, x: -speed, y: 0 });
+      await scrollBoard({ page, x: speed, y: 0 });
       await page.clock.runFor(16);
     }
 
-    expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+    expect(await cardCenter({ page, board: monoids })).toEqual(atEdge);
   });
 
   test.describe('with reduced motion', () => {
@@ -177,23 +197,23 @@ test.describe('panning', () => {
 
     test('the board stops at an edge without bouncing', async ({ page }) => {
       await page.clock.install();
-      await page.goto(ocaml.url);
+      await page.goto(functional.url);
       await scrollToEdge({ page });
-      const atEdge = await cardCenter({ page, board: ocamlNotes });
+      const atEdge = await cardCenter({ page, board: monoids });
 
-      await scrollBoard({ page, x: -40, y: 0 });
+      await scrollBoard({ page, x: 40, y: 0 });
 
-      expect(await cardCenter({ page, board: ocamlNotes })).toEqual(atEdge);
+      expect(await cardCenter({ page, board: monoids })).toEqual(atEdge);
     });
   });
 });
 
 /**
- * Scrolls left until the board's left edge stops it, and lets the board
+ * Scrolls right until the board's right edge stops it, and lets the board
  * settle.
  */
 const scrollToEdge = async ({ page }: { page: Page }) => {
-  await scrollBoard({ page, x: -5000, y: 0 });
+  await scrollBoard({ page, x: 5000, y: 0 });
   await settle({ page });
 };
 

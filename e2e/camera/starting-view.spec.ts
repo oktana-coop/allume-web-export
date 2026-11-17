@@ -6,9 +6,11 @@ import {
   haskell,
   haskellNotes,
   mlFamily,
+  monoids,
 } from '../shared/boards';
 import {
   boardCard,
+  cardCenter,
   enterBoard,
   expectCardCentered,
   scrollBoard,
@@ -84,9 +86,9 @@ test.describe('starting view', () => {
     await scrollBoard({ page, x: 300, y: 200 });
     await enterBoard({ page, board: haskell });
 
-    await page.goto(`${functional.url}#card-${haskell.id}`);
+    await page.goto(`${functional.url}#card-${monoids.id}`);
 
-    await expectCardCentered({ page, board: haskell });
+    await expectCardCentered({ page, board: monoids });
   });
 
   test('changing the URL to a card on the open board centers the card', async ({
@@ -96,8 +98,21 @@ test.describe('starting view', () => {
     await scrollBoard({ page, x: 300, y: 200 });
 
     // The same page, so only its hash changes, without loading it again.
-    await page.goto(`${functional.url}#card-${haskell.id}`);
+    await page.goto(`${functional.url}#card-${monoids.id}`);
 
-    await expectCardCentered({ page, board: haskell });
+    await expectCardCentered({ page, board: monoids });
+  });
+
+  test('a link to a card near the top left shows the board from its top left', async ({
+    page,
+  }) => {
+    // Haskell's card is too near ML family's top left to be centered.
+    await page.goto(mlFamily.url);
+    const firstVisit = await cardCenter({ page, board: haskell });
+    await scrollBoard({ page, x: 300, y: 200 });
+
+    await page.goto(`${mlFamily.url}#card-${haskell.id}`);
+
+    expect(await cardCenter({ page, board: haskell })).toEqual(firstVisit);
   });
 });

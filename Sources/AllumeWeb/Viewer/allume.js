@@ -127,11 +127,11 @@
     return {
       x: [
         marginX - maxX(contentBounds) * scale,
-        viewport.width - marginX - contentBounds.x * scale
+        Math.max(0, -contentBounds.x) * scale
       ],
       y: [
         marginY - maxY(contentBounds) * scale,
-        viewport.height - marginY - contentBounds.y * scale
+        (FIT_TOP_PADDING + Math.max(0, -contentBounds.y)) * scale
       ]
     };
   }
