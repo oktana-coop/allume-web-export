@@ -33,6 +33,30 @@ import Testing
     #expect(try text(of: "preview-light.jpg", in: root) == "JPEG")
   }
 
+  @Test func writesEveryFileReadableByAllAndExecutableByNone() throws {
+    let root = try makeTemporaryFolder()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let image = try makeFile("image.png", text: "PNG", in: root)
+    try FileManager.default.setAttributes(
+      [.posixPermissions: 0o755], ofItemAtPath: image.path(percentEncoded: false))
+    let folder = root.appending(path: "site")
+
+    _ = try writeFolder(
+      [
+        OutputFile(path: "index.html", source: .text("<p>Languages</p>")),
+        OutputFile(path: "preview-light.jpg", source: .data(Data("JPEG".utf8))),
+        OutputFile(path: "files/image.png", source: .copy(image)),
+      ],
+      to: folder, replacingContents: false)
+
+    let permissions = try ["index.html", "preview-light.jpg", "files/image.png"].map { path in
+      try FileManager.default.attributesOfItem(
+        atPath: folder.appending(path: path).path(percentEncoded: false))[.posixPermissions]
+        as? Int
+    }
+    #expect(permissions == [0o644, 0o644, 0o644])
+  }
+
   @Test func writesIntoAnEmptyFolderWithoutBeingAsked() throws {
     let root = try makeTemporaryFolder()
     defer { try? FileManager.default.removeItem(at: root) }

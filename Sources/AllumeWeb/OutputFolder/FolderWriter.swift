@@ -63,37 +63,29 @@ func leavesFolder(_ path: String) -> Bool {
   path.hasPrefix("/") || path.split(separator: "/").contains("..")
 }
 
-/// Nil once the file is written, or a warning when its source is missing.
+/// Nil once the file is written, or a warning when its source is missing. Every file is written
+/// readable by all and executable by none, whatever its source's permissions.
 private func write(_ file: OutputFile, into folder: URL)
   throws(UnwritableFolderError) -> PublishingWarning?
 {
   let destination = folder.appending(path: file.path)
-
-  switch file.source {
-  case .text(let text):
-    try attempt(at: destination) {
-      try createParent(of: destination)
-      try Data(text.utf8).write(to: destination)
-    }
-    return nil
-
-  case .data(let data):
-    try attempt(at: destination) {
-      try createParent(of: destination)
-      try data.write(to: destination)
-    }
-    return nil
-
-  case .copy(let source):
-    guard FileManager.default.fileExists(atPath: source.path(percentEncoded: false)) else {
-      return .missingFile(path: file.path, source: source)
-    }
-    try attempt(at: destination) {
-      try createParent(of: destination)
-      try FileManager.default.copyItem(at: source, to: destination)
-    }
-    return nil
+  if case .copy(let source) = file.source,
+    !FileManager.default.fileExists(atPath: source.path(percentEncoded: false))
+  {
+    return .missingFile(path: file.path, source: source)
   }
+
+  try attempt(at: destination) {
+    try createParent(of: destination)
+    switch file.source {
+    case .text(let text): try Data(text.utf8).write(to: destination)
+    case .data(let data): try data.write(to: destination)
+    case .copy(let source): try FileManager.default.copyItem(at: source, to: destination)
+    }
+    try FileManager.default.setAttributes(
+      [.posixPermissions: 0o644], ofItemAtPath: destination.path(percentEncoded: false))
+  }
+  return nil
 }
 
 private func createParent(of file: URL) throws {
