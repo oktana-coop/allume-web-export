@@ -39,7 +39,7 @@ The command is then `.build/release/allume-web-export`.
 #### Site
 
 ```sh
-allume-web-export site Programming.muse --out site
+allume-web-export site path/to/bundle.muse --out site
 ```
 
 The site's folder then holds:
@@ -60,7 +60,7 @@ The site's folder then holds:
 #### Embed
 
 ```sh
-allume-web-export embed Programming.muse --out allume
+allume-web-export embed path/to/bundle.muse --out allume
 ```
 
 Its folder holds:
@@ -80,7 +80,7 @@ To have the views link to the site's URLs instead, give `embed` the site's patte
 URL, with `{slug}` standing for its slug, and where the site serves the folder's `files/`:
 
 ```sh
-allume-web-export embed Programming.muse --out allume --board-url '/boards/{slug}/' \
+allume-web-export embed path/to/bundle.muse --out allume --board-url '/boards/{slug}/' \
   --files-url /allume/files
 ```
 
