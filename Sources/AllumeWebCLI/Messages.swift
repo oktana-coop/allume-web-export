@@ -75,6 +75,8 @@ func errorMessage(for error: UnreadableBundleError) -> String {
   switch error {
   case .missingFile(let name):
     "The export folder has no \(name). Is it an Allume export?"
+  case .notAnArchive(let name):
+    "\(name) isn't a folder or a zip archive, so it can't be an Allume export."
   case .invalidJSON(let file, let reason):
     "The export's \(file) can't be read: \(reason)"
   case .invalidContents(let error):

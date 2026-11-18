@@ -95,8 +95,12 @@ struct EmbedCommand: AsyncParsableCommand {
 }
 
 struct PublishingOptions: ParsableArguments {
-  @Argument(help: "The export folder, with contents.json and files/.")
-  var exportDir: String
+  @Argument(
+    help: ArgumentHelp(
+      "The export: the file Allume writes, or the folder decompressed from it, with "
+        + "contents.json and files/.")
+  )
+  var export: String
 
   @Option(
     help: "The folder to write to. It must be missing or empty, unless --replace is given."
@@ -149,13 +153,17 @@ private func publish(
     faviconCount: Int, warnings: [PublishingWarning]
   )
 ) async throws(CommandFailure) {
-  let exportFolder = URL(filePath: options.exportDir, directoryHint: .isDirectory).absoluteURL
+  let export = URL(filePath: options.export).absoluteURL
   let outFolder = URL(filePath: options.out, directoryHint: .isDirectory).absoluteURL
   let faviconCache = URL.cachesDirectory.appending(path: "allume-web-export/favicons")
+  // An archive's files stay until publishing has copied the ones the boards show.
+  let decompressed = FileManager.default.temporaryDirectory.appending(
+    path: "allume-web-export-\(UUID())")
+  defer { try? FileManager.default.removeItem(at: decompressed) }
 
   let (exported, readingWarnings) = try await failingWithMessage {
     () throws(UnreadableBundleError) in
-    try readBundle(at: exportFolder)
+    try readBundle(at: isFolder(export) ? export : decompressExport(at: export, into: decompressed))
   } message: { error in
     errorMessage(for: error)
   }
@@ -168,7 +176,8 @@ private func publish(
     errorMessage(for: error)
   }
 
-  let name = contents.board(contents.rootID)?.label ?? exportFolder.lastPathComponent
+  let name =
+    contents.board(contents.rootID)?.label ?? export.deletingPathExtension().lastPathComponent
   let boardCount = contents.hierarchy.boardIDs.count
   // Unbuffered, like standard error, so the summary comes before the warnings.
   FileHandle.standardOutput.write(
@@ -178,6 +187,10 @@ private func publish(
     + publishingWarnings.map { warning in warningMessage(for: warning, in: contents) }
   FileHandle.standardError.write(
     Data(warnings.map { warning in "  warning: \(warning)\n" }.joined().utf8))
+}
+
+private func isFolder(_ url: URL) -> Bool {
+  (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
 }
 
 /// A failure the command reports in words, which swift-argument-parser prints as `Error: …`.

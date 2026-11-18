@@ -29,18 +29,17 @@ The command is then `.build/release/allume-web-export`.
 ### Run
 
 1. In Allume, export the board to publish with **Export Board As › Allume Bundle…**. The boards
-   inside it are exported with it.
-2. Decompress the bundle, a compressed archive, with a tool like
-   [The Unarchiver](https://theunarchiver.com). This gives the export folder, with
-   `contents.json`, `metadata.json` and `files/` in it.
-3. Run the tool on the export folder, with one of its two commands, which publish the boards in two
-   ways: `site` as a website of their own, and `embed` for an existing site to show in its own
-   pages. Either way, PDFs are never published: their cards show only their title.
+   inside it are exported with it, into a zip archive named after the board, such as
+   `Programming.muse`.
+2. Run the tool on the bundle, with one of its two commands, which publish the boards in two ways:
+   `site` as a website of their own, and `embed` for an existing site to show in its own pages.
+   Either way, PDFs are never published: their cards show only their title. A folder decompressed
+   from the bundle, with `contents.json`, `metadata.json` and `files/` in it, works too.
 
 #### Site
 
 ```sh
-allume-web-export site path/to/export --out site
+allume-web-export site Programming.muse --out site
 ```
 
 The site's folder then holds:
@@ -61,7 +60,7 @@ The site's folder then holds:
 #### Embed
 
 ```sh
-allume-web-export embed path/to/export --out allume
+allume-web-export embed Programming.muse --out allume
 ```
 
 Its folder holds:
@@ -81,7 +80,7 @@ To have the views link to the site's URLs instead, give `embed` the site's patte
 URL, with `{slug}` standing for its slug, and where the site serves the folder's `files/`:
 
 ```sh
-allume-web-export embed path/to/export --out allume --board-url '/boards/{slug}/' \
+allume-web-export embed Programming.muse --out allume --board-url '/boards/{slug}/' \
   --files-url /allume/files
 ```
 
