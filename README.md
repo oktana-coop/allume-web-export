@@ -3,6 +3,12 @@
 `allume-web-export` turns an [Allume](https://allume.com) board export into a static website: a page
 for every board, which visitors can pan, zoom and move between as they would in Allume.
 
+## Demos
+
+- Deployed as a standalone website in [Programming](https://allume-export-website.netlify.app).
+- Embedded within the [Fragments & Flows](https://fragmentsandflows.com/garden/boards/home-l0tzup/)
+  digital garden.
+
 ## Usage
 
 ### Prerequisites
