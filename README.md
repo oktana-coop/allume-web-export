@@ -11,14 +11,20 @@ for every board, which visitors can pan, zoom and move between as they would in 
 
 ## Usage
 
-### Prerequisites
+### Install
 
-- macOS 14 or later.
-- Xcode 26 or later, for its Swift 6.
+The tool runs on macOS 14 or later. Install it with [Homebrew](https://brew.sh):
+
+```sh
+brew install oktana-coop/tap/allume-web-export
+```
+
+Each [release](https://github.com/oktana-coop/allume-web-export/releases) also has it as a zip: the
+command and its resource bundle, which the command needs beside it.
 
 ### Build
 
-There are no releases yet, so build the tool from this repository:
+To build the tool from this repository instead, with Xcode 26 or later:
 
 ```sh
 swift build -c release
@@ -205,4 +211,4 @@ A workflow on GitHub tests, builds, signs, notarizes and publishes each release.
 
 ## License
 
-[AGPL-3.0](LICENSE).
+[AGPL-3.0-or-later](LICENSE).
