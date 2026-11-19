@@ -1,12 +1,17 @@
 # Allume Web Export
 
-`allume-web-export` turns an [Allume](https://allume.com/) board export into a static website: a page for every board, which visitors can pan, zoom and move between as they would in Allume.
+`allume-web-export` turns an [Allume](https://allume.com/) board export into a static website: a
+page for every board, which visitors can pan, zoom and move between as they would in Allume.
 
-Allume (formerly Muse) is a spatial canvas for thinking and organizing ideas. This tool lets you publish those boards on the open web, either as a standalone website or embedded in an existing site.
+Allume (formerly Muse) is a spatial canvas for thinking and organizing ideas. This tool lets you
+publish those boards on the open web, either as a standalone website or embedded in an existing
+site.
 
-**See it in action:** [Fragments & Flows](https://fragmentsandflows.com/garden/boards/home-l0tzup/), a digital garden that uses the exporter.
+**See it in action:** [Fragments & Flows](https://fragmentsandflows.com/garden/boards/home-l0tzup/),
+a digital garden that uses the exporter.
 
-For the motivation behind the project, read [Opening the Pensieve: Web Exporting for Allume](https://oktana.dev/blog/opening-the-pensieve-web-exporting-for-allume/).
+For the motivation behind the project, read [Opening the Pensieve: Web Exporting for
+Allume](https://oktana.dev/blog/opening-the-pensieve-web-exporting-for-allume/).
 
 ## Demos
 
@@ -150,6 +155,13 @@ and open <http://localhost:8000>.
 
 See [docs/Development.md](docs/Development.md) for working on the tool: running it from source,
 the viewer, formatting, commits, testing and releasing.
+
+## Support
+
+If you like our work, please consider [supporting us financially](https://oktana.dev/#support), so
+that we can do more of this. We statutorily do not accept venture capital investment so that we stay
+independent and our resources are currently limited and based on personal savings from previous work
+we’ve undertaken. It would be amazing for us to reach a point where our work is community-funded.
 
 ## License
 
