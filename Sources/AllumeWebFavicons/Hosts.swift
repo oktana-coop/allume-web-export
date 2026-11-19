@@ -11,7 +11,7 @@ func isFetchable(_ host: String) -> Bool {
       !label.isEmpty && label.count <= 63 && label.allSatisfy(hostCharacters.contains)
     }
   // A name's last label starts with a letter, and an IP address's with a digit.
-  let isName = labels.last?.first.map(("a"..."z").contains) == true
+  let isName = labels.last?.first.map { first in ("a"..."z").contains(first) } == true
   let isLocal = localSuffixes.contains { suffix in host.hasSuffix(suffix) }
 
   return wellFormed && isName && !isLocal
