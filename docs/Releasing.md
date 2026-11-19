@@ -1,7 +1,7 @@
 # Releasing
 
-A release is a zip on GitHub with the tool for Apple silicon and Intel, signed with Oktana's
-Developer ID certificate and notarized by Apple, beside its SHA-256. The
+A release is a zip on GitHub with the tool for Apple silicon and Intel, signed with a Developer ID
+certificate and notarized by Apple, beside its SHA-256. The
 [Release workflow](../.github/workflows/release.yml) makes it, run by hand on `main`.
 
 ## Running a Release
