@@ -18,7 +18,7 @@ concurrency:
 jobs:
   release:
     if: github.ref == 'refs/heads/main'
-    runs-on: macos-15
+    runs-on: macos-latest
     # Holds the secrets, which only main can use.
     environment: release
     steps:

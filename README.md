@@ -14,7 +14,7 @@ for every board, which visitors can pan, zoom and move between as they would in 
 ### Prerequisites
 
 - macOS 14 or later.
-- Swift 6, which comes with Xcode 16 or later.
+- Xcode 26 or later, for its Swift 6.
 
 ### Build
 
