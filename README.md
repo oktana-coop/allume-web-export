@@ -1,7 +1,12 @@
 # Allume Web Export
 
-`allume-web-export` turns an [Allume](https://allume.com) board export into a static website: a page
-for every board, which visitors can pan, zoom and move between as they would in Allume.
+`allume-web-export` turns an [Allume](https://allume.com/) board export into a static website: a page for every board, which visitors can pan, zoom and move between as they would in Allume.
+
+Allume (formerly Muse) is a spatial canvas for thinking and organizing ideas. This tool lets you publish those boards on the open web, either as a standalone website or embedded in an existing site.
+
+**See it in action:** [Fragments & Flows](https://fragmentsandflows.com/garden/boards/home-l0tzup/), a digital garden that uses the exporter.
+
+For the motivation behind the project, read [Opening the Pensieve: Web Exporting for Allume](https://oktana.dev/blog/opening-the-pensieve-web-exporting-for-allume/).
 
 ## Demos
 
@@ -9,28 +14,32 @@ for every board, which visitors can pan, zoom and move between as they would in 
 - Embedded within the [Fragments & Flows](https://fragmentsandflows.com/garden/boards/home-l0tzup/)
   digital garden.
 
-## Usage
+## Install
 
-### Install
+The tool runs on macOS 14 or later.
 
-The tool runs on macOS 14 or later. Install it with [Homebrew](https://brew.sh):
+### With Homebrew
 
 ```sh
 brew install oktana-coop/tap/allume-web-export
 ```
 
-Each [release](https://github.com/oktana-coop/allume-web-export/releases) also has it as a zip: the
+### From a Release
+
+Each [release](https://github.com/oktana-coop/allume-web-export/releases) has the tool as a zip: the
 command and its resource bundle, which the command needs beside it.
 
-### Build
+### From Source
 
-To build the tool from this repository instead, with Xcode 26 or later:
+With Xcode 26 or later, build the tool from this repository:
 
 ```sh
 swift build -c release
 ```
 
 The command is then `.build/release/allume-web-export`.
+
+## Usage
 
 ### Run
 
@@ -94,16 +103,16 @@ Either can be given alone, leaving the other kind of reference in.
 
 #### Options
 
-| Option | Commands | What it does |
-| :-- | :-- | :-- |
-| `--out <folder>` | both | Where to write, `out` by default. The folder must be missing or empty. |
-| `--replace` | both | Replaces the folder's contents, to publish again over an earlier run. |
-| `--no-favicons` | both | Gives link cards a generic link icon instead of their site's, e.g. to build offline. |
-| `--root-label <label>` | both | Labels the exported board otherwise, e.g. `Home`. |
-| `--preview-width <pixels>` | both | How wide board cards' previews are drawn, 1024 px by default. |
-| `--theme <theme>` | `site` | `light`, the default, `dark`, or `system`, which follows each reader's system. |
-| `--board-url <pattern>` | `embed` | Each board's URL on the site, with `{slug}` standing for its slug. |
-| `--files-url <url>` | `embed` | Where the site serves the folder's `files/`. |
+| Option                     | Commands | What it does                                                                         |
+| :------------------------- | :------- | :----------------------------------------------------------------------------------- |
+| `--out <folder>`           | both     | Where to write, `out` by default. The folder must be missing or empty.               |
+| `--replace`                | both     | Replaces the folder's contents, to publish again over an earlier run.                |
+| `--no-favicons`            | both     | Gives link cards a generic link icon instead of their site's, e.g. to build offline. |
+| `--root-label <label>`     | both     | Labels the exported board otherwise, e.g. `Home`.                                    |
+| `--preview-width <pixels>` | both     | How wide board cards' previews are drawn, 1024 px by default.                        |
+| `--theme <theme>`          | `site`   | `light`, the default, `dark`, or `system`, which follows each reader's system.       |
+| `--board-url <pattern>`    | `embed`  | Each board's URL on the site, with `{slug}` standing for its slug.                   |
+| `--files-url <url>`        | `embed`  | Where the site serves the folder's `files/`.                                         |
 
 - `--out` refuses a folder with anything in it unless `--replace` is given, so that a mistyped path
   can't wipe a folder. If anything fails while writing, the earlier run's files are left as they
@@ -139,78 +148,8 @@ and open <http://localhost:8000>.
 
 ## Development
 
-### Run
-
-`swift run` builds the tool and runs it in one step. To try it on the public sample export in
-`Fixtures/SampleExport/`, and view the result:
-
-```sh
-swift run allume-web-export site Fixtures/SampleExport --out out --replace
-python3 -m http.server --directory out
-```
-
-Then open <http://localhost:8000>. Git ignores `out/`. `--replace` lets each run replace the last
-one's site, and `--no-favicons` keeps the run offline.
-
-### Viewer
-
-The viewer is the script and stylesheet that let visitors pan, zoom and move between boards. Its
-sources are in `viewer/`, but the tool doesn't build them: it copies a built `allume.js` and
-`allume.css` from its resources, in `Sources/AllumeWeb/Viewer/`, into every site it writes.
-esbuild builds those two files from `viewer/`, and they're committed, so building the tool needs
-only Swift.
-
-A change to the viewer therefore takes two steps: rebuilding it into the tool's resources, then
-writing the site again with them:
-
-```sh
-npm run build:viewer
-swift run allume-web-export site Fixtures/SampleExport --out out --replace
-```
-
-Then reload the page, served as in [Run](#run). The
-[end-to-end tests](docs/Testing.md#end-to-end-tests) rebuild the viewer before each run.
-
-`npm run typecheck` checks the TypeScript: the viewer against the browser's APIs, and the build
-script and the end-to-end tests against Node's. esbuild removes the types without checking them,
-so before committing a change to `viewer/`, run the type check, the
-[unit tests](docs/Testing.md#viewer) and the end-to-end tests, and commit the rebuilt
-files with it. All of these need Node and `npm install`, as for the end-to-end tests.
-
-The renderer in `Sources/AllumeWebRendering/`, the stylesheets and the script share the page's
-classes and `data-*` attributes, so renaming one means renaming it in all three. The integration
-tests' expected pages and the end-to-end tests catch one that's missed. Each class, ID and `data-*`
-attribute starts with `allume-`, as in `data-allume-color`, so that a site's own styles and scripts
-can't reach the board's view. The one exception is a card's `card-<id>`, which links point to.
-
-### Formatting
-
-The code is formatted with swift-format's defaults, which keep lines within 100 columns, and
-`.editorconfig` sets two-space indentation everywhere. Format before committing:
-
-```sh
-swift format --in-place --recursive Package.swift Sources Tests
-```
-
-`swift format lint --recursive Sources Tests` lists what's left.
-
-The viewer and the end-to-end tests are formatted with Prettier, which keeps lines within 80
-columns: `npm run format`.
-
-### Commits
-
-Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), e.g.
-`feat: draw the icons` or `fix: find files in folders whose names have spaces`.
-
-### Testing
-
-Run `swift test`. See [docs/Testing.md](docs/Testing.md) for the unit, integration and
-end-to-end tests, how to run some of them, and how to update the expected output.
-
-### Releasing
-
-A workflow on GitHub tests, builds, signs, notarizes and publishes each release. See
-[docs/Releasing.md](docs/Releasing.md) for instructions.
+See [docs/Development.md](docs/Development.md) for working on the tool: running it from source,
+the viewer, formatting, commits, testing and releasing.
 
 ## License
 
