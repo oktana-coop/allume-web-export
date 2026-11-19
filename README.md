@@ -133,6 +133,9 @@ and open <http://localhost:8000>.
   drawn over the text, positioned for how Allume wraps it, and the browser may wrap the text
   differently. So the ink's position has to be worked out against the browser's own layout,
   rather than copied.
+- WebKit draws the previews again on every run, and doesn't always draw them identically. So
+  publishing the same export again can give a few previews pixels a shade apart: invisibly
+  different, but different files.
 
 ## Development
 
