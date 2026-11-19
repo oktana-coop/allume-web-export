@@ -17,7 +17,8 @@ part of the version to bump: patch, minor or major. The workflow:
 
 ## Secrets
 
-The workflow reads five repository secrets:
+The workflow reads five secrets from the repository's `release` environment, which only `main` can
+use:
 
 - `DEVELOPER_ID_CERTIFICATE`: the Developer ID Application certificate and its private key, as a
   `.p12` file encoded in base64.
