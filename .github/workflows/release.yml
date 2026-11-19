@@ -1,0 +1,191 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Keeps the job's token out of .git/config, where code run by the tests and the build
+          # could read it. Only the steps that push get it.
+          persist-credentials: false
+
+      - name: Test
+        # With the dependency versions Package.resolved pins, as the build has.
+        run: swift test --only-use-versions-from-resolved-file
+
+      - name: Bump the version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          file=Sources/AllumeWebCLI/Version.swift
+          current="$(sed -n 's/^let toolVersion = "\([0-9]*\.[0-9]*\.[0-9]*\)"$/\1/p' "$file")"
+          if [ -z "$current" ]; then
+            echo "$file doesn't give the version as let toolVersion = \"x.y.z\"." >&2
+            exit 1
+          fi
+
+          IFS=. read -r major minor patch <<< "$current"
+          case "$BUMP" in
+            major) version="$((major + 1)).0.0" ;;
+            minor) version="$major.$((minor + 1)).0" ;;
+            patch) version="$major.$minor.$((patch + 1))" ;;
+            *)
+              echo "Unknown bump: $BUMP." >&2
+              exit 1
+              ;;
+          esac
+
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$version")" ]; then
+            echo "v$version is already tagged." >&2
+            exit 1
+          fi
+
+          sed -i '' "s/^let toolVersion = \".*\"$/let toolVersion = \"$version\"/" "$file"
+
+          # Lines added to $GITHUB_ENV become variables in the steps that follow, which use the
+          # version and the zip's name.
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "ZIP=allume-web-export-$version-macos.zip" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: |
+          build=(swift build -c release --arch arm64 --arch x86_64 \
+            --only-use-versions-from-resolved-file)
+          "${build[@]}"
+
+          bin="$("${build[@]}" --show-bin-path)"
+          if [ "$("$bin/allume-web-export" --version)" != "$VERSION" ]; then
+            echo "The built tool doesn't report version $VERSION." >&2
+            exit 1
+          fi
+
+          # Where the steps that follow find the binary and its resource bundle.
+          echo "BIN=$bin" >> "$GITHUB_ENV"
+
+      - name: Sign
+        env:
+          DEVELOPER_ID_CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+          DEVELOPER_ID_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: |
+          # A keychain of its own, with a password made for this run, which the last step deletes.
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(openssl rand -base64 24)"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+
+          certificate="$RUNNER_TEMP/certificate.p12"
+          echo "$DEVELOPER_ID_CERTIFICATE" | base64 --decode > "$certificate"
+          security import "$certificate" -k "$keychain" -P "$DEVELOPER_ID_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign
+          rm "$certificate"
+
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" \
+            > /dev/null
+          security list-keychains -d user -s "$keychain" \
+            $(security list-keychains -d user | tr -d '"')
+
+          # Notarization needs the hardened runtime and a secure timestamp.
+          codesign --sign "Developer ID Application" --keychain "$keychain" \
+            --options runtime --timestamp --identifier dev.oktana.allume-web-export \
+            "$BIN/allume-web-export"
+          codesign --verify --strict --verbose=2 "$BIN/allume-web-export"
+
+      - name: Package
+        run: |
+          # The binary finds its resource bundle beside it, so the two travel together.
+          package="$RUNNER_TEMP/package"
+          mkdir "$package"
+          cp "$BIN/allume-web-export" "$package/"
+          cp -R "$BIN/allume-web-export_AllumeWeb.bundle" "$package/"
+
+          # The binary's signature is inside it, so the zip goes without macOS's metadata files.
+          ditto -c -k --norsrc --noextattr --noacl "$package" "$ZIP"
+
+      - name: Notarize
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          credentials=(--apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD")
+
+          xcrun notarytool submit "$ZIP" "${credentials[@]}" --wait --output-format json \
+            > "$RUNNER_TEMP/notarization.json"
+          cat "$RUNNER_TEMP/notarization.json"
+
+          if [ "$(jq -r .status "$RUNNER_TEMP/notarization.json")" != "Accepted" ]; then
+            xcrun notarytool log "$(jq -r .id "$RUNNER_TEMP/notarization.json")" "${credentials[@]}"
+            exit 1
+          fi
+
+      - name: Commit and tag the version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git commit -m "chore: release v$VERSION" Sources/AllumeWebCLI/Version.swift
+          git tag -a "v$VERSION" -m "v$VERSION"
+
+          # Git reaches the token through gh, in this step and the undo step alone.
+          gh auth setup-git
+
+          # The first thing to reach GitHub, once the tool is built, signed and notarized. Both or
+          # neither, so main having moved on leaves no stray tag.
+          git push --atomic origin HEAD:main "refs/tags/v$VERSION"
+
+          # Tells the undo step there's a commit and a tag to undo.
+          echo "PUSHED=true" >> "$GITHUB_ENV"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shasum -a 256 "$ZIP" > "$ZIP.sha256"
+
+          # Drafted first, since an immutable release takes no more files once published.
+          gh release create "v$VERSION" "$ZIP" "$ZIP.sha256" --draft --verify-tag \
+            --title "v$VERSION" --generate-notes
+          gh release edit "v$VERSION" --draft=false
+
+      - name: Undo the version if publishing failed
+        if: failure() && env.PUSHED == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # A release published although its step failed stays, since its tag can't be reused.
+          if [ "$(gh release view "v$VERSION" --json isDraft --jq .isDraft)" = false ]; then
+            exit 0
+          fi
+
+          gh release delete "v$VERSION" --yes || true
+          git push --delete origin "v$VERSION"
+
+          git revert --no-edit HEAD
+          git commit --amend -m "chore: revert the failed release v$VERSION"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Delete the keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true

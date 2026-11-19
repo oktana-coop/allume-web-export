@@ -198,6 +198,11 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 Run `swift test`. See [docs/Testing.md](docs/Testing.md) for the unit, integration and
 end-to-end tests, how to run some of them, and how to update the expected output.
 
+### Releasing
+
+A workflow on GitHub tests, builds, signs, notarizes and publishes each release. See
+[docs/Releasing.md](docs/Releasing.md) for instructions.
+
 ## License
 
 [AGPL-3.0](LICENSE).

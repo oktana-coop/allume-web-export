@@ -9,6 +9,7 @@ struct AllumeWebExportCommand: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "allume-web-export",
     abstract: "Publishes an Allume board export on the web.",
+    version: toolVersion,
     subcommands: [SiteCommand.self, EmbedCommand.self]
   )
 }
